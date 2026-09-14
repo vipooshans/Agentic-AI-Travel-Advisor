@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/shared/" />
+  <Folder Name="/shared/Core/">
+    <Project Path="shared/Core/TravelAdvisor.Core.csproj" />
+  </Folder>
+  <Folder Name="/shared/Infrastructure/">
+    <Project Path="shared/Infrastructure/TravelAdvisor.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/web-api/">
+    <Project Path="web-api/TravelAdvisor.Api.csproj" />
+  </Folder>
+  <Folder Name="/web-app/">
+    <Project Path="web-app/TravelAdvisor.Web.csproj" />
+  </Folder>
+</Solution>
