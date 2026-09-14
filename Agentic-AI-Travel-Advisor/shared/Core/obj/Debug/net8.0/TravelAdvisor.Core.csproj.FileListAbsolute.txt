@@ -1,0 +1,13 @@
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Core\bin\Debug\net8.0\TravelAdvisor.Core.deps.json
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Core\bin\Debug\net8.0\TravelAdvisor.Core.dll
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Core\bin\Debug\net8.0\TravelAdvisor.Core.pdb
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Core\obj\Debug\net8.0\TravelAdvisor.Core.csproj.AssemblyReference.cache
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Core\obj\Debug\net8.0\TravelAdvisor.Core.GeneratedMSBuildEditorConfig.editorconfig
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Core\obj\Debug\net8.0\TravelAdvisor.Core.AssemblyInfoInputs.cache
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Core\obj\Debug\net8.0\TravelAdvisor.Core.AssemblyInfo.cs
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Core\obj\Debug\net8.0\TravelAdvisor.Core.csproj.CoreCompileInputs.cache
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Core\obj\Debug\net8.0\TravelAdvisor.Core.sourcelink.json
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Core\obj\Debug\net8.0\TravelAdvisor.Core.dll
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Core\obj\Debug\net8.0\refint\TravelAdvisor.Core.dll
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Core\obj\Debug\net8.0\TravelAdvisor.Core.pdb
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Core\obj\Debug\net8.0\ref\TravelAdvisor.Core.dll

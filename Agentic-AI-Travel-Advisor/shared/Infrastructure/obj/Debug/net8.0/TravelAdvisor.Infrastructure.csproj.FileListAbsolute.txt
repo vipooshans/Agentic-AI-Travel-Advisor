@@ -1,0 +1,16 @@
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\bin\Debug\net8.0\TravelAdvisor.Infrastructure.deps.json
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\bin\Debug\net8.0\TravelAdvisor.Infrastructure.dll
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\bin\Debug\net8.0\TravelAdvisor.Infrastructure.pdb
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\bin\Debug\net8.0\TravelAdvisor.Core.dll
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\bin\Debug\net8.0\TravelAdvisor.Core.pdb
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\obj\Debug\net8.0\TravelAdvisor.Infrastructure.csproj.AssemblyReference.cache
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\obj\Debug\net8.0\TravelAdvisor.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\obj\Debug\net8.0\TravelAdvisor.Infrastructure.AssemblyInfoInputs.cache
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\obj\Debug\net8.0\TravelAdvisor.Infrastructure.AssemblyInfo.cs
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\obj\Debug\net8.0\TravelAdvisor.Infrastructure.csproj.CoreCompileInputs.cache
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\obj\Debug\net8.0\TravelAdvisor.Infrastructure.sourcelink.json
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\obj\Debug\net8.0\TravelAd.8440AE67.Up2Date
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\obj\Debug\net8.0\TravelAdvisor.Infrastructure.dll
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\obj\Debug\net8.0\refint\TravelAdvisor.Infrastructure.dll
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\obj\Debug\net8.0\TravelAdvisor.Infrastructure.pdb
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\obj\Debug\net8.0\ref\TravelAdvisor.Infrastructure.dll
