@@ -48,10 +48,10 @@
     --bs-danger-rgb: 239, 68, 68;
     --bs-body-font-family: var(--sans);
     --bs-body-color: var(--text);
-    --bs-body-bg: var(--cream);
-    --bs-border-radius: 0.85rem;
-    --bs-link-color: #8c6d45;
-    --bs-link-hover-color: #12161f;
+    --bs-body-bg: var(--page);
+    --bs-border-radius: 0.625rem;
+    --bs-link-color: var(--primary);
+    --bs-link-hover-color: var(--primary-600);
 }
 
 html, body {
