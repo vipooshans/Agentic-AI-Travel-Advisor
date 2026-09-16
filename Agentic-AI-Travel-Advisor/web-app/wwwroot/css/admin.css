@@ -60,9 +60,18 @@ html, body {
 
 body {
     font-family: var(--sans);
+    font-size: 0.9375rem;
+    line-height: 1.55;
     color: var(--text);
-    background: var(--cream);
-    letter-spacing: 0.01em;
+    background: var(--page);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text);
+    font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
 .admin-wrapper {
