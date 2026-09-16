@@ -1,26 +1,27 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using TravelAdvisor.Core.Enums;
 using TravelAdvisor.Web.Models;
 
 namespace TravelAdvisor.Web.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
-    {
-        _logger = logger;
-    }
-
     public IActionResult Index()
     {
-        return View();
-    }
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+            return role switch
+            {
+                RoleNames.Admin => RedirectToAction("Dashboard", "Admin"),
+                RoleNames.HotelOwner => RedirectToAction("Dashboard", "Owner"),
+                RoleNames.TravelAgent => RedirectToAction("Dashboard", "Agent"),
+                _ => RedirectToAction("AccessDenied", "Account")
+            };
+        }
 
-    public IActionResult Privacy()
-    {
-        return View();
+        return RedirectToAction("Login", "Account");
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

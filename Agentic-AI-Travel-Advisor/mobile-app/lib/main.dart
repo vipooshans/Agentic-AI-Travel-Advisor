@@ -1,25 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'providers/auth_provider.dart';
+import 'routes/app_router.dart';
+import 'services/auth_service.dart';
 
 void main() {
-  runApp(const TravelAdvisorApp());
-}
+  final authProvider = AuthProvider(AuthService());
+  final router = createAppRouter(authProvider);
 
-class TravelAdvisorApp extends StatelessWidget {
-  const TravelAdvisorApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Travel Advisor',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const Scaffold(
-        body: Center(
-          child: Text('Agentic AI Travel Advisor'),
-        ),
-      ),
-    );
-  }
+  runApp(
+    ChangeNotifierProvider.value(
+      value: authProvider,
+      child: TravelAdvisorApp(router: router),
+    ),
+  );
 }

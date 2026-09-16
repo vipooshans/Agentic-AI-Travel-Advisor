@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "Access Denied";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body class="d-flex align-items-center justify-content-center vh-100 bg-light">
+    <div class="text-center">
+        <h1 class="display-6">Access Denied</h1>
+        <p class="text-muted">Your account does not have access to the admin portal.</p>
+        <p class="text-muted">Regular users should use the mobile app.</p>
+        <a asp-controller="Account" asp-action="Login" class="btn btn-primary">Back to Login</a>
+    </div>
+</body>
+</html>

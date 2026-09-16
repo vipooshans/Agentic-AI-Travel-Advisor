@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using TravelAdvisor.Core.DTOs.Auth;
+using TravelAdvisor.Web.Models;
 
 namespace TravelAdvisor.Web.Services;
 
@@ -36,6 +37,11 @@ public class ApiAuthService
         if (auth is null)
         {
             return (false, "Invalid response from server.");
+        }
+
+        if (auth.User.Role == "USER")
+        {
+            return (false, "Regular users should use the mobile app.");
         }
 
         await SignInAsync(auth);
@@ -88,6 +94,3 @@ public class ApiAuthService
         public string? Message { get; set; }
     }
 }
-
-// Alias for view model used in service
-using LoginViewModel = TravelAdvisor.Web.Models.LoginViewModel;
