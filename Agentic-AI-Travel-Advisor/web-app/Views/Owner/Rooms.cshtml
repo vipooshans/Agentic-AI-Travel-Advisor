@@ -1,0 +1,20 @@
+@model List<TravelAdvisor.Core.DTOs.Hotels.RoomDto>
+@{ Layout = "_AdminLayout"; var hotel = ViewBag.Hotel as TravelAdvisor.Core.DTOs.Hotels.HotelDetailDto; }
+
+<div class="d-flex justify-content-between mb-3">
+    <h5>Rooms - @hotel?.Name</h5>
+    <a asp-action="AddRoom" asp-route-hotelId="@hotel?.Id" class="btn btn-primary btn-sm">Add Room</a>
+</div>
+<table class="table table-striped">
+    <thead><tr><th>Name</th><th>Type</th><th>Price/Night</th><th>Capacity</th><th>Available</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var r in Model)
+    {
+        <tr>
+            <td>@r.Name</td><td>@r.RoomType</td><td>$@r.PricePerNight</td><td>@r.Capacity</td>
+            <td><span class="badge @(r.IsAvailable ? "bg-success" : "bg-danger")">@(r.IsAvailable ? "Yes" : "No")</span></td>
+            <td><a asp-action="EditRoom" asp-route-hotelId="@r.HotelId" asp-route-roomId="@r.Id" class="btn btn-sm btn-outline-primary">Edit</a></td>
+        </tr>
+    }
+    </tbody>
+</table>

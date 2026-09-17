@@ -1,0 +1,22 @@
+@model List<TravelAdvisor.Core.DTOs.Hotels.HotelDto>
+@{ Layout = "_AdminLayout"; }
+
+<div class="d-flex justify-content-between mb-3">
+    <h5>My Hotels</h5>
+    <a asp-action="CreateHotel" class="btn btn-primary btn-sm">Add Hotel</a>
+</div>
+<table class="table table-striped">
+    <thead><tr><th>Name</th><th>City</th><th>Country</th><th>Rooms</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var h in Model)
+    {
+        <tr>
+            <td>@h.Name</td><td>@h.City</td><td>@h.Country</td><td>@h.RoomCount</td>
+            <td>
+                <a asp-action="EditHotel" asp-route-id="@h.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                <a asp-action="Rooms" asp-route-id="@h.Id" class="btn btn-sm btn-outline-secondary">Rooms</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

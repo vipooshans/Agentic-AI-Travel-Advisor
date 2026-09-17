@@ -10,6 +10,7 @@ public class AdminController : Controller
     {
         ViewData["Title"] = "Admin Dashboard";
         ViewData["Role"] = "Administrator";
+        ViewData["Portal"] = "Admin";
         return View();
     }
 }

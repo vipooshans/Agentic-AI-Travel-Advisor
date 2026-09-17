@@ -12,5 +12,6 @@ public class TravelPackage
 
     public ApplicationUser Agent { get; set; } = null!;
     public Destination Destination { get; set; } = null!;
+    public ICollection<PackageActivity> Activities { get; set; } = [];
     public ICollection<Booking> Bookings { get; set; } = [];
 }

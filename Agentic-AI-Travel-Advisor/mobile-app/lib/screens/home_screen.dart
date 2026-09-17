@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../models/destination.dart';
 import '../providers/auth_provider.dart';
+import '../services/destination_service.dart';
+import '../widgets/destination_card.dart';
+import '../widgets/loading_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -10,65 +14,84 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final user = auth.user;
+    final service = DestinationService(auth.api);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Travel Advisor'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await auth.logout();
-              if (context.mounted) context.go('/login');
-            },
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
+      appBar: AppBar(title: const Text('Travel Advisor')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Hello, ${user?.firstName ?? 'Traveler'}!',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+            Text('Hello, ${auth.user?.firstName ?? 'Traveler'}!', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 8),
-            Text(
-              user?.email ?? '',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey.shade600,
-                  ),
+            Text('Where would you like to go?', style: TextStyle(color: Colors.grey.shade600)),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(child: _QuickLink(icon: Icons.explore, label: 'Destinations', onTap: () => context.go('/destinations'))),
+                const SizedBox(width: 12),
+                Expanded(child: _QuickLink(icon: Icons.hotel, label: 'Hotels', onTap: () => context.go('/destinations'))),
+                const SizedBox(width: 12),
+                Expanded(child: _QuickLink(icon: Icons.card_travel, label: 'Packages', onTap: () => context.go('/destinations'))),
+              ],
             ),
-            const SizedBox(height: 32),
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.explore, color: Colors.blue),
-                title: const Text('Plan a Trip'),
-                subtitle: const Text('AI-powered travel planning coming soon'),
-                onTap: () {},
-              ),
-            ),
+            const SizedBox(height: 24),
+            Text('Featured Destinations', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.bookmark, color: Colors.green),
-                title: const Text('My Bookings'),
-                subtitle: const Text('View your reservations'),
-                onTap: () {},
-              ),
-            ),
-            const SizedBox(height: 12),
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.map, color: Colors.orange),
-                title: const Text('Itineraries'),
-                subtitle: const Text('Your travel itineraries'),
-                onTap: () {},
+            SizedBox(
+              height: 200,
+              child: FutureBuilder<List<Destination>>(
+                future: service.getAll(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) return const LoadingWidget();
+                  final items = snapshot.data ?? [];
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: items.length,
+                    itemBuilder: (_, i) => SizedBox(
+                      width: 160,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: DestinationCard(
+                          destination: items[i],
+                          onTap: () => context.push('/destinations/${items[i].id}'),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _QuickLink extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _QuickLink({required this.icon, required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            children: [
+              Icon(icon, color: Colors.blue),
+              const SizedBox(height: 8),
+              Text(label, style: const TextStyle(fontSize: 12)),
+            ],
+          ),
         ),
       ),
     );

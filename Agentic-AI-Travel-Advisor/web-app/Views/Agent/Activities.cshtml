@@ -1,0 +1,39 @@
+@model TravelAdvisor.Core.DTOs.Packages.TravelPackageDetailDto
+@{ Layout = "_AdminLayout"; }
+
+<h5 class="mb-3">Activities - @Model.Title</h5>
+
+<table class="table table-striped mb-4">
+    <thead><tr><th>Day</th><th>Title</th><th>Description</th><th>Price</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var a in Model.Activities)
+    {
+        <tr>
+            <td>@a.DayNumber</td><td>@a.Title</td><td>@a.Description</td><td>$@a.Price</td>
+            <td>
+                <form asp-action="DeleteActivity" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="packageId" value="@Model.Id" />
+                    <input type="hidden" name="activityId" value="@a.Id" />
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<div class="card"><div class="card-body">
+    <h6>Add Activity</h6>
+    <form asp-action="AddActivity" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="PackageId" value="@Model.Id" />
+        <div class="row g-3">
+            <div class="col-md-4"><input name="Title" class="form-control" placeholder="Title" required /></div>
+            <div class="col-md-3"><input name="Description" class="form-control" placeholder="Description" /></div>
+            <div class="col-md-1"><input name="DayNumber" class="form-control" type="number" value="1" placeholder="Day" /></div>
+            <div class="col-md-2"><input name="Price" class="form-control" type="number" step="0.01" value="0" placeholder="Price" /></div>
+            <div class="col-md-2"><button type="submit" class="btn btn-primary w-100">Add</button></div>
+        </div>
+    </form>
+</div></div>

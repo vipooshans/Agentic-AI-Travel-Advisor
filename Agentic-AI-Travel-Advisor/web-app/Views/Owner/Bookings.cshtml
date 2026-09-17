@@ -1,0 +1,17 @@
+@model List<TravelAdvisor.Core.DTOs.Bookings.BookingDto>
+@{ Layout = "_AdminLayout"; }
+
+<h5 class="mb-3">Hotel Bookings</h5>
+<table class="table table-striped">
+    <thead><tr><th>Guest</th><th>Room</th><th>Hotel</th><th>Check-in</th><th>Check-out</th><th>Total</th><th>Status</th></tr></thead>
+    <tbody>
+    @foreach (var b in Model)
+    {
+        <tr>
+            <td>@b.UserEmail</td><td>@b.RoomName</td><td>@b.HotelName</td>
+            <td>@b.CheckIn.ToString("yyyy-MM-dd")</td><td>@b.CheckOut.ToString("yyyy-MM-dd")</td>
+            <td>$@b.TotalPrice</td><td>@b.Status</td>
+        </tr>
+    }
+    </tbody>
+</table>

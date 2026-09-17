@@ -93,6 +93,16 @@ CREATE TABLE IF NOT EXISTS "ItineraryItems" (
     "SortOrder" INTEGER NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS "PackageActivities" (
+    "Id" SERIAL PRIMARY KEY,
+    "TravelPackageId" INTEGER NOT NULL REFERENCES "TravelPackages"("Id") ON DELETE CASCADE,
+    "Title" TEXT NOT NULL,
+    "Description" TEXT,
+    "DayNumber" INTEGER NOT NULL,
+    "Price" NUMERIC NOT NULL,
+    "SortOrder" INTEGER NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS "AIConversations" (
     "Id" SERIAL PRIMARY KEY,
     "UserId" TEXT NOT NULL REFERENCES "AspNetUsers"("Id"),

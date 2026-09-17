@@ -448,6 +448,40 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.ToTable("ItineraryItems");
                 });
 
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.PackageActivity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DayNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TravelPackageId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TravelPackageId");
+
+                    b.ToTable("PackageActivities");
+                });
+
             modelBuilder.Entity("TravelAdvisor.Core.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -701,6 +735,17 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.Navigation("Itinerary");
                 });
 
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.PackageActivity", b =>
+                {
+                    b.HasOne("TravelAdvisor.Core.Entities.TravelPackage", "TravelPackage")
+                        .WithMany("Activities")
+                        .HasForeignKey("TravelPackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TravelPackage");
+                });
+
             modelBuilder.Entity("TravelAdvisor.Core.Entities.Room", b =>
                 {
                     b.HasOne("TravelAdvisor.Core.Entities.Hotel", "Hotel")
@@ -784,6 +829,8 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.TravelPackage", b =>
                 {
+                    b.Navigation("Activities");
+
                     b.Navigation("Bookings");
                 });
 #pragma warning restore 612, 618
