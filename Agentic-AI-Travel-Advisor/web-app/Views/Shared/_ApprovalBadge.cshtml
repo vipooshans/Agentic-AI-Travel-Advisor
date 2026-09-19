@@ -1,0 +1,11 @@
+@using TravelAdvisor.Core.Enums
+@model ApprovalStatus
+@{
+    var (css, label) = Model switch
+    {
+        ApprovalStatus.Approved => ("bg-success", "Approved"),
+        ApprovalStatus.Rejected => ("bg-danger", "Rejected"),
+        _ => ("bg-warning text-dark", "Pending")
+    };
+}
+<span class="badge @css">@label</span>

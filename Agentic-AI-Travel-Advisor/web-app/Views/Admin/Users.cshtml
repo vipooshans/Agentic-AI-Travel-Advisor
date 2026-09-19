@@ -1,0 +1,51 @@
+@model List<TravelAdvisor.Core.DTOs.Auth.UserDto>
+@{
+    Layout = "_AdminLayout";
+    var filter = ViewBag.RoleFilter as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Users</h5>
+    <a asp-action="CreateUser" class="btn btn-primary btn-sm">Create owner / agent</a>
+</div>
+<div class="mb-3">
+    <a asp-action="Users" class="btn btn-sm @(string.IsNullOrEmpty(filter) ? "btn-secondary" : "btn-outline-secondary")">All</a>
+    <a asp-action="Users" asp-route-role="USER" class="btn btn-sm @(filter == "USER" ? "btn-secondary" : "btn-outline-secondary")">USER</a>
+    <a asp-action="Users" asp-route-role="HOTEL_OWNER" class="btn btn-sm @(filter == "HOTEL_OWNER" ? "btn-secondary" : "btn-outline-secondary")">Owners</a>
+    <a asp-action="Users" asp-route-role="TRAVEL_AGENT" class="btn btn-sm @(filter == "TRAVEL_AGENT" ? "btn-secondary" : "btn-outline-secondary")">Agents</a>
+    <a asp-action="Users" asp-route-role="ADMIN" class="btn btn-sm @(filter == "ADMIN" ? "btn-secondary" : "btn-outline-secondary")">Admins</a>
+</div>
+<table class="table table-striped">
+    <thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Created</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var u in Model)
+    {
+        <tr>
+            <td>@u.Email</td>
+            <td>@u.FirstName @u.LastName</td>
+            <td>@u.Role</td>
+            <td>@u.CreatedAt.ToString("yyyy-MM-dd")</td>
+            <td>
+                @if (u.IsActive)
+                {
+                    <span class="badge bg-success">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Inactive</span>
+                }
+            </td>
+            <td>
+                <form asp-action="SetUserActive" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@u.Id" />
+                    <input type="hidden" name="isActive" value="@((!u.IsActive).ToString().ToLowerInvariant())" />
+                    <button class="btn btn-sm @(u.IsActive ? "btn-outline-danger" : "btn-outline-success")">
+                        @(u.IsActive ? "Deactivate" : "Activate")
+                    </button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

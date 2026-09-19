@@ -34,4 +34,12 @@ class BookingService {
     }
     return Booking.fromJson(jsonDecode(response.body));
   }
+
+  Future<Booking> updateStatus(int id, int status) async {
+    final response = await _api.patch('/api/bookings/$id/status', {'status': status});
+    if (response.statusCode != 200) {
+      throw Exception(_api.parseErrorMessage(response) ?? 'Could not update booking');
+    }
+    return Booking.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+  }
 }

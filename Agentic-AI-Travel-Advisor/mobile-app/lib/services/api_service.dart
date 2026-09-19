@@ -35,6 +35,22 @@ class ApiService {
     return timeout == null ? future : future.timeout(timeout);
   }
 
+  Future<http.Response> put(String path, Map<String, dynamic> body) {
+    return http.put(
+      Uri.parse('${ApiConfig.baseUrl}$path'),
+      headers: _headers,
+      body: jsonEncode(body),
+    );
+  }
+
+  Future<http.Response> patch(String path, Map<String, dynamic> body) {
+    return http.patch(
+      Uri.parse('${ApiConfig.baseUrl}$path'),
+      headers: _headers,
+      body: jsonEncode(body),
+    );
+  }
+
   String? parseErrorMessage(http.Response response) {
     try {
       final data = jsonDecode(response.body) as Map<String, dynamic>;

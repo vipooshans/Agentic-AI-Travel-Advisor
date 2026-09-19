@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TravelAdvisor.Core.DTOs.Packages;
+using TravelAdvisor.Core.Enums;
 using TravelAdvisor.Web.Models;
 using TravelAdvisor.Web.Services;
 
@@ -23,10 +24,15 @@ public class AgentController : Controller
         ViewData["Portal"] = "Agent";
 
         var packages = await _api.GetMyPackagesAsync();
-        var bookings = await _api.GetBookingsAsync();
+        var report = await _api.GetReportSummaryAsync();
 
         ViewBag.PackageCount = packages.Count;
-        ViewBag.BookingCount = bookings.Count;
+        ViewBag.BookingCount = (report?.PendingBookings ?? 0) + (report?.ConfirmedBookings ?? 0);
+        ViewBag.PendingCount = report?.PendingBookings ?? 0;
+        ViewBag.ConfirmedCount = report?.ConfirmedBookings ?? 0;
+        ViewBag.CompletedCount = report?.CompletedBookings ?? 0;
+        ViewBag.PendingApprovals = report?.PendingPackageApprovals ?? 0;
+        ViewBag.Revenue = report?.Revenue ?? 0;
         ViewBag.DestinationCount = packages.Select(p => p.DestinationId).Distinct().Count();
 
         return View();
@@ -164,6 +170,16 @@ public class AgentController : Controller
         ViewData["Title"] = "Package Bookings";
         ViewData["Role"] = "Travel Agent";
         ViewData["Portal"] = "Agent";
+        ViewData["StatusController"] = "Agent";
         return View(await _api.GetBookingsAsync());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateBookingStatus(int id, BookingStatus status)
+    {
+        if (!await _api.UpdateBookingStatusAsync(id, status))
+            TempData["Error"] = "Could not update booking status.";
+        return RedirectToAction(nameof(Bookings));
     }
 }

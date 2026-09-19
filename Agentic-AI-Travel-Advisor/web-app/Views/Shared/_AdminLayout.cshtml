@@ -35,6 +35,11 @@
                 else
                 {
                     <a class="nav-link" asp-controller="Admin" asp-action="Dashboard">Dashboard</a>
+                    <a class="nav-link" asp-controller="Admin" asp-action="Users">Users</a>
+                    <a class="nav-link" asp-controller="Admin" asp-action="CreateUser">Create owner / agent</a>
+                    <a class="nav-link" asp-controller="Admin" asp-action="Hotels">Hotels</a>
+                    <a class="nav-link" asp-controller="Admin" asp-action="Packages">Packages</a>
+                    <a class="nav-link" asp-controller="Admin" asp-action="Bookings">Bookings</a>
                 }
             </nav>
         </aside>
@@ -49,7 +54,17 @@
                     </form>
                 </div>
             </header>
-            <main class="admin-content">@RenderBody()</main>
+            <main class="admin-content">
+                @if (TempData["Error"] is string error)
+                {
+                    <div class="alert alert-danger">@error</div>
+                }
+                @if (TempData["Success"] is string success)
+                {
+                    <div class="alert alert-success">@success</div>
+                }
+                @RenderBody()
+            </main>
         </div>
     </div>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

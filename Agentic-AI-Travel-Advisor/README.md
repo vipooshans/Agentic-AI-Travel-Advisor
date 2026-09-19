@@ -2,6 +2,15 @@
 
 Full-stack travel advisory platform with Flutter mobile app, ASP.NET Web API, MVC admin portal, and PostgreSQL.
 
+## Day 4 Features
+
+- Flutter USER hub: edit profile, travel preferences, cancel pending bookings, resume AI chat history
+- Hotel owner and travel agent portals: approval badges, pending booking requests, Confirm/Cancel/Complete, revenue stats
+- Admin portal: users (create owner/agent, activate/deactivate), hotel/package approval, booking monitor, live reports
+- Public catalog shows **Approved** hotels and packages only; new listings start as **Pending**
+
+USER stays on Flutter. Owner, Agent, and Admin use the MVC portal at `:7000`.
+
 ## Day 3 Features
 
 - AI chat that extracts destination, budget, dates, travelers, interests, and stay preference

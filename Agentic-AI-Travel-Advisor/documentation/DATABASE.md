@@ -17,9 +17,9 @@ Connection string in `web-api/appsettings.json`.
 | Roles | RBAC roles |
 | AspNetUsers | Users with profile + RoleId |
 | Destinations | Travel destinations |
-| Hotels | Hotel listings (owner FK) |
+| Hotels | Hotel listings (owner FK, `ApprovalStatus`) |
 | Rooms | Hotel rooms |
-| TravelPackages | Agent packages (destination FK) |
+| TravelPackages | Agent packages (destination FK, `ApprovalStatus`) |
 | PackageActivities | Activities within packages (Day 2) |
 | Bookings | Room or package reservations |
 | TravelPreferences | User preferences (1:1) |
@@ -40,3 +40,6 @@ On API startup, `DbSeeder` creates:
 - `InitialCreate` — core schema
 - `AddPackageActivity` — PackageActivities table
 - `AddItineraryPlanFields` — Itineraries.EstimatedCost, DestinationId, Summary
+- `AddApprovalStatus` — `Hotels.ApprovalStatus` and `TravelPackages.ApprovalStatus` (`Pending=0`, `Approved=1`, `Rejected=2`). Existing rows default to **Approved** so the public catalog stays visible.
+
+`ApprovalStatus` on new hotels/packages is **Pending**. Seeded catalog listings are **Approved**. Public `GET /api/hotels` and `GET /api/packages` filter to Approved. Bookings ignore Cancelled rows for overlap checks.

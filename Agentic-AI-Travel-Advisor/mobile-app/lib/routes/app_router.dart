@@ -14,6 +14,9 @@ import '../screens/itinerary_list_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/package_detail_screen.dart';
 import '../screens/profile_screen.dart';
+import '../screens/conversation_list_screen.dart';
+import '../screens/edit_profile_screen.dart';
+import '../screens/preferences_screen.dart';
 import '../screens/register_screen.dart';
 import '../screens/splash_screen.dart';
 import '../widgets/main_shell.dart';
@@ -58,6 +61,9 @@ GoRouter createAppRouter(AuthProvider authProvider) {
           GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
         ],
       ),
+      GoRoute(path: '/profile/edit', builder: (_, __) => const EditProfileScreen()),
+      GoRoute(path: '/preferences', builder: (_, __) => const PreferencesScreen()),
+      GoRoute(path: '/conversations', builder: (_, __) => const ConversationListScreen()),
       GoRoute(
         path: '/destinations/:id',
         builder: (_, state) => DestinationDetailScreen(id: int.parse(state.pathParameters['id']!)),

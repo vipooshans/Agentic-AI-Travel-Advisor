@@ -356,6 +356,9 @@ namespace TravelAdvisor.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("ApprovalStatus")
+                        .HasColumnType("integer");
+
                     b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("text");
@@ -559,6 +562,9 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.Property<string>("AgentId")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("ApprovalStatus")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");

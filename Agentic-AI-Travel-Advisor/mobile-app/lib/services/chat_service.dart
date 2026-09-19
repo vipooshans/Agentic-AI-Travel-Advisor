@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../models/chat_message.dart';
+import '../models/conversation_summary.dart';
 import '../models/suggested_plan.dart';
 import 'api_service.dart';
 
@@ -39,5 +40,23 @@ class ChatService {
             : null,
       ),
     );
+  }
+
+  Future<List<ConversationSummary>> listConversations() async {
+    final response = await _api.get('/api/ai/conversations');
+    if (response.statusCode != 200) throw Exception('Failed to load conversations');
+    return (jsonDecode(response.body) as List)
+        .map((c) => ConversationSummary.fromJson(c as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<(int id, List<ChatMessage> messages)> getConversation(int id) async {
+    final response = await _api.get('/api/ai/conversations/$id');
+    if (response.statusCode != 200) throw Exception('Failed to load conversation');
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    final messages = (data['messages'] as List? ?? [])
+        .map((m) => ChatMessage.fromJson(m as Map<String, dynamic>))
+        .toList();
+    return ((data['id'] as num).toInt(), messages);
   }
 }

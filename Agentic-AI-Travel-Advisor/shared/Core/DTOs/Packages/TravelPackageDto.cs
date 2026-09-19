@@ -1,3 +1,5 @@
+using TravelAdvisor.Core.Enums;
+
 namespace TravelAdvisor.Core.DTOs.Packages;
 
 public class TravelPackageDto
@@ -11,6 +13,7 @@ public class TravelPackageDto
     public string DestinationName { get; set; } = string.Empty;
     public string DestinationCountry { get; set; } = string.Empty;
     public int ActivityCount { get; set; }
+    public ApprovalStatus ApprovalStatus { get; set; }
 }
 
 public class TravelPackageDetailDto : TravelPackageDto

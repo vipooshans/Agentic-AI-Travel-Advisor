@@ -2,11 +2,15 @@
 
 <div class="row g-4">
     <div class="col-md-4"><div class="stat-card"><h6>My Hotels</h6><p class="stat-value">@ViewBag.HotelCount</p></div></div>
-    <div class="col-md-4"><div class="stat-card"><h6>Total Rooms</h6><p class="stat-value">@ViewBag.RoomCount</p></div></div>
-    <div class="col-md-4"><div class="stat-card"><h6>Bookings</h6><p class="stat-value">@ViewBag.BookingCount</p></div></div>
+    <div class="col-md-4"><div class="stat-card"><h6>Rooms</h6><p class="stat-value">@ViewBag.RoomCount</p></div></div>
+    <div class="col-md-4"><div class="stat-card"><h6>Pending approvals</h6><p class="stat-value">@ViewBag.PendingApprovals</p></div></div>
+    <div class="col-md-4"><div class="stat-card"><h6>Pending bookings</h6><p class="stat-value">@ViewBag.PendingCount</p></div></div>
+    <div class="col-md-4"><div class="stat-card"><h6>Active bookings</h6><p class="stat-value">@ViewBag.BookingCount</p></div></div>
+    <div class="col-md-4"><div class="stat-card"><h6>Revenue</h6><p class="stat-value">$@(((decimal)(ViewBag.Revenue ?? 0)).ToString("N0"))</p></div></div>
 </div>
 <div class="card mt-4"><div class="card-body">
     <h5>Hotel Management</h5>
-    <p class="text-muted">Manage your hotels, rooms, and view bookings.</p>
+    <p class="text-muted">New hotels stay hidden from travelers until an admin approves them. Revenue includes confirmed and completed room bookings.</p>
     <a asp-action="Hotels" class="btn btn-primary">View Hotels</a>
+    <a asp-action="Bookings" class="btn btn-outline-primary">Booking requests</a>
 </div></div>

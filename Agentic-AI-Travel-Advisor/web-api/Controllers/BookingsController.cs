@@ -128,6 +128,42 @@ public class BookingsController : ControllerBase
         });
     }
 
+    [HttpPatch("{id}/status")]
+    public async Task<ActionResult<BookingDto>> UpdateStatus(int id, [FromBody] UpdateBookingStatusRequest request)
+    {
+        var booking = await _context.Bookings
+            .Include(b => b.Room).ThenInclude(r => r!.Hotel)
+            .Include(b => b.TravelPackage)
+            .Include(b => b.User)
+            .FirstOrDefaultAsync(b => b.Id == id);
+
+        if (booking is null)
+            return NotFound(new { message = "Booking not found." });
+
+        if (!CanAccessBooking(booking))
+            return Forbid();
+
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var role = User.FindFirstValue(ClaimTypes.Role) ?? string.Empty;
+        var isGuest = booking.UserId == userId && role == RoleNames.User;
+        var canManage = BookingStatusHelper.CanManageListing(booking, userId, role);
+
+        if (!isGuest && !canManage && role != RoleNames.Admin)
+            return Forbid();
+
+        if (role == RoleNames.HotelOwner && booking.Room is null)
+            return Forbid();
+        if (role == RoleNames.TravelAgent && booking.TravelPackage is null)
+            return Forbid();
+
+        if (!BookingStatusHelper.CanTransition(booking.Status, request.Status, role, isGuest))
+            return BadRequest(new { message = $"Cannot change status from {booking.Status} to {request.Status}." });
+
+        booking.Status = request.Status;
+        await _context.SaveChangesAsync();
+        return Ok(await MapToDtoAsync(booking.Id));
+    }
+
     private bool CanAccessBooking(Booking booking)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;

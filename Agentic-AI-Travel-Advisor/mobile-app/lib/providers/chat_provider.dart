@@ -78,6 +78,15 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
+  void loadConversation(int conversationId, List<ChatMessage> messages) {
+    _conversationId = conversationId;
+    _messages
+      ..clear()
+      ..addAll(messages);
+    _error = null;
+    notifyListeners();
+  }
+
   void reset() {
     _conversationId = null;
     _messages.clear();

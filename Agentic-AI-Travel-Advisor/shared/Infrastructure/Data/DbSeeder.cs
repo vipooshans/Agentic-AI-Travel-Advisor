@@ -95,7 +95,8 @@ public static class DbSeeder
                 Address = "123 Champs-Élysées",
                 City = "Paris",
                 Country = "France",
-                Description = "Luxury hotel in the heart of Paris"
+                Description = "Luxury hotel in the heart of Paris",
+                ApprovalStatus = ApprovalStatus.Approved
             };
             var tokyoHotel = new Hotel
             {
@@ -104,7 +105,8 @@ public static class DbSeeder
                 Address = "45 Shibuya Street",
                 City = "Tokyo",
                 Country = "Japan",
-                Description = "Modern hotel near Shibuya crossing"
+                Description = "Modern hotel near Shibuya crossing",
+                ApprovalStatus = ApprovalStatus.Approved
             };
             context.Hotels.AddRange(parisHotel, tokyoHotel);
             await context.SaveChangesAsync();
@@ -131,7 +133,8 @@ public static class DbSeeder
                 Title = "Paris Romance Getaway",
                 Description = "5 days exploring Paris including Eiffel Tower, Louvre, and Seine cruise",
                 Price = 1299,
-                DurationDays = 5
+                DurationDays = 5,
+                ApprovalStatus = ApprovalStatus.Approved
             };
             var baliPkg = new TravelPackage
             {
@@ -140,7 +143,8 @@ public static class DbSeeder
                 Title = "Bali Adventure Package",
                 Description = "7 days of beaches, temples, and rice terraces",
                 Price = 899,
-                DurationDays = 7
+                DurationDays = 7,
+                ApprovalStatus = ApprovalStatus.Approved
             };
             var tokyoPkg = new TravelPackage
             {
@@ -149,7 +153,8 @@ public static class DbSeeder
                 Title = "Tokyo Explorer",
                 Description = "4 days discovering Tokyo's highlights",
                 Price = 749,
-                DurationDays = 4
+                DurationDays = 4,
+                ApprovalStatus = ApprovalStatus.Approved
             };
             context.TravelPackages.AddRange(parisPkg, baliPkg, tokyoPkg);
             await context.SaveChangesAsync();
@@ -209,7 +214,8 @@ public static class DbSeeder
                 Address = "Passara Road",
                 City = "Ella",
                 Country = "Sri Lanka",
-                Description = "Budget-friendly inn with views over Ella Gap"
+                Description = "Budget-friendly inn with views over Ella Gap",
+                ApprovalStatus = ApprovalStatus.Approved
             };
             var ellaLodge = new Hotel
             {
@@ -218,7 +224,8 @@ public static class DbSeeder
                 Address = "Wellness Place, Ella",
                 City = "Ella",
                 Country = "Sri Lanka",
-                Description = "Mid-range lodge near Little Adam's Peak"
+                Description = "Mid-range lodge near Little Adam's Peak",
+                ApprovalStatus = ApprovalStatus.Approved
             };
             var kandyHotel = new Hotel
             {
@@ -227,7 +234,8 @@ public static class DbSeeder
                 Address = "Lake Drive",
                 City = "Kandy",
                 Country = "Sri Lanka",
-                Description = "Lakeside stay walking distance from the Temple of the Tooth"
+                Description = "Lakeside stay walking distance from the Temple of the Tooth",
+                ApprovalStatus = ApprovalStatus.Approved
             };
             var galleHotel = new Hotel
             {
@@ -236,7 +244,8 @@ public static class DbSeeder
                 Address = "Church Street, Galle Fort",
                 City = "Galle",
                 Country = "Sri Lanka",
-                Description = "Heritage guesthouse inside the Dutch Fort"
+                Description = "Heritage guesthouse inside the Dutch Fort",
+                ApprovalStatus = ApprovalStatus.Approved
             };
             context.Hotels.AddRange(ellaInn, ellaLodge, kandyHotel, galleHotel);
             await context.SaveChangesAsync();
@@ -266,7 +275,8 @@ public static class DbSeeder
                 Title = "Ella Hills Escape",
                 Description = "3 days of hill-country hikes, Nine Arch Bridge, and tea estates. Hotel not included.",
                 Price = 28000,
-                DurationDays = 3
+                DurationDays = 3,
+                ApprovalStatus = ApprovalStatus.Approved
             };
             var kandyPkg = new TravelPackage
             {
@@ -275,7 +285,8 @@ public static class DbSeeder
                 Title = "Kandy Cultural Weekend",
                 Description = "3 days covering the Temple of the Tooth, Peradeniya Gardens, and city walks.",
                 Price = 30000,
-                DurationDays = 3
+                DurationDays = 3,
+                ApprovalStatus = ApprovalStatus.Approved
             };
             var gallePkg = new TravelPackage
             {
@@ -284,7 +295,8 @@ public static class DbSeeder
                 Title = "Galle Fort Getaway",
                 Description = "3 days exploring Galle Fort, Unawatuna beach, and the lighthouse.",
                 Price = 29000,
-                DurationDays = 3
+                DurationDays = 3,
+                ApprovalStatus = ApprovalStatus.Approved
             };
             context.TravelPackages.AddRange(ellaPkg, kandyPkg, gallePkg);
             await context.SaveChangesAsync();

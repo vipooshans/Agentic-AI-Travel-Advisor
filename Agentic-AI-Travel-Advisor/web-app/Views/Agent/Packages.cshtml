@@ -5,13 +5,15 @@
     <h5>My Packages</h5>
     <a asp-action="CreatePackage" class="btn btn-primary btn-sm">Create Package</a>
 </div>
+<p class="text-muted">Rejected packages can be edited and are resubmitted as Pending.</p>
 <table class="table table-striped">
-    <thead><tr><th>Title</th><th>Destination</th><th>Duration</th><th>Price</th><th>Activities</th><th></th></tr></thead>
+    <thead><tr><th>Title</th><th>Destination</th><th>Duration</th><th>Price</th><th>Activities</th><th>Approval</th><th></th></tr></thead>
     <tbody>
     @foreach (var p in Model)
     {
         <tr>
             <td>@p.Title</td><td>@p.DestinationName</td><td>@p.DurationDays days</td><td>$@p.Price</td><td>@p.ActivityCount</td>
+            <td>@await Html.PartialAsync("_ApprovalBadge", p.ApprovalStatus)</td>
             <td>
                 <a asp-action="EditPackage" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary">Edit</a>
                 <a asp-action="Activities" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">Activities</a>

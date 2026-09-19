@@ -34,6 +34,9 @@ public static class BookingHelper
             if (room is null)
                 return (false, "Room not found.", 0, default);
 
+            if (room.Hotel.ApprovalStatus != ApprovalStatus.Approved)
+                return (false, "Hotel is not approved for booking.", 0, default);
+
             if (!room.IsAvailable)
                 return (false, "Room is not available.", 0, default);
 
@@ -58,6 +61,9 @@ public static class BookingHelper
 
         if (package is null)
             return (false, "Travel package not found.", 0, default);
+
+        if (package.ApprovalStatus != ApprovalStatus.Approved)
+            return (false, "Package is not approved for booking.", 0, default);
 
         var packageCheckOut = checkIn.Date.AddDays(package.DurationDays);
         var activityTotal = package.Activities.Sum(a => a.Price);

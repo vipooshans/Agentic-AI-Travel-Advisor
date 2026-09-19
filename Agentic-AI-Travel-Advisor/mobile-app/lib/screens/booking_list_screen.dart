@@ -1,26 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/booking.dart';
 import '../providers/auth_provider.dart';
 import '../services/booking_service.dart';
 import '../widgets/booking_card.dart';
 import '../widgets/error_widget.dart';
 import '../widgets/loading_widget.dart';
 
-class BookingListScreen extends StatelessWidget {
+class BookingListScreen extends StatefulWidget {
   const BookingListScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final service = BookingService(context.read<AuthProvider>().api);
+  State<BookingListScreen> createState() => _BookingListScreenState();
+}
 
+class _BookingListScreenState extends State<BookingListScreen> {
+  late Future<List<Booking>> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _load();
+  }
+
+  Future<List<Booking>> _load() => BookingService(context.read<AuthProvider>().api).getAll();
+
+  Future<void> _cancel(Booking booking) async {
+    try {
+      await BookingService(context.read<AuthProvider>().api).updateStatus(booking.id, 2);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Booking cancelled')));
+      setState(() => _future = _load());
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('My Bookings')),
       body: FutureBuilder(
-        future: service.getAll(),
+        future: _future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) return const LoadingWidget();
-          if (snapshot.hasError) return ErrorDisplayWidget(message: snapshot.error.toString());
+          if (snapshot.hasError) {
+            return ErrorDisplayWidget(message: snapshot.error.toString(), onRetry: () => setState(() => _future = _load()));
+          }
           final bookings = snapshot.data ?? [];
           if (bookings.isEmpty) {
             return const Center(child: Text('No bookings yet. Explore and book a trip!'));
@@ -30,7 +58,10 @@ class BookingListScreen extends StatelessWidget {
             itemCount: bookings.length,
             itemBuilder: (_, i) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: BookingCard(booking: bookings[i]),
+              child: BookingCard(
+                booking: bookings[i],
+                onCancel: bookings[i].status == 0 ? () => _cancel(bookings[i]) : null,
+              ),
             ),
           );
         },

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TravelAdvisor.Core.DTOs.Hotels;
+using TravelAdvisor.Core.Enums;
 using TravelAdvisor.Web.Models;
 using TravelAdvisor.Web.Services;
 
@@ -23,11 +24,14 @@ public class OwnerController : Controller
         ViewData["Portal"] = "Owner";
 
         var hotels = await _api.GetMyHotelsAsync();
-        var bookings = await _api.GetBookingsAsync();
+        var report = await _api.GetReportSummaryAsync();
 
         ViewBag.HotelCount = hotels.Count;
         ViewBag.RoomCount = hotels.Sum(h => h.RoomCount);
-        ViewBag.BookingCount = bookings.Count;
+        ViewBag.BookingCount = (report?.PendingBookings ?? 0) + (report?.ConfirmedBookings ?? 0);
+        ViewBag.PendingCount = report?.PendingBookings ?? 0;
+        ViewBag.PendingApprovals = report?.PendingHotelApprovals ?? 0;
+        ViewBag.Revenue = report?.Revenue ?? 0;
 
         return View();
     }
@@ -210,6 +214,16 @@ public class OwnerController : Controller
         ViewData["Title"] = "Hotel Bookings";
         ViewData["Role"] = "Hotel Owner";
         ViewData["Portal"] = "Owner";
+        ViewData["StatusController"] = "Owner";
         return View(await _api.GetBookingsAsync());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateBookingStatus(int id, BookingStatus status)
+    {
+        if (!await _api.UpdateBookingStatusAsync(id, status))
+            TempData["Error"] = "Could not update booking status.";
+        return RedirectToAction(nameof(Bookings));
     }
 }

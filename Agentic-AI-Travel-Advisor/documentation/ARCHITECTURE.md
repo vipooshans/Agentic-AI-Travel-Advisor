@@ -49,3 +49,19 @@ LLM calls use an OpenAI-compatible Chat Completions client (`Ai:BaseUrl`, `Ai:Mo
 - **ItineraryAgent** — Builds a daily schedule and estimated cost from catalog matches
 
 Booking remains a separate Flutter + `/api/bookings` flow (no book-from-chat in Day 3).
+
+## Dashboards (Day 4)
+
+```
+Flutter USER  →  Web API  →  PostgreSQL
+MVC Owner     →  Web API
+MVC Agent     →  Web API
+MVC Admin     →  Web API
+```
+
+- **USER (Flutter)** — profile, bookings, itineraries, preferences, AI conversation history
+- **Owner** — hotels/rooms, approval status, room booking Confirm/Cancel/Complete, revenue
+- **Agent** — packages/activities, approval status, package booking actions, revenue
+- **Admin** — users, hotel/package approval, all bookings, report cards
+
+New hotels and packages are `Pending` until Admin approves. Public Flutter catalog and AI catalog tools only see `Approved` listings.

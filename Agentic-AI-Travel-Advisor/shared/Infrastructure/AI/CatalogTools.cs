@@ -56,7 +56,7 @@ public class CatalogTools : ICatalogTools
     {
         var rooms = _context.Rooms
             .Include(r => r.Hotel)
-            .Where(r => r.IsAvailable && r.Capacity >= minCapacity);
+            .Where(r => r.IsAvailable && r.Capacity >= minCapacity && r.Hotel.ApprovalStatus == Core.Enums.ApprovalStatus.Approved);
 
         if (!string.IsNullOrWhiteSpace(city))
         {
@@ -96,6 +96,7 @@ public class CatalogTools : ICatalogTools
         var packages = _context.TravelPackages
             .Include(p => p.Destination)
             .Include(p => p.Activities)
+            .Where(p => p.ApprovalStatus == Core.Enums.ApprovalStatus.Approved)
             .AsQueryable();
 
         if (destinationId.HasValue)

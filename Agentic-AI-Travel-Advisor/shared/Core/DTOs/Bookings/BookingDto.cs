@@ -26,3 +26,8 @@ public class CreateBookingRequest
     public DateTime CheckIn { get; set; }
     public DateTime? CheckOut { get; set; }
 }
+
+public class UpdateBookingStatusRequest
+{
+    public BookingStatus Status { get; set; }
+}

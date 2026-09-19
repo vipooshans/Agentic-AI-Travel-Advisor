@@ -1,37 +1,24 @@
-@{
-    Layout = "_AdminLayout";
-}
+@model TravelAdvisor.Core.DTOs.Reports.ReportSummaryDto?
+@{ Layout = "_AdminLayout"; }
 
 <div class="row g-4">
-    <div class="col-md-3">
-        <div class="stat-card">
-            <h6>Total Users</h6>
-            <p class="stat-value">—</p>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stat-card">
-            <h6>Active Bookings</h6>
-            <p class="stat-value">—</p>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stat-card">
-            <h6>Hotels</h6>
-            <p class="stat-value">—</p>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stat-card">
-            <h6>Travel Packages</h6>
-            <p class="stat-value">—</p>
-        </div>
-    </div>
+    <div class="col-md-3"><div class="stat-card"><h6>Total Users</h6><p class="stat-value">@(Model?.UserCount ?? 0)</p></div></div>
+    <div class="col-md-3"><div class="stat-card"><h6>Hotel Owners</h6><p class="stat-value">@(Model?.HotelOwnerCount ?? 0)</p></div></div>
+    <div class="col-md-3"><div class="stat-card"><h6>Travel Agents</h6><p class="stat-value">@(Model?.TravelAgentCount ?? 0)</p></div></div>
+    <div class="col-md-3"><div class="stat-card"><h6>Revenue</h6><p class="stat-value">$@((Model?.Revenue ?? 0).ToString("N0"))</p></div></div>
+    <div class="col-md-3"><div class="stat-card"><h6>Hotels</h6><p class="stat-value">@(Model?.HotelCount ?? 0)</p></div></div>
+    <div class="col-md-3"><div class="stat-card"><h6>Packages</h6><p class="stat-value">@(Model?.PackageCount ?? 0)</p></div></div>
+    <div class="col-md-3"><div class="stat-card"><h6>Hotel approvals pending</h6><p class="stat-value">@(Model?.PendingHotelApprovals ?? 0)</p></div></div>
+    <div class="col-md-3"><div class="stat-card"><h6>Package approvals pending</h6><p class="stat-value">@(Model?.PendingPackageApprovals ?? 0)</p></div></div>
+    <div class="col-md-3"><div class="stat-card"><h6>Pending bookings</h6><p class="stat-value">@(Model?.PendingBookings ?? 0)</p></div></div>
+    <div class="col-md-3"><div class="stat-card"><h6>Confirmed</h6><p class="stat-value">@(Model?.ConfirmedBookings ?? 0)</p></div></div>
+    <div class="col-md-3"><div class="stat-card"><h6>Completed</h6><p class="stat-value">@(Model?.CompletedBookings ?? 0)</p></div></div>
+    <div class="col-md-3"><div class="stat-card"><h6>Cancelled</h6><p class="stat-value">@(Model?.CancelledBookings ?? 0)</p></div></div>
 </div>
 
 <div class="card mt-4">
     <div class="card-body">
-        <h5>Welcome to the Admin Dashboard</h5>
-        <p class="text-muted mb-0">System overview and management tools will appear here.</p>
+        <h5>Reports</h5>
+        <p class="text-muted mb-0">Live counts from the API. Revenue is the sum of confirmed and completed booking totals. USER accounts stay on Flutter; create owners and agents from Users.</p>
     </div>
 </div>

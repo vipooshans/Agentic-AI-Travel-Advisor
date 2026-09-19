@@ -1,0 +1,23 @@
+@using TravelAdvisor.Core.Enums
+@model List<TravelAdvisor.Core.DTOs.Bookings.BookingDto>
+@{ Layout = "_AdminLayout"; }
+
+<h5 class="mb-2">All bookings</h5>
+<p class="text-muted">Monitor every booking and apply status changes. Highlighted rows are pending requests.</p>
+<table class="table table-striped">
+    <thead><tr><th>Guest</th><th>Listing</th><th>Check-in</th><th>Check-out</th><th>Total</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var b in Model)
+    {
+        <tr class="@(b.Status == BookingStatus.Pending ? "table-warning" : null)">
+            <td>@b.UserEmail</td>
+            <td>@(b.HotelName ?? b.PackageTitle)</td>
+            <td>@b.CheckIn.ToString("yyyy-MM-dd")</td>
+            <td>@b.CheckOut.ToString("yyyy-MM-dd")</td>
+            <td>$@b.TotalPrice</td>
+            <td>@await Html.PartialAsync("_BookingStatusBadge", b.Status)</td>
+            <td>@await Html.PartialAsync("_BookingStatusActions", b)</td>
+        </tr>
+    }
+    </tbody>
+</table>

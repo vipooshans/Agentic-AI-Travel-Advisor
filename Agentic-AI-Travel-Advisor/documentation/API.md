@@ -17,13 +17,16 @@ All protected endpoints require `Authorization: Bearer <token>`.
 
 ## Hotels
 
+Public list/detail return **Approved** hotels only. New hotels are `Pending` until an admin approves them. Editing a rejected hotel resubmits it as `Pending`.
+
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/api/hotels` | Public | List hotels (`?city=`, `?country=`) |
-| GET | `/api/hotels/mine` | HOTEL_OWNER | Owner's hotels |
-| GET | `/api/hotels/{id}` | Public | Hotel detail with rooms |
-| POST | `/api/hotels` | HOTEL_OWNER | Create hotel |
-| PUT | `/api/hotels/{id}` | HOTEL_OWNER | Update own hotel |
+| GET | `/api/hotels` | Public (Approved); ADMIN sees all (`?approvalStatus=`) | List hotels (`?city=`, `?country=`) |
+| GET | `/api/hotels/mine` | HOTEL_OWNER | Owner's hotels (all approval states) |
+| GET | `/api/hotels/{id}` | Public if Approved; owner/admin otherwise | Hotel detail with rooms |
+| POST | `/api/hotels` | HOTEL_OWNER | Create hotel (`Pending`) |
+| PUT | `/api/hotels/{id}` | HOTEL_OWNER | Update own hotel (Rejected → Pending) |
+| PATCH | `/api/hotels/{id}/approval` | ADMIN | `{ "status": 1 }` Approved or `{ "status": 2 }` Rejected |
 
 ## Rooms
 
@@ -36,13 +39,16 @@ All protected endpoints require `Authorization: Bearer <token>`.
 
 ## Packages
 
+Same approval rules as hotels. Public catalog is Approved-only.
+
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/api/packages` | Public | List packages (`?destinationId=`) |
-| GET | `/api/packages/mine` | TRAVEL_AGENT | Agent's packages |
-| GET | `/api/packages/{id}` | Public | Package detail with activities |
-| POST | `/api/packages` | TRAVEL_AGENT | Create package |
-| PUT | `/api/packages/{id}` | TRAVEL_AGENT | Update own package |
+| GET | `/api/packages` | Public (Approved); ADMIN sees all (`?approvalStatus=`) | List packages (`?destinationId=`) |
+| GET | `/api/packages/mine` | TRAVEL_AGENT | Agent's packages (all approval states) |
+| GET | `/api/packages/{id}` | Public if Approved; agent/admin otherwise | Package detail with activities |
+| POST | `/api/packages` | TRAVEL_AGENT | Create package (`Pending`) |
+| PUT | `/api/packages/{id}` | TRAVEL_AGENT | Update own package (Rejected → Pending) |
+| PATCH | `/api/packages/{id}/approval` | ADMIN | `{ "status": 1 \| 2 }` Approve or Reject |
 | POST | `/api/packages/{id}/activities` | TRAVEL_AGENT | Add activity |
 | DELETE | `/api/packages/{packageId}/activities/{activityId}` | TRAVEL_AGENT | Remove activity |
 
@@ -50,9 +56,12 @@ All protected endpoints require `Authorization: Bearer <token>`.
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| POST | `/api/bookings` | USER | Create booking (room or package) |
+| POST | `/api/bookings` | USER | Create booking (room or package); listing must be Approved |
 | GET | `/api/bookings` | Authenticated | Role-scoped booking list |
 | GET | `/api/bookings/{id}` | Authenticated | Single booking |
+| PATCH | `/api/bookings/{id}/status` | Guest / listing owner / agent / ADMIN | `{ "status": Confirmed\|Cancelled\|Completed }` |
+
+Allowed transitions: Pending → Confirmed (owner/agent/admin); Pending → Cancelled (guest or staff); Confirmed → Completed or Cancelled (owner/agent/admin). Illegal jumps return 400.
 
 ### Create Booking Example
 
@@ -83,7 +92,19 @@ Package booking (checkOut auto-calculated from duration):
 | POST | `/api/auth/register` | Register USER |
 | POST | `/api/auth/login` | Login, returns JWT |
 | GET | `/api/auth/me` | Current user |
+| PUT | `/api/auth/me` | Update first/last name |
 | GET | `/api/health` | Health check |
+
+## Users, preferences, reports (Day 4)
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/users` | ADMIN | List users (`?role=USER\|HOTEL_OWNER\|TRAVEL_AGENT\|ADMIN`) |
+| POST | `/api/users` | ADMIN | Create HOTEL_OWNER or TRAVEL_AGENT |
+| PATCH | `/api/users/{id}/active` | ADMIN | `{ "isActive": false }` activate/deactivate |
+| GET | `/api/users/me/preferences` | USER | Travel preferences |
+| PUT | `/api/users/me/preferences` | USER | `{ budgetMin, budgetMax, preferredClimate, interests }` |
+| GET | `/api/reports/summary` | Authenticated | Role-scoped counts and revenue (Confirmed + Completed `TotalPrice`) |
 
 ---
 

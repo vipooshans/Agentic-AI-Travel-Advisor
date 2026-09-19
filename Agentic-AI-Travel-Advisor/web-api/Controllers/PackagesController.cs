@@ -2,8 +2,10 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TravelAdvisor.Core.DTOs.Hotels;
 using TravelAdvisor.Core.DTOs.Packages;
 using TravelAdvisor.Core.Entities;
+using TravelAdvisor.Core.Enums;
 using TravelAdvisor.Infrastructure.Data;
 
 namespace TravelAdvisor.Api.Controllers;
@@ -20,12 +22,24 @@ public class PackagesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<TravelPackageDto>>> GetAll([FromQuery] int? destinationId)
+    public async Task<ActionResult<List<TravelPackageDto>>> GetAll(
+        [FromQuery] int? destinationId,
+        [FromQuery] ApprovalStatus? approvalStatus)
     {
         var query = _context.TravelPackages
             .Include(p => p.Destination)
             .Include(p => p.Activities)
             .AsQueryable();
+
+        if (User.Identity?.IsAuthenticated == true && User.IsInRole(RoleNames.Admin))
+        {
+            if (approvalStatus.HasValue)
+                query = query.Where(p => p.ApprovalStatus == approvalStatus.Value);
+        }
+        else
+        {
+            query = query.Where(p => p.ApprovalStatus == ApprovalStatus.Approved);
+        }
 
         if (destinationId.HasValue)
             query = query.Where(p => p.DestinationId == destinationId.Value);
@@ -42,7 +56,8 @@ public class PackagesController : ControllerBase
                 DestinationId = p.DestinationId,
                 DestinationName = p.Destination.Name,
                 DestinationCountry = p.Destination.Country,
-                ActivityCount = p.Activities.Count
+                ActivityCount = p.Activities.Count,
+                ApprovalStatus = p.ApprovalStatus
             })
             .ToListAsync();
 
@@ -69,7 +84,8 @@ public class PackagesController : ControllerBase
                 DestinationId = p.DestinationId,
                 DestinationName = p.Destination.Name,
                 DestinationCountry = p.Destination.Country,
-                ActivityCount = p.Activities.Count
+                ActivityCount = p.Activities.Count,
+                ApprovalStatus = p.ApprovalStatus
             })
             .ToListAsync();
 
@@ -84,7 +100,7 @@ public class PackagesController : ControllerBase
             .Include(p => p.Activities)
             .FirstOrDefaultAsync(p => p.Id == id);
 
-        if (package is null)
+        if (package is null || !CanViewPackage(package))
             return NotFound(new { message = "Package not found." });
 
         return Ok(MapToDetail(package));
@@ -106,7 +122,8 @@ public class PackagesController : ControllerBase
             Title = request.Title,
             Description = request.Description,
             Price = request.Price,
-            DurationDays = request.DurationDays
+            DurationDays = request.DurationDays,
+            ApprovalStatus = ApprovalStatus.Pending
         };
 
         _context.TravelPackages.Add(package);
@@ -124,7 +141,8 @@ public class PackagesController : ControllerBase
             DestinationId = package.DestinationId,
             DestinationName = destination!.Name,
             DestinationCountry = destination.Country,
-            ActivityCount = 0
+            ActivityCount = 0,
+            ApprovalStatus = package.ApprovalStatus
         });
     }
 
@@ -153,6 +171,8 @@ public class PackagesController : ControllerBase
         package.Description = request.Description;
         package.Price = request.Price;
         package.DurationDays = request.DurationDays;
+        if (package.ApprovalStatus == ApprovalStatus.Rejected)
+            package.ApprovalStatus = ApprovalStatus.Pending;
 
         await _context.SaveChangesAsync();
 
@@ -168,7 +188,8 @@ public class PackagesController : ControllerBase
             DestinationId = package.DestinationId,
             DestinationName = destination!.Name,
             DestinationCountry = destination.Country,
-            ActivityCount = package.Activities.Count
+            ActivityCount = package.Activities.Count,
+            ApprovalStatus = package.ApprovalStatus
         });
     }
 
@@ -230,6 +251,49 @@ public class PackagesController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Policy = "RequireAdmin")]
+    [HttpPatch("{id}/approval")]
+    public async Task<ActionResult<TravelPackageDto>> SetApproval(int id, [FromBody] UpdateApprovalRequest request)
+    {
+        if (request.Status is not ApprovalStatus.Approved and not ApprovalStatus.Rejected)
+            return BadRequest(new { message = "Status must be Approved or Rejected." });
+
+        var package = await _context.TravelPackages
+            .Include(p => p.Destination)
+            .Include(p => p.Activities)
+            .FirstOrDefaultAsync(p => p.Id == id);
+        if (package is null)
+            return NotFound(new { message = "Package not found." });
+
+        package.ApprovalStatus = request.Status;
+        await _context.SaveChangesAsync();
+        return Ok(new TravelPackageDto
+        {
+            Id = package.Id,
+            Title = package.Title,
+            Description = package.Description,
+            Price = package.Price,
+            DurationDays = package.DurationDays,
+            DestinationId = package.DestinationId,
+            DestinationName = package.Destination.Name,
+            DestinationCountry = package.Destination.Country,
+            ActivityCount = package.Activities.Count,
+            ApprovalStatus = package.ApprovalStatus
+        });
+    }
+
+    private bool CanViewPackage(TravelPackage package)
+    {
+        if (package.ApprovalStatus == ApprovalStatus.Approved)
+            return true;
+        if (User.Identity?.IsAuthenticated != true)
+            return false;
+        if (User.IsInRole(RoleNames.Admin))
+            return true;
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return package.AgentId == userId;
+    }
+
     private static TravelPackageDetailDto MapToDetail(TravelPackage package) => new()
     {
         Id = package.Id,
@@ -241,6 +305,7 @@ public class PackagesController : ControllerBase
         DestinationName = package.Destination.Name,
         DestinationCountry = package.Destination.Country,
         ActivityCount = package.Activities.Count,
+        ApprovalStatus = package.ApprovalStatus,
         Activities = package.Activities
             .OrderBy(a => a.DayNumber).ThenBy(a => a.SortOrder)
             .Select(a => new PackageActivityDto

@@ -22,8 +22,13 @@ public class RoomsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<RoomDto>>> GetAll(int hotelId)
     {
-        var hotelExists = await _context.Hotels.AnyAsync(h => h.Id == hotelId);
-        if (!hotelExists)
+        var hotel = await _context.Hotels.FirstOrDefaultAsync(h => h.Id == hotelId);
+        if (hotel is null)
+            return NotFound(new { message = "Hotel not found." });
+
+        var isOwnerOrAdmin = User.Identity?.IsAuthenticated == true &&
+            (User.IsInRole("ADMIN") || User.FindFirstValue(ClaimTypes.NameIdentifier) == hotel.OwnerId);
+        if (hotel.ApprovalStatus != TravelAdvisor.Core.Enums.ApprovalStatus.Approved && !isOwnerOrAdmin)
             return NotFound(new { message = "Hotel not found." });
 
         var rooms = await _context.Rooms

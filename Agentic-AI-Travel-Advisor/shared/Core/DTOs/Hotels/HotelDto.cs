@@ -1,3 +1,5 @@
+using TravelAdvisor.Core.Enums;
+
 namespace TravelAdvisor.Core.DTOs.Hotels;
 
 public class HotelDto
@@ -9,6 +11,7 @@ public class HotelDto
     public string Country { get; set; } = string.Empty;
     public string? Description { get; set; }
     public int RoomCount { get; set; }
+    public ApprovalStatus ApprovalStatus { get; set; }
 }
 
 public class HotelDetailDto : HotelDto
@@ -64,4 +67,9 @@ public class UpdateRoomRequest
 public class UpdateRoomAvailabilityRequest
 {
     public bool IsAvailable { get; set; }
+}
+
+public class UpdateApprovalRequest
+{
+    public ApprovalStatus Status { get; set; }
 }

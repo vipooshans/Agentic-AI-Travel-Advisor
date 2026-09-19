@@ -103,6 +103,23 @@ public class AuthController : ControllerBase
         return Ok(MapToUserDto(user));
     }
 
+    [Authorize]
+    [HttpPut("me")]
+    public async Task<ActionResult<UserDto>> UpdateMe([FromBody] UpdateProfileRequest request)
+    {
+        var user = await _userManager.Users
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Id == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+
+        if (user is null)
+            return NotFound(new { message = "User not found." });
+
+        user.FirstName = request.FirstName.Trim();
+        user.LastName = request.LastName.Trim();
+        await _userManager.UpdateAsync(user);
+        return Ok(MapToUserDto(user));
+    }
+
     private async Task<AuthResponse> BuildAuthResponse(ApplicationUser user)
     {
         if (user.Role is null)
@@ -126,6 +143,8 @@ public class AuthController : ControllerBase
         Email = user.Email ?? string.Empty,
         FirstName = user.FirstName,
         LastName = user.LastName,
-        Role = user.Role?.Name ?? string.Empty
+        Role = user.Role?.Name ?? string.Empty,
+        IsActive = user.IsActive,
+        CreatedAt = user.CreatedAt
     };
 }

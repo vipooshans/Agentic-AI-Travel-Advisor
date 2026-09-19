@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TravelAdvisor.Core.DTOs.Hotels;
 using TravelAdvisor.Core.Entities;
+using TravelAdvisor.Core.Enums;
 using TravelAdvisor.Infrastructure.Data;
 
 namespace TravelAdvisor.Api.Controllers;
@@ -20,9 +21,22 @@ public class HotelsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<HotelDto>>> GetAll([FromQuery] string? city, [FromQuery] string? country)
+    public async Task<ActionResult<List<HotelDto>>> GetAll(
+        [FromQuery] string? city,
+        [FromQuery] string? country,
+        [FromQuery] ApprovalStatus? approvalStatus)
     {
         var query = _context.Hotels.AsQueryable();
+
+        if (IsAdmin())
+        {
+            if (approvalStatus.HasValue)
+                query = query.Where(h => h.ApprovalStatus == approvalStatus.Value);
+        }
+        else
+        {
+            query = query.Where(h => h.ApprovalStatus == ApprovalStatus.Approved);
+        }
 
         if (!string.IsNullOrWhiteSpace(city))
             query = query.Where(h => h.City.ToLower() == city.ToLower());
@@ -40,7 +54,8 @@ public class HotelsController : ControllerBase
                 City = h.City,
                 Country = h.Country,
                 Description = h.Description,
-                RoomCount = h.Rooms.Count
+                RoomCount = h.Rooms.Count,
+                ApprovalStatus = h.ApprovalStatus
             })
             .ToListAsync();
 
@@ -63,7 +78,8 @@ public class HotelsController : ControllerBase
                 City = h.City,
                 Country = h.Country,
                 Description = h.Description,
-                RoomCount = h.Rooms.Count
+                RoomCount = h.Rooms.Count,
+                ApprovalStatus = h.ApprovalStatus
             })
             .ToListAsync();
 
@@ -77,7 +93,7 @@ public class HotelsController : ControllerBase
             .Include(h => h.Rooms)
             .FirstOrDefaultAsync(h => h.Id == id);
 
-        if (hotel is null)
+        if (hotel is null || !CanViewHotel(hotel))
             return NotFound(new { message = "Hotel not found." });
 
         return Ok(MapToDetail(hotel));
@@ -95,22 +111,14 @@ public class HotelsController : ControllerBase
             Address = request.Address,
             City = request.City,
             Country = request.Country,
-            Description = request.Description
+            Description = request.Description,
+            ApprovalStatus = ApprovalStatus.Pending
         };
 
         _context.Hotels.Add(hotel);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetById), new { id = hotel.Id }, new HotelDto
-        {
-            Id = hotel.Id,
-            Name = hotel.Name,
-            Address = hotel.Address,
-            City = hotel.City,
-            Country = hotel.Country,
-            Description = hotel.Description,
-            RoomCount = 0
-        });
+        return CreatedAtAction(nameof(GetById), new { id = hotel.Id }, MapDto(hotel));
     }
 
     [Authorize(Policy = "RequireHotelOwner")]
@@ -123,7 +131,7 @@ public class HotelsController : ControllerBase
         if (hotel is null)
             return NotFound(new { message = "Hotel not found." });
 
-        if (hotel.OwnerId != userId && !User.IsInRole("ADMIN"))
+        if (hotel.OwnerId != userId && !IsAdmin())
             return Forbid();
 
         hotel.Name = request.Name;
@@ -131,20 +139,54 @@ public class HotelsController : ControllerBase
         hotel.City = request.City;
         hotel.Country = request.Country;
         hotel.Description = request.Description;
+        if (hotel.ApprovalStatus == ApprovalStatus.Rejected)
+            hotel.ApprovalStatus = ApprovalStatus.Pending;
 
         await _context.SaveChangesAsync();
-
-        return Ok(new HotelDto
-        {
-            Id = hotel.Id,
-            Name = hotel.Name,
-            Address = hotel.Address,
-            City = hotel.City,
-            Country = hotel.Country,
-            Description = hotel.Description,
-            RoomCount = await _context.Rooms.CountAsync(r => r.HotelId == hotel.Id)
-        });
+        return Ok(MapDto(hotel, await _context.Rooms.CountAsync(r => r.HotelId == hotel.Id)));
     }
+
+    [Authorize(Policy = "RequireAdmin")]
+    [HttpPatch("{id}/approval")]
+    public async Task<ActionResult<HotelDto>> SetApproval(int id, [FromBody] UpdateApprovalRequest request)
+    {
+        if (request.Status is not ApprovalStatus.Approved and not ApprovalStatus.Rejected)
+            return BadRequest(new { message = "Status must be Approved or Rejected." });
+
+        var hotel = await _context.Hotels.FirstOrDefaultAsync(h => h.Id == id);
+        if (hotel is null)
+            return NotFound(new { message = "Hotel not found." });
+
+        hotel.ApprovalStatus = request.Status;
+        await _context.SaveChangesAsync();
+        return Ok(MapDto(hotel, await _context.Rooms.CountAsync(r => r.HotelId == hotel.Id)));
+    }
+
+    private bool IsAdmin() => User.Identity?.IsAuthenticated == true && User.IsInRole(RoleNames.Admin);
+
+    private bool CanViewHotel(Hotel hotel)
+    {
+        if (hotel.ApprovalStatus == ApprovalStatus.Approved)
+            return true;
+        if (!User.Identity?.IsAuthenticated ?? true)
+            return false;
+        if (IsAdmin())
+            return true;
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return hotel.OwnerId == userId;
+    }
+
+    private static HotelDto MapDto(Hotel h, int? roomCount = null) => new()
+    {
+        Id = h.Id,
+        Name = h.Name,
+        Address = h.Address,
+        City = h.City,
+        Country = h.Country,
+        Description = h.Description,
+        RoomCount = roomCount ?? h.Rooms?.Count ?? 0,
+        ApprovalStatus = h.ApprovalStatus
+    };
 
     private static HotelDetailDto MapToDetail(Hotel hotel) => new()
     {
@@ -155,6 +197,7 @@ public class HotelsController : ControllerBase
         Country = hotel.Country,
         Description = hotel.Description,
         RoomCount = hotel.Rooms.Count,
+        ApprovalStatus = hotel.ApprovalStatus,
         Rooms = hotel.Rooms.Select(r => new RoomDto
         {
             Id = r.Id,
