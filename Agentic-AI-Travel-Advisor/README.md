@@ -38,7 +38,7 @@ Swagger: http://localhost:5000/swagger
 Optional LLM (OpenAI-compatible). If `Ai:ApiKey` is empty, a catalog-backed fallback planner still answers queries such as “Plan a 3-day trip to Ella under Rs. 50,000.”
 
 ```bash
-dotnet user-secrets set "Ai:ApiKey" "sk-..." --project web-api
+dotnet user-secrets set "Ai:ApiKey" "YOUR_KEY" --project web-api/TravelAdvisor.Api.csproj
 ```
 
 Or set environment variable `Ai__ApiKey`. Swap `Ai:BaseUrl` / `Ai:Model` for Groq or Gemini’s OpenAI-compatible endpoint.
