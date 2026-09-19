@@ -26,12 +26,13 @@ class ApiService {
     );
   }
 
-  Future<http.Response> post(String path, Map<String, dynamic> body) {
-    return http.post(
+  Future<http.Response> post(String path, Map<String, dynamic> body, {Duration? timeout}) {
+    final future = http.post(
       Uri.parse('${ApiConfig.baseUrl}$path'),
       headers: _headers,
       body: jsonEncode(body),
     );
+    return timeout == null ? future : future.timeout(timeout);
   }
 
   String? parseErrorMessage(http.Response response) {

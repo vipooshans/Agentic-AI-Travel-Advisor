@@ -84,3 +84,56 @@ Package booking (checkOut auto-calculated from duration):
 | POST | `/api/auth/login` | Login, returns JWT |
 | GET | `/api/auth/me` | Current user |
 | GET | `/api/health` | Health check |
+
+---
+
+## AI Chat (Day 3)
+
+All AI endpoints require `Authorization: Bearer <token>`. Chat is restricted to the **USER** role.
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/ai/chat` | USER | Send a message; returns assistant reply and optional suggested plan |
+| GET | `/api/ai/conversations` | Authenticated | List current user's conversations |
+| GET | `/api/ai/conversations/{id}` | Authenticated | Conversation history (messages + suggested plans) |
+
+### Chat Example
+
+```json
+POST /api/ai/chat
+{
+  "conversationId": null,
+  "message": "Plan a 3-day trip to Ella under Rs. 50,000."
+}
+```
+
+Response includes `conversationId`, `message`, and `suggestedPlan` (hotel, package, estimated cost, day items) when destination and budget are known. Incomplete prompts return a clarifying question and no plan.
+
+Pass `conversationId` on follow-up messages to continue the same thread.
+
+---
+
+## Itineraries (Day 3)
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/itineraries` | USER | Save a travel plan (title, dates, items, optional destination/cost) |
+| GET | `/api/itineraries` | Authenticated | Current user's saved itineraries |
+| GET | `/api/itineraries/{id}` | Authenticated | Detail with day items |
+
+### Save Itinerary Example
+
+```json
+POST /api/itineraries
+{
+  "title": "3-Day Ella Trip",
+  "startDate": "2026-10-03T00:00:00Z",
+  "endDate": "2026-10-05T00:00:00Z",
+  "destinationId": 6,
+  "estimatedCost": 44000,
+  "summary": "Ella Gap View Inn + Ella Hills Escape",
+  "items": [
+    { "dayNumber": 1, "title": "Nine Arch Bridge", "description": "Morning visit", "startTime": "09:00:00", "sortOrder": 0 }
+  ]
+}
+```

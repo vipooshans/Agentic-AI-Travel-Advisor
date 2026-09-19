@@ -30,11 +30,13 @@ Connection string in `web-api/appsettings.json`.
 
 On API startup, `DbSeeder` creates:
 - 4 roles + demo admin/owner/agent accounts
-- 5 destinations (Paris, Tokyo, Bali, New York, Rome)
+- 5 international destinations (Paris, Tokyo, Bali, New York, Rome)
 - 2 hotels with 4 rooms (owner account)
 - 3 travel packages with 7 activities (agent account)
+- Additive Sri Lanka catalog (if Ella is missing): Ella, Kandy, Galle destinations; hotels/rooms; 3-day packages with hill-country, cultural, and fort activities priced for LKR budgets around Rs. 50,000
 
 ## Migrations
 
 - `InitialCreate` — core schema
 - `AddPackageActivity` — PackageActivities table
+- `AddItineraryPlanFields` — Itineraries.EstimatedCost, DestinationId, Summary

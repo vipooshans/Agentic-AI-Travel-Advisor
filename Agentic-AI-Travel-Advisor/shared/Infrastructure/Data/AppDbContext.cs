@@ -55,6 +55,14 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
                 "(\"RoomId\" IS NOT NULL AND \"TravelPackageId\" IS NULL) OR (\"RoomId\" IS NULL AND \"TravelPackageId\" IS NOT NULL)"));
         });
 
+        builder.Entity<Itinerary>(entity =>
+        {
+            entity.HasOne(i => i.Destination)
+                .WithMany(d => d.Itineraries)
+                .HasForeignKey(i => i.DestinationId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
         builder.Entity<ItineraryItem>(entity =>
         {
             entity.HasOne(i => i.Itinerary)

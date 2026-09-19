@@ -26,7 +26,16 @@ class HomeScreen extends StatelessWidget {
             Text('Hello, ${auth.user?.firstName ?? 'Traveler'}!', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 8),
             Text('Where would you like to go?', style: TextStyle(color: Colors.grey.shade600)),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.smart_toy, color: Colors.blue),
+                title: const Text('AI Travel Assistant'),
+                subtitle: const Text('Plan a trip in chat and save an itinerary'),
+                onTap: () => context.go('/chat'),
+              ),
+            ),
+            const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(child: _QuickLink(icon: Icons.explore, label: 'Destinations', onTap: () => context.go('/destinations'))),

@@ -36,6 +36,14 @@ public static class DependencyInjection
 
         services.AddScoped<IJwtTokenService, JwtTokenService>();
 
+        services.Configure<AI.AiOptions>(configuration.GetSection(AI.AiOptions.SectionName));
+        services.AddHttpClient<ILlmClient, AI.OpenAiCompatClient>();
+        services.AddScoped<ICatalogTools, AI.CatalogTools>();
+        services.AddScoped<AI.Agents.TravelPlanningAgent>();
+        services.AddScoped<AI.Agents.RecommendationAgent>();
+        services.AddScoped<AI.Agents.ItineraryAgent>();
+        services.AddScoped<IAgenticAiService, AI.AgenticAiService>();
+
         var jwtSettings = configuration.GetSection("Jwt");
         var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
 

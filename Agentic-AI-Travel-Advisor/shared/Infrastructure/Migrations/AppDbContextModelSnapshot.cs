@@ -390,14 +390,23 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("DestinationId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("EstimatedCost")
+                        .HasColumnType("numeric");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Summary")
+                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -408,6 +417,8 @@ namespace TravelAdvisor.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DestinationId");
 
                     b.HasIndex("UserId");
 
@@ -715,11 +726,18 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.Itinerary", b =>
                 {
+                    b.HasOne("TravelAdvisor.Core.Entities.Destination", "Destination")
+                        .WithMany("Itineraries")
+                        .HasForeignKey("DestinationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("TravelAdvisor.Core.Entities.ApplicationUser", "User")
                         .WithMany("Itineraries")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Destination");
 
                     b.Navigation("User");
                 });
@@ -804,6 +822,8 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.Destination", b =>
                 {
+                    b.Navigation("Itineraries");
+
                     b.Navigation("TravelPackages");
                 });
 

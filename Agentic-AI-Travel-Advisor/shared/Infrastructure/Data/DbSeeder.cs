@@ -164,5 +164,146 @@ public static class DbSeeder
                 new PackageActivity { TravelPackageId = tokyoPkg.Id, Title = "Mt. Fuji Day Trip", Description = "Full day excursion", DayNumber = 3, Price = 120, SortOrder = 2 });
             await context.SaveChangesAsync();
         }
+
+        await SeedSriLankaCatalogAsync(context, owner, agent);
+    }
+
+    private static async Task SeedSriLankaCatalogAsync(
+        AppDbContext context,
+        ApplicationUser? owner,
+        ApplicationUser? agent)
+    {
+        if (!await context.Destinations.AnyAsync(d => d.Name == "Ella"))
+        {
+            context.Destinations.AddRange(
+                new Destination
+                {
+                    Name = "Ella",
+                    Country = "Sri Lanka",
+                    Description = "Hill-country village famous for Nine Arch Bridge, Little Adam's Peak, and tea estates",
+                    ImageUrl = "https://images.unsplash.com/photo-1566296314637-05c0c0c1c0c1?w=800"
+                },
+                new Destination
+                {
+                    Name = "Kandy",
+                    Country = "Sri Lanka",
+                    Description = "Cultural capital with the Temple of the Tooth and lakeside walks",
+                    ImageUrl = "https://images.unsplash.com/photo-1625734220649-0c0c0c0c0c0c?w=800"
+                },
+                new Destination
+                {
+                    Name = "Galle",
+                    Country = "Sri Lanka",
+                    Description = "UNESCO Dutch fort, lighthouse, and southern beaches",
+                    ImageUrl = "https://images.unsplash.com/photo-1580881977107-bf99924000b0?w=800"
+                });
+            await context.SaveChangesAsync();
+        }
+
+        if (owner is not null && !await context.Hotels.AnyAsync(h => h.City == "Ella"))
+        {
+            var ellaInn = new Hotel
+            {
+                OwnerId = owner.Id,
+                Name = "Ella Gap View Inn",
+                Address = "Passara Road",
+                City = "Ella",
+                Country = "Sri Lanka",
+                Description = "Budget-friendly inn with views over Ella Gap"
+            };
+            var ellaLodge = new Hotel
+            {
+                OwnerId = owner.Id,
+                Name = "Ella Heights Lodge",
+                Address = "Wellness Place, Ella",
+                City = "Ella",
+                Country = "Sri Lanka",
+                Description = "Mid-range lodge near Little Adam's Peak"
+            };
+            var kandyHotel = new Hotel
+            {
+                OwnerId = owner.Id,
+                Name = "Kandy Lake House",
+                Address = "Lake Drive",
+                City = "Kandy",
+                Country = "Sri Lanka",
+                Description = "Lakeside stay walking distance from the Temple of the Tooth"
+            };
+            var galleHotel = new Hotel
+            {
+                OwnerId = owner.Id,
+                Name = "Galle Fort Stay",
+                Address = "Church Street, Galle Fort",
+                City = "Galle",
+                Country = "Sri Lanka",
+                Description = "Heritage guesthouse inside the Dutch Fort"
+            };
+            context.Hotels.AddRange(ellaInn, ellaLodge, kandyHotel, galleHotel);
+            await context.SaveChangesAsync();
+
+            context.Rooms.AddRange(
+                new Room { HotelId = ellaInn.Id, Name = "Garden Double", RoomType = "Double", PricePerNight = 8000, Capacity = 2, IsAvailable = true },
+                new Room { HotelId = ellaInn.Id, Name = "Family Room", RoomType = "Family", PricePerNight = 12000, Capacity = 4, IsAvailable = true },
+                new Room { HotelId = ellaLodge.Id, Name = "Peak View Room", RoomType = "Deluxe", PricePerNight = 15000, Capacity = 2, IsAvailable = true },
+                new Room { HotelId = ellaLodge.Id, Name = "Suite", RoomType = "Suite", PricePerNight = 18000, Capacity = 3, IsAvailable = true },
+                new Room { HotelId = kandyHotel.Id, Name = "Lake View Double", RoomType = "Double", PricePerNight = 9000, Capacity = 2, IsAvailable = true },
+                new Room { HotelId = kandyHotel.Id, Name = "Family Suite", RoomType = "Family", PricePerNight = 14000, Capacity = 4, IsAvailable = true },
+                new Room { HotelId = galleHotel.Id, Name = "Fort Double", RoomType = "Double", PricePerNight = 10000, Capacity = 2, IsAvailable = true },
+                new Room { HotelId = galleHotel.Id, Name = "Lighthouse Suite", RoomType = "Suite", PricePerNight = 16000, Capacity = 3, IsAvailable = true });
+            await context.SaveChangesAsync();
+        }
+
+        if (agent is not null && !await context.TravelPackages.AnyAsync(p => p.Title == "Ella Hills Escape"))
+        {
+            var ella = await context.Destinations.FirstAsync(d => d.Name == "Ella");
+            var kandy = await context.Destinations.FirstAsync(d => d.Name == "Kandy");
+            var galle = await context.Destinations.FirstAsync(d => d.Name == "Galle");
+
+            var ellaPkg = new TravelPackage
+            {
+                AgentId = agent.Id,
+                DestinationId = ella.Id,
+                Title = "Ella Hills Escape",
+                Description = "3 days of hill-country hikes, Nine Arch Bridge, and tea estates. Hotel not included.",
+                Price = 28000,
+                DurationDays = 3
+            };
+            var kandyPkg = new TravelPackage
+            {
+                AgentId = agent.Id,
+                DestinationId = kandy.Id,
+                Title = "Kandy Cultural Weekend",
+                Description = "3 days covering the Temple of the Tooth, Peradeniya Gardens, and city walks.",
+                Price = 30000,
+                DurationDays = 3
+            };
+            var gallePkg = new TravelPackage
+            {
+                AgentId = agent.Id,
+                DestinationId = galle.Id,
+                Title = "Galle Fort Getaway",
+                Description = "3 days exploring Galle Fort, Unawatuna beach, and the lighthouse.",
+                Price = 29000,
+                DurationDays = 3
+            };
+            context.TravelPackages.AddRange(ellaPkg, kandyPkg, gallePkg);
+            await context.SaveChangesAsync();
+
+            context.PackageActivities.AddRange(
+                new PackageActivity { TravelPackageId = ellaPkg.Id, Title = "Nine Arch Bridge", Description = "Morning visit timed for the hill-country train", DayNumber = 1, Price = 0, SortOrder = 1 },
+                new PackageActivity { TravelPackageId = ellaPkg.Id, Title = "Little Adam's Peak", Description = "Guided hike with Ella Gap views", DayNumber = 1, Price = 2500, SortOrder = 2 },
+                new PackageActivity { TravelPackageId = ellaPkg.Id, Title = "Ravana Falls", Description = "Waterfall stop and photo break", DayNumber = 2, Price = 0, SortOrder = 3 },
+                new PackageActivity { TravelPackageId = ellaPkg.Id, Title = "Tea Estate Walk", Description = "Factory tour and tasting at a local estate", DayNumber = 2, Price = 3500, SortOrder = 4 },
+                new PackageActivity { TravelPackageId = ellaPkg.Id, Title = "Ella Rock Viewpoint", Description = "Optional longer hike or scenic train viewpoint", DayNumber = 3, Price = 2000, SortOrder = 5 },
+                new PackageActivity { TravelPackageId = kandyPkg.Id, Title = "Temple of the Tooth", Description = "Guided visit to Sri Dalada Maligawa", DayNumber = 1, Price = 2000, SortOrder = 1 },
+                new PackageActivity { TravelPackageId = kandyPkg.Id, Title = "Kandy Lake Walk", Description = "Evening stroll around the lake", DayNumber = 1, Price = 0, SortOrder = 2 },
+                new PackageActivity { TravelPackageId = kandyPkg.Id, Title = "Peradeniya Botanical Gardens", Description = "Half-day gardens visit", DayNumber = 2, Price = 3000, SortOrder = 3 },
+                new PackageActivity { TravelPackageId = kandyPkg.Id, Title = "Cultural Dance Show", Description = "Traditional Kandyan dance evening", DayNumber = 3, Price = 2500, SortOrder = 4 },
+                new PackageActivity { TravelPackageId = gallePkg.Id, Title = "Galle Fort Ramparts", Description = "Sunset walk along the walls to the lighthouse", DayNumber = 1, Price = 0, SortOrder = 1 },
+                new PackageActivity { TravelPackageId = gallePkg.Id, Title = "Unawatuna Beach", Description = "Morning swim and cafe stop", DayNumber = 2, Price = 0, SortOrder = 2 },
+                new PackageActivity { TravelPackageId = gallePkg.Id, Title = "Maritime Museum", Description = "Dutch-era museum inside the fort", DayNumber = 2, Price = 1500, SortOrder = 3 },
+                new PackageActivity { TravelPackageId = gallePkg.Id, Title = "Jungle Beach Walk", Description = "Coastal trail and picnic", DayNumber = 3, Price = 2000, SortOrder = 4 });
+            await context.SaveChangesAsync();
+        }
     }
 }

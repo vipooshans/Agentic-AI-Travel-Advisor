@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../providers/chat_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -24,13 +25,25 @@ class ProfileScreen extends StatelessWidget {
             Text('${user?.firstName ?? ''} ${user?.lastName ?? ''}', style: Theme.of(context).textTheme.headlineSmall),
             Text(user?.email ?? '', style: TextStyle(color: Colors.grey.shade600)),
             Text('Role: ${user?.role ?? ''}'),
+            const SizedBox(height: 24),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.event_note_outlined, color: Colors.blue),
+                title: const Text('Saved itineraries'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/itineraries'),
+              ),
+            ),
             const Spacer(),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
                 onPressed: () async {
                   await auth.logout();
-                  if (context.mounted) context.go('/login');
+                  if (context.mounted) {
+                    context.read<ChatProvider>().reset();
+                    context.go('/login');
+                  }
                 },
                 child: const Text('Sign Out'),
               ),

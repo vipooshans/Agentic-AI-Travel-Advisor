@@ -9,4 +9,5 @@ public class Destination
     public string? ImageUrl { get; set; }
 
     public ICollection<TravelPackage> TravelPackages { get; set; } = [];
+    public ICollection<Itinerary> Itineraries { get; set; } = [];
 }

@@ -3,11 +3,14 @@ import 'package:go_router/go_router.dart';
 
 import '../providers/auth_provider.dart';
 import '../screens/booking_list_screen.dart';
+import '../screens/chat_screen.dart';
 import '../screens/create_booking_screen.dart';
 import '../screens/destination_detail_screen.dart';
 import '../screens/destination_list_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/hotel_detail_screen.dart';
+import '../screens/itinerary_detail_screen.dart';
+import '../screens/itinerary_list_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/package_detail_screen.dart';
 import '../screens/profile_screen.dart';
@@ -50,6 +53,7 @@ GoRouter createAppRouter(AuthProvider authProvider) {
         routes: [
           GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
           GoRoute(path: '/destinations', builder: (_, __) => const DestinationListScreen()),
+          GoRoute(path: '/chat', builder: (_, __) => const ChatScreen()),
           GoRoute(path: '/bookings', builder: (_, __) => const BookingListScreen()),
           GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
         ],
@@ -65,6 +69,14 @@ GoRouter createAppRouter(AuthProvider authProvider) {
       GoRoute(
         path: '/packages/:id',
         builder: (_, state) => PackageDetailScreen(id: int.parse(state.pathParameters['id']!)),
+      ),
+      GoRoute(
+        path: '/itineraries',
+        builder: (_, __) => const ItineraryListScreen(),
+      ),
+      GoRoute(
+        path: '/itineraries/:id',
+        builder: (_, state) => ItineraryDetailScreen(id: int.parse(state.pathParameters['id']!)),
       ),
       GoRoute(
         path: '/bookings/new',

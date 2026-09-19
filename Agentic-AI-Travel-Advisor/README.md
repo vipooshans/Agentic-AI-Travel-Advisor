@@ -2,6 +2,13 @@
 
 Full-stack travel advisory platform with Flutter mobile app, ASP.NET Web API, MVC admin portal, and PostgreSQL.
 
+## Day 3 Features
+
+- AI chat that extracts destination, budget, dates, travelers, interests, and stay preference
+- Catalog-backed recommendations (hotels, rooms, packages, activities from PostgreSQL)
+- Day-by-day itinerary generation with estimated cost
+- Save itinerary from the Flutter chat screen
+
 ## Day 2 Features
 
 - Browse destinations, hotels, and travel packages (Flutter)
@@ -20,13 +27,21 @@ dotnet ef database update \
   --startup-project web-api/TravelAdvisor.Api.csproj
 ```
 
-### 2. Web API (seeds sample data on first run)
+### 2. Web API (seeds sample data on first run, including Sri Lanka catalog)
 
 ```bash
 dotnet run --project web-api
 ```
 
 Swagger: http://localhost:5000/swagger
+
+Optional LLM (OpenAI-compatible). If `Ai:ApiKey` is empty, a catalog-backed fallback planner still answers queries such as “Plan a 3-day trip to Ella under Rs. 50,000.”
+
+```bash
+dotnet user-secrets set "Ai:ApiKey" "sk-..." --project web-api
+```
+
+Or set environment variable `Ai__ApiKey`. Swap `Ai:BaseUrl` / `Ai:Model` for Groq or Gemini’s OpenAI-compatible endpoint.
 
 ### 3. Admin Portal
 
@@ -43,6 +58,8 @@ cd mobile-app
 flutter pub get
 flutter run
 ```
+
+Use the **AI** tab (or the Home card) to chat, then **Save itinerary**.
 
 ## Demo Accounts
 
