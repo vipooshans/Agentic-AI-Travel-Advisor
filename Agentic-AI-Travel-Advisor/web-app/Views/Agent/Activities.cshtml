@@ -3,6 +3,15 @@
 
 <h5 class="mb-3">Activities - @Model.Title</h5>
 
+@if (!Model.Activities.Any())
+{
+    ViewData["EmptyTitle"] = "No activities yet";
+    ViewData["EmptyMessage"] = "Add day-by-day activities for this package.";
+    @await Html.PartialAsync("_EmptyState")
+}
+else
+{
+<div class="table-responsive">
 <table class="table table-striped mb-4">
     <thead><tr><th>Day</th><th>Title</th><th>Description</th><th>Price</th><th></th></tr></thead>
     <tbody>
@@ -22,6 +31,8 @@
     }
     </tbody>
 </table>
+</div>
+}
 
 <div class="card"><div class="card-body">
     <h6>Add Activity</h6>

@@ -6,6 +6,15 @@
     <a asp-action="CreateHotel" class="btn btn-primary btn-sm">Add Hotel</a>
 </div>
 <p class="text-muted">Rejected hotels can be edited and are resubmitted as Pending.</p>
+@if (!Model.Any())
+{
+    ViewData["EmptyTitle"] = "No hotels yet";
+    ViewData["EmptyMessage"] = "Add a hotel to start receiving bookings.";
+    @await Html.PartialAsync("_EmptyState")
+}
+else
+{
+<div class="table-responsive">
 <table class="table table-striped">
     <thead><tr><th>Name</th><th>City</th><th>Country</th><th>Rooms</th><th>Approval</th><th></th></tr></thead>
     <tbody>
@@ -22,3 +31,5 @@
     }
     </tbody>
 </table>
+</div>
+}

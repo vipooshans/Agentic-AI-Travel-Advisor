@@ -22,14 +22,15 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsEnvironment("Testing"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.UseCors("AllowClients");
-app.UseHttpsRedirection();
+if (!HttpOnlyUrls() && !app.Environment.IsEnvironment("Testing"))
+    app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
@@ -37,3 +38,12 @@ app.MapControllers();
 await DbSeeder.SeedAsync(app.Services);
 
 app.Run();
+
+static bool HttpOnlyUrls()
+{
+    var urls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? string.Empty;
+    return urls.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+           && !urls.Contains("https://", StringComparison.OrdinalIgnoreCase);
+}
+
+public partial class Program;

@@ -4,6 +4,15 @@
 
 <h5 class="mb-2">All bookings</h5>
 <p class="text-muted">Monitor every booking and apply status changes. Highlighted rows are pending requests.</p>
+@if (!Model.Any())
+{
+    ViewData["EmptyTitle"] = "No bookings";
+    ViewData["EmptyMessage"] = "Bookings from travelers will appear here.";
+    @await Html.PartialAsync("_EmptyState")
+}
+else
+{
+<div class="table-responsive">
 <table class="table table-striped">
     <thead><tr><th>Guest</th><th>Listing</th><th>Check-in</th><th>Check-out</th><th>Total</th><th>Status</th><th></th></tr></thead>
     <tbody>
@@ -21,3 +30,5 @@
     }
     </tbody>
 </table>
+</div>
+}

@@ -4,6 +4,15 @@
 
 <h5 class="mb-2">Package Bookings</h5>
 <p class="text-muted">Highlighted rows are customer requests (Pending). Confirm, cancel, or complete from here.</p>
+@if (!Model.Any())
+{
+    ViewData["EmptyTitle"] = "No customer requests";
+    ViewData["EmptyMessage"] = "Package bookings will appear here when travelers book.";
+    @await Html.PartialAsync("_EmptyState")
+}
+else
+{
+<div class="table-responsive">
 <table class="table table-striped">
     <thead><tr><th>Guest</th><th>Package</th><th>Check-in</th><th>Check-out</th><th>Total</th><th>Status</th><th></th></tr></thead>
     <tbody>
@@ -19,3 +28,5 @@
     }
     </tbody>
 </table>
+</div>
+}

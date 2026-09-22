@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../services/hotel_service.dart';
 import '../widgets/error_widget.dart';
+import '../widgets/empty_state_widget.dart';
 import '../widgets/loading_widget.dart';
 
 class HotelDetailScreen extends StatelessWidget {
@@ -37,7 +38,14 @@ class HotelDetailScreen extends StatelessWidget {
                 const SizedBox(height: 24),
                 Text('Available Rooms', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 8),
-                ...(hotel.rooms ?? []).map((room) => Card(
+                if ((hotel.rooms ?? []).isEmpty)
+                  const EmptyStateWidget(
+                    icon: Icons.meeting_room_outlined,
+                    title: 'No rooms listed',
+                    message: 'This hotel has no rooms available to book yet.',
+                  )
+                else
+                  ...(hotel.rooms ?? []).map((room) => Card(
                   child: ListTile(
                     title: Text(room.name),
                     subtitle: Text('${room.roomType} · ${room.capacity} guests · \$${room.pricePerNight}/night'),

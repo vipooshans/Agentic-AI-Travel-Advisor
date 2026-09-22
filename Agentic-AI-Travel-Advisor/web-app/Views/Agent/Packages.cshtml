@@ -6,6 +6,15 @@
     <a asp-action="CreatePackage" class="btn btn-primary btn-sm">Create Package</a>
 </div>
 <p class="text-muted">Rejected packages can be edited and are resubmitted as Pending.</p>
+@if (!Model.Any())
+{
+    ViewData["EmptyTitle"] = "No packages yet";
+    ViewData["EmptyMessage"] = "Create a package to start receiving customer requests.";
+    @await Html.PartialAsync("_EmptyState")
+}
+else
+{
+<div class="table-responsive">
 <table class="table table-striped">
     <thead><tr><th>Title</th><th>Destination</th><th>Duration</th><th>Price</th><th>Activities</th><th>Approval</th><th></th></tr></thead>
     <tbody>
@@ -22,3 +31,5 @@
     }
     </tbody>
 </table>
+</div>
+}

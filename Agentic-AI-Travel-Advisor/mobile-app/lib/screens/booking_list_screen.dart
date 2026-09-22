@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../models/booking.dart';
 import '../providers/auth_provider.dart';
 import '../services/booking_service.dart';
 import '../widgets/booking_card.dart';
+import '../widgets/empty_state_widget.dart';
 import '../widgets/error_widget.dart';
 import '../widgets/loading_widget.dart';
 
@@ -34,7 +36,7 @@ class _BookingListScreenState extends State<BookingListScreen> {
       setState(() => _future = _load());
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ErrorDisplayWidget.friendly(e))));
     }
   }
 
@@ -51,16 +53,25 @@ class _BookingListScreenState extends State<BookingListScreen> {
           }
           final bookings = snapshot.data ?? [];
           if (bookings.isEmpty) {
-            return const Center(child: Text('No bookings yet. Explore and book a trip!'));
+            return EmptyStateWidget(
+              icon: Icons.bookmark_border,
+              title: 'No bookings yet',
+              message: 'Explore destinations and book a hotel or package.',
+              actionLabel: 'Explore',
+              onAction: () => context.go('/destinations'),
+            );
           }
-          return ListView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: bookings.length,
-            itemBuilder: (_, i) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: BookingCard(
-                booking: bookings[i],
-                onCancel: bookings[i].status == 0 ? () => _cancel(bookings[i]) : null,
+          return RefreshIndicator(
+            onRefresh: () async => setState(() => _future = _load()),
+            child: ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: bookings.length,
+              itemBuilder: (_, i) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: BookingCard(
+                  booking: bookings[i],
+                  onCancel: bookings[i].status == 0 ? () => _cancel(bookings[i]) : null,
+                ),
               ),
             ),
           );

@@ -6,6 +6,7 @@ import '../providers/auth_provider.dart';
 import '../services/destination_service.dart';
 import '../services/package_service.dart';
 import '../widgets/error_widget.dart';
+import '../widgets/empty_state_widget.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/package_card.dart';
 
@@ -46,10 +47,17 @@ class DestinationDetailScreen extends StatelessWidget {
                 const SizedBox(height: 24),
                 Text('Packages', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 8),
-                ...packages.map((p) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: PackageCard(package: p, onTap: () => context.push('/packages/${p.id}')),
-                )),
+                if (packages.isEmpty)
+                  const EmptyStateWidget(
+                    icon: Icons.card_travel,
+                    title: 'No packages',
+                    message: 'There are no approved packages for this destination yet.',
+                  )
+                else
+                  ...packages.map((p) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: PackageCard(package: p, onTap: () => context.push('/packages/${p.id}')),
+                  )),
               ],
             ),
           );

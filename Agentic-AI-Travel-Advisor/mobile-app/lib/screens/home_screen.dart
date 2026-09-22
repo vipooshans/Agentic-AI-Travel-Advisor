@@ -6,6 +6,8 @@ import '../models/destination.dart';
 import '../providers/auth_provider.dart';
 import '../services/destination_service.dart';
 import '../widgets/destination_card.dart';
+import '../widgets/empty_state_widget.dart';
+import '../widgets/error_widget.dart';
 import '../widgets/loading_widget.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -40,9 +42,9 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Expanded(child: _QuickLink(icon: Icons.explore, label: 'Destinations', onTap: () => context.go('/destinations'))),
                 const SizedBox(width: 12),
-                Expanded(child: _QuickLink(icon: Icons.hotel, label: 'Hotels', onTap: () => context.go('/destinations'))),
+                Expanded(child: _QuickLink(icon: Icons.hotel, label: 'Hotels', onTap: () => context.go('/destinations?tab=hotels'))),
                 const SizedBox(width: 12),
-                Expanded(child: _QuickLink(icon: Icons.card_travel, label: 'Packages', onTap: () => context.go('/destinations'))),
+                Expanded(child: _QuickLink(icon: Icons.card_travel, label: 'Packages', onTap: () => context.go('/destinations?tab=packages'))),
               ],
             ),
             const SizedBox(height: 24),
@@ -54,7 +56,17 @@ class HomeScreen extends StatelessWidget {
                 future: service.getAll(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) return const LoadingWidget();
+                  if (snapshot.hasError) {
+                    return ErrorDisplayWidget(message: snapshot.error.toString());
+                  }
                   final items = snapshot.data ?? [];
+                  if (items.isEmpty) {
+                    return const EmptyStateWidget(
+                      icon: Icons.public,
+                      title: 'No destinations yet',
+                      message: 'Check back soon for featured places to visit.',
+                    );
+                  }
                   return ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: items.length,

@@ -55,7 +55,7 @@ GoRouter createAppRouter(AuthProvider authProvider) {
         builder: (_, __, child) => MainShell(child: child),
         routes: [
           GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
-          GoRoute(path: '/destinations', builder: (_, __) => const DestinationListScreen()),
+          GoRoute(path: '/destinations', builder: (_, state) => DestinationListScreen(initialTab: state.uri.queryParameters['tab'])),
           GoRoute(path: '/chat', builder: (_, __) => const ChatScreen()),
           GoRoute(path: '/bookings', builder: (_, __) => const BookingListScreen()),
           GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),

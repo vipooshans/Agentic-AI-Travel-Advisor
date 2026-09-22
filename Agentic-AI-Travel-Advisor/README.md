@@ -2,14 +2,31 @@
 
 Full-stack travel advisory platform with Flutter mobile app, ASP.NET Web API, MVC admin portal, and PostgreSQL.
 
+## Day 5 — Demo ready
+
+- Automated tests (`dotnet test`) for booking rules plus API flows (auth, RBAC, hotels, packages, bookings, AI, itineraries)
+- UI polish: empty states, friendlier errors, pull-to-refresh, compact Flutter nav, responsive portal sidebar
+- Docker Compose for PostgreSQL + API + MVC portal
+- Android APK with a configurable API URL for emulator, LAN, or ngrok
+
+## Quick Start (Docker)
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+- Portal: http://localhost:7000
+- API / Swagger: http://localhost:5000/swagger
+
+USER stays on Flutter. Owner, Agent, and Admin use the MVC portal.
+
 ## Day 4 Features
 
 - Flutter USER hub: edit profile, travel preferences, cancel pending bookings, resume AI chat history
 - Hotel owner and travel agent portals: approval badges, pending booking requests, Confirm/Cancel/Complete, revenue stats
 - Admin portal: users (create owner/agent, activate/deactivate), hotel/package approval, booking monitor, live reports
 - Public catalog shows **Approved** hotels and packages only; new listings start as **Pending**
-
-USER stays on Flutter. Owner, Agent, and Admin use the MVC portal at `:7000`.
 
 ## Day 3 Features
 
@@ -26,7 +43,7 @@ USER stays on Flutter. Owner, Agent, and Admin use the MVC portal at `:7000`.
 - Travel agent portal: create packages, add activities, manage bookings
 - Full REST API with RBAC
 
-## Quick Start
+## Quick Start (local without Docker)
 
 ### 1. Database
 
@@ -70,6 +87,30 @@ flutter run
 
 Use the **AI** tab (or the Home card) to chat, then **Save itinerary**.
 
+### 5. Android APK
+
+From `mobile-app` (run `powershell -File ../scripts/setup-android.ps1` once if `android/` is missing):
+
+```bash
+# Emulator (default API http://10.0.2.2:5000)
+flutter build apk --release
+
+# Physical device on the same Wi-Fi as Docker
+flutter build apk --release --dart-define=API_BASE_URL=http://YOUR_LAN_IP:5000
+```
+
+APK: `mobile-app/build/app/outputs/flutter-apk/app-release.apk`
+
+Cleartext HTTP is allowed for classroom demos. Point `API_BASE_URL` at an ngrok HTTPS/HTTP URL if the phone is off the LAN.
+
+### Tests
+
+```bash
+dotnet test tests/TravelAdvisor.UnitTests
+dotnet test tests/TravelAdvisor.Api.Tests   # needs Docker for Testcontainers PostgreSQL
+cd mobile-app && flutter test
+```
+
 ## Demo Accounts
 
 | Role | Email | Password | Platform |
@@ -81,6 +122,7 @@ Use the **AI** tab (or the Home card) to chat, then **Save itinerary**.
 
 ## Documentation
 
+- [Demo script](documentation/DEMO.md)
 - [API Reference](documentation/API.md)
 - [Database Setup](documentation/DATABASE.md)
 - [Architecture](documentation/ARCHITECTURE.md)

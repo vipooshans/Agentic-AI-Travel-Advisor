@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vipoo}
+      POSTGRES_DB: travel_advisor
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: web-api/Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=travel_advisor;Username=postgres;Password=${POSTGRES_PASSWORD:-vipoo}
+      Jwt__Key: ${JWT_KEY:-TravelAdvisorSuperSecretKeyForJwtTokenGeneration2026!}
+      Jwt__Issuer: TravelAdvisor.Api
+      Jwt__Audience: TravelAdvisor.Clients
+      Jwt__ExpireHours: "24"
+      Cors__AllowedOrigins__0: http://localhost:7000
+      Cors__AllowedOrigins__1: http://127.0.0.1:7000
+      Cors__AllowedOrigins__2: http://localhost:5000
+      Ai__ApiKey: ${AI_API_KEY:-}
+      Ai__BaseUrl: ${AI_BASE_URL:-https://api.openai.com/v1}
+      Ai__Model: ${AI_MODEL:-gpt-4o-mini}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: web-app/Dockerfile
+    ports:
+      - "7000:8080"
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_ENVIRONMENT: Production
+      ApiSettings__BaseUrl: http://api:8080
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

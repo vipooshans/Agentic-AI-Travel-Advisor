@@ -5,6 +5,15 @@
     <h5>Rooms - @hotel?.Name</h5>
     <a asp-action="AddRoom" asp-route-hotelId="@hotel?.Id" class="btn btn-primary btn-sm">Add Room</a>
 </div>
+@if (!Model.Any())
+{
+    ViewData["EmptyTitle"] = "No rooms yet";
+    ViewData["EmptyMessage"] = "Add a room so travelers can book this hotel.";
+    @await Html.PartialAsync("_EmptyState")
+}
+else
+{
+<div class="table-responsive">
 <table class="table table-striped">
     <thead><tr><th>Name</th><th>Type</th><th>Price/Night</th><th>Capacity</th><th>Available</th><th></th></tr></thead>
     <tbody>
@@ -18,3 +27,5 @@
     }
     </tbody>
 </table>
+</div>
+}

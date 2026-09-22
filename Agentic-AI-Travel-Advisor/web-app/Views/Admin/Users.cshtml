@@ -15,6 +15,15 @@
     <a asp-action="Users" asp-route-role="TRAVEL_AGENT" class="btn btn-sm @(filter == "TRAVEL_AGENT" ? "btn-secondary" : "btn-outline-secondary")">Agents</a>
     <a asp-action="Users" asp-route-role="ADMIN" class="btn btn-sm @(filter == "ADMIN" ? "btn-secondary" : "btn-outline-secondary")">Admins</a>
 </div>
+@if (!Model.Any())
+{
+    ViewData["EmptyTitle"] = "No users found";
+    ViewData["EmptyMessage"] = "Try another role filter or create an owner or agent.";
+    @await Html.PartialAsync("_EmptyState")
+}
+else
+{
+<div class="table-responsive">
 <table class="table table-striped">
     <thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Created</th><th>Status</th><th></th></tr></thead>
     <tbody>
@@ -49,3 +58,5 @@
     }
     </tbody>
 </table>
+</div>
+}
