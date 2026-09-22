@@ -18,8 +18,9 @@ docker compose up --build
 
 - Portal: http://localhost:7000
 - API / Swagger: http://localhost:5000/swagger
+- Postgres (host): `localhost:5433` (mapped from container `5432` so it does not clash with a local Postgres on 5432)
 
-USER stays on Flutter. Owner, Agent, and Admin use the MVC portal.
+Env vars (see `.env.example`): `POSTGRES_PASSWORD`, `JWT_KEY` / `Jwt__Key`, `ConnectionStrings__DefaultConnection`, `AI_API_KEY` / `Ai__ApiKey`.
 
 ## Day 4 Features
 

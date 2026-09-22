@@ -5,12 +5,16 @@ Walk this path for a live demonstration. USER stays on Flutter (or APK). Owner, 
 ## Start the stack
 
 ```bash
+cp .env.example .env   # set POSTGRES_PASSWORD, JWT_KEY, AI_API_KEY as needed
 docker compose up --build
 ```
 
 - API: http://localhost:5000/swagger
 - Portal: http://localhost:7000
+- Postgres on the host: `localhost:5433` (Compose maps container 5432 → host 5433)
 - Flutter emulator: API is `http://10.0.2.2:5000` (default). Physical phone: rebuild the APK with `--dart-define=API_BASE_URL=http://YOUR_LAN_IP:5000`.
+
+Compose injects `ConnectionStrings__DefaultConnection`, `Jwt__Key`, and `Ai__ApiKey` into the API container.
 
 ## Demo accounts (portal)
 
