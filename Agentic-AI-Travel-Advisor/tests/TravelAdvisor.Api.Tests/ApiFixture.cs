@@ -35,7 +35,7 @@ public class ApiFixture : IAsyncLifetime
                 .WithUsername("postgres")
                 .WithPassword("postgres")
                 .Build();
-            await _postgres.StartAsync();
+            await _postgres.StartAsync().WaitAsync(TimeSpan.FromMinutes(2));
         }
         catch (Exception ex)
         {

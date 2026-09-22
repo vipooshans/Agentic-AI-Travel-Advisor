@@ -7,7 +7,11 @@ $root = Split-Path -Parent $PSScriptRoot
 $app = Join-Path $root "mobile-app"
 
 Set-Location $app
-flutter create . --platforms=android --org com.traveladvisor --project-name travel_advisor
+if (Get-Command flutter -ErrorAction SilentlyContinue) {
+    flutter create . --platforms=android --org com.traveladvisor --project-name travel_advisor
+} elseif (-not (Test-Path (Join-Path $app "android"))) {
+    throw "Flutter SDK not found. Install Flutter, or keep the checked-in android/ folder and run this script after flutter is on PATH."
+}
 
 $xmlDir = Join-Path $app "android\app\src\main\res\xml"
 New-Item -ItemType Directory -Force -Path $xmlDir | Out-Null
