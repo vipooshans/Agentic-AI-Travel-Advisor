@@ -21,10 +21,10 @@ else
     @foreach (var d in Model)
     {
         <tr>
-            <td style="width:72px">
+            <td style="width:96px">
                 @if (!string.IsNullOrWhiteSpace(d.ImageUrl))
                 {
-                    <img src="@d.ImageUrl" alt="" width="64" height="40" style="object-fit:cover;border-radius:6px" />
+                    <img src="@d.ImageUrl" alt="" width="72" height="48" class="destination-thumb" loading="lazy" />
                 }
             </td>
             <td>@d.Name</td>
