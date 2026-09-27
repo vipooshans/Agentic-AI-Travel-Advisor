@@ -10,7 +10,11 @@ public class Itinerary
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public ItineraryStatus Status { get; set; } = ItineraryStatus.Draft;
+    public decimal? EstimatedCost { get; set; }
+    public int? DestinationId { get; set; }
+    public string? Summary { get; set; }
 
     public ApplicationUser User { get; set; } = null!;
+    public Destination? Destination { get; set; }
     public ICollection<ItineraryItem> Items { get; set; } = [];
 }

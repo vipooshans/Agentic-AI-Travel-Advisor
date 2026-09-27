@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/user.dart';
+import '../services/api_service.dart';
 import '../services/auth_service.dart';
 
 enum AuthStatus { unknown, authenticated, unauthenticated }
@@ -20,6 +21,7 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
   bool get isAuthenticated => _status == AuthStatus.authenticated;
+  ApiService get api => _authService.api;
 
   Future<void> initialize() async {
     _isLoading = true;
@@ -79,6 +81,22 @@ class AuthProvider extends ChangeNotifier {
       );
       _user = auth.user;
       _status = AuthStatus.authenticated;
+      return true;
+    } catch (e) {
+      _error = e.toString().replaceFirst('Exception: ', '');
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> updateProfile({required String firstName, required String lastName}) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      _user = await _authService.updateProfile(firstName: firstName, lastName: lastName);
       return true;
     } catch (e) {
       _error = e.toString().replaceFirst('Exception: ', '');

@@ -62,3 +62,6 @@ E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\
 E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\web-app\obj\Debug\net8.0\TravelAdvisor.Web.pdb
 E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\web-app\obj\Debug\net8.0\TravelAdvisor.Web.genruntimeconfig.cache
 E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\web-app\obj\Debug\net8.0\ref\TravelAdvisor.Web.dll
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\web-app\bin\Debug\net8.0\Microsoft.Extensions.Diagnostics.dll
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\web-app\bin\Debug\net8.0\Microsoft.Extensions.Diagnostics.Abstractions.dll
+E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\web-app\bin\Debug\net8.0\Microsoft.Extensions.Http.dll

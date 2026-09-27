@@ -59,6 +59,28 @@ class AuthService {
     return auth;
   }
 
+  Future<User> updateProfile({required String firstName, required String lastName}) async {
+    final response = await _api.put('/api/auth/me', {
+      'firstName': firstName,
+      'lastName': lastName,
+    });
+    if (response.statusCode != 200) {
+      throw Exception(_api.parseErrorMessage(response) ?? 'Update failed');
+    }
+    final user = User.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+    await _storage.write(
+      key: _userKey,
+      value: jsonEncode({
+        'id': user.id,
+        'email': user.email,
+        'firstName': user.firstName,
+        'lastName': user.lastName,
+        'role': user.role,
+      }),
+    );
+    return user;
+  }
+
   Future<User?> getMe() async {
     final response = await _api.get('/api/auth/me');
     if (response.statusCode != 200) return null;

@@ -30,12 +30,52 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Admin/Bookings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQm9va2luZ3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Admin/CreateUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ3JlYXRlVXNlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Admin/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Admin/Hotels.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cSG90ZWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Admin/Packages.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cUGFja2FnZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Admin/Users.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVXNlcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Agent/Activities.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWdlbnRcQWN0aXZpdGllcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Agent/Bookings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWdlbnRcQm9va2luZ3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Agent/CreatePackage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWdlbnRcQ3JlYXRlUGFja2FnZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Agent/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWdlbnRcRGFzaGJvYXJkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Agent/EditPackage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWdlbnRcRWRpdFBhY2thZ2UuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Agent/Packages.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWdlbnRcUGFja2FnZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Home/Index.cshtml]
@@ -46,8 +86,36 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Owner/AddRoom.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3duZXJcQWRkUm9vbS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Owner/Bookings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3duZXJcQm9va2luZ3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Owner/CreateHotel.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3duZXJcQ3JlYXRlSG90ZWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Owner/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3duZXJcRGFzaGJvYXJkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Owner/EditHotel.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3duZXJcRWRpdEhvdGVsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Owner/EditRoom.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3duZXJcRWRpdFJvb20uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Owner/Hotels.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3duZXJcSG90ZWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Owner/Rooms.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3duZXJcUm9vbXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Shared/Error.cshtml]
@@ -56,6 +124,22 @@ build_metadata.AdditionalFiles.CssScope =
 
 [E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Shared/_AdminLayout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BZG1pbkxheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Shared/_ApprovalBadge.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BcHByb3ZhbEJhZGdlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Shared/_BookingStatusActions.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Cb29raW5nU3RhdHVzQWN0aW9ucy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Shared/_BookingStatusBadge.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Cb29raW5nU3RhdHVzQmFkZ2UuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Shared/_EmptyState.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9FbXB0eVN0YXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Shared/_ValidationScriptsPartial.cshtml]

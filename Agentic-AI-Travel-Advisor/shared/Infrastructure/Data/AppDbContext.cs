@@ -15,6 +15,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Room> Rooms => Set<Room>();
     public DbSet<Destination> Destinations => Set<Destination>();
     public DbSet<TravelPackage> TravelPackages => Set<TravelPackage>();
+    public DbSet<PackageActivity> PackageActivities => Set<PackageActivity>();
     public DbSet<Booking> Bookings => Set<Booking>();
     public DbSet<TravelPreferences> TravelPreferences => Set<TravelPreferences>();
     public DbSet<Itinerary> Itineraries => Set<Itinerary>();
@@ -54,11 +55,27 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
                 "(\"RoomId\" IS NOT NULL AND \"TravelPackageId\" IS NULL) OR (\"RoomId\" IS NULL AND \"TravelPackageId\" IS NOT NULL)"));
         });
 
+        builder.Entity<Itinerary>(entity =>
+        {
+            entity.HasOne(i => i.Destination)
+                .WithMany(d => d.Itineraries)
+                .HasForeignKey(i => i.DestinationId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
         builder.Entity<ItineraryItem>(entity =>
         {
             entity.HasOne(i => i.Itinerary)
                 .WithMany(it => it.Items)
                 .HasForeignKey(i => i.ItineraryId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<PackageActivity>(entity =>
+        {
+            entity.HasOne(a => a.TravelPackage)
+                .WithMany(p => p.Activities)
+                .HasForeignKey(a => a.TravelPackageId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
     }

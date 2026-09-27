@@ -1,31 +1,6 @@
 # Database Documentation
 
-## Overview
-
-PostgreSQL database for the Travel Advisor platform. Schema is managed by **EF Core migrations** in `shared/Infrastructure/Migrations/`.
-
 ## Setup
-
-### 1. Create the database
-
-```sql
-CREATE DATABASE travel_advisor;
-```
-
-### 2. Configure connection string
-
-Update the password in both config files to match your local PostgreSQL install:
-
-- [`web-api/appsettings.json`](../web-api/appsettings.json)
-- [`web-app/appsettings.json`](../web-app/appsettings.json)
-
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "Host=localhost;Port=5432;Database=travel_advisor;Username=postgres;Password=YOUR_PASSWORD"
-}
-```
-
-### 3. Apply migrations
 
 ```bash
 dotnet ef database update \
@@ -33,37 +8,38 @@ dotnet ef database update \
   --startup-project web-api/TravelAdvisor.Api.csproj
 ```
 
-On first API startup, `DbSeeder` also runs migrations and seeds roles plus demo accounts.
+Connection string in `web-api/appsettings.json`.
 
 ## Tables
 
 | Table | Description |
 |-------|-------------|
-| `Roles` | Application RBAC roles |
-| `AspNetUsers` | Users (ASP.NET Identity + profile fields) |
-| `Hotels` | Hotel listings |
-| `Rooms` | Hotel rooms |
-| `Destinations` | Travel destinations |
-| `TravelPackages` | Agent-created packages |
-| `Bookings` | User reservations |
-| `TravelPreferences` | User travel preferences (1:1) |
-| `Itineraries` | Trip itineraries |
-| `ItineraryItems` | Day-by-day itinerary entries |
-| `AIConversations` | AI chat history (JSON messages) |
-
-Plus standard ASP.NET Identity tables (`AspNetRoles`, `AspNetUserClaims`, etc.).
+| Roles | RBAC roles |
+| AspNetUsers | Users with profile + RoleId |
+| Destinations | Travel destinations |
+| Hotels | Hotel listings (owner FK, `ApprovalStatus`) |
+| Rooms | Hotel rooms |
+| TravelPackages | Agent packages (destination FK, `ApprovalStatus`) |
+| PackageActivities | Activities within packages (Day 2) |
+| Bookings | Room or package reservations |
+| TravelPreferences | User preferences (1:1) |
+| Itineraries / ItineraryItems | Trip plans |
+| AIConversations | AI chat history |
 
 ## Seed Data
 
-| Role | Email | Password |
-|------|-------|----------|
-| ADMIN | admin@traveladvisor.com | Admin@123 |
-| HOTEL_OWNER | owner@traveladvisor.com | Owner@123 |
-| TRAVEL_AGENT | agent@traveladvisor.com | Agent@123 |
+On API startup, `DbSeeder` creates:
+- 4 roles + demo admin/owner/agent accounts
+- 5 international destinations (Paris, Tokyo, Bali, New York, Rome)
+- 2 hotels with 4 rooms (owner account)
+- 3 travel packages with 7 activities (agent account)
+- Additive Sri Lanka catalog (if Ella is missing): Ella, Kandy, Galle destinations; hotels/rooms; 3-day packages with hill-country, cultural, and fort activities priced for LKR budgets around Rs. 50,000
 
-Roles: `USER`, `HOTEL_OWNER`, `TRAVEL_AGENT`, `ADMIN`
+## Migrations
 
-## Reference SQL
+- `InitialCreate` — core schema
+- `AddPackageActivity` — PackageActivities table
+- `AddItineraryPlanFields` — Itineraries.EstimatedCost, DestinationId, Summary
+- `AddApprovalStatus` — `Hotels.ApprovalStatus` and `TravelPackages.ApprovalStatus` (`Pending=0`, `Approved=1`, `Rejected=2`). Existing rows default to **Approved** so the public catalog stays visible.
 
-- Schema reference: [`database/schemas/001_initial.sql`](../database/schemas/001_initial.sql)
-- Role seed: [`database/seed/001_roles.sql`](../database/seed/001_roles.sql)
+`ApprovalStatus` on new hotels/packages is **Pending**. Seeded catalog listings are **Approved**. Public `GET /api/hotels` and `GET /api/packages` filter to Approved. Bookings ignore Cancelled rows for overlap checks.

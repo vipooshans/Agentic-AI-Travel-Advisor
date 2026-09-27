@@ -18,7 +18,7 @@ public class ApiAuthService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<(bool Success, string? Error)> LoginAsync(LoginViewModel model)
+    public async Task<(bool Success, string? Error, string? Role)> LoginAsync(LoginViewModel model)
     {
         var client = _httpClientFactory.CreateClient("TravelAdvisorApi");
         var response = await client.PostAsJsonAsync("/api/auth/login", new LoginRequest
@@ -30,22 +30,22 @@ public class ApiAuthService
         if (!response.IsSuccessStatusCode)
         {
             var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
-            return (false, error?.Message ?? "Login failed.");
+            return (false, error?.Message ?? "Login failed.", null);
         }
 
         var auth = await response.Content.ReadFromJsonAsync<AuthResponse>();
         if (auth is null)
         {
-            return (false, "Invalid response from server.");
+            return (false, "Invalid response from server.", null);
         }
 
         if (auth.User.Role == "USER")
         {
-            return (false, "Regular users should use the mobile app.");
+            return (false, "Regular users should use the mobile app.", null);
         }
 
         await SignInAsync(auth);
-        return (true, null);
+        return (true, null, auth.User.Role);
     }
 
     public async Task LogoutAsync()

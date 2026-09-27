@@ -1,0 +1,8 @@
+@{
+    var title = ViewData["EmptyTitle"] as string ?? "Nothing here yet";
+    var message = ViewData["EmptyMessage"] as string ?? "There are no items to show.";
+}
+<div class="empty-state">
+    <h6>@title</h6>
+    <p class="text-muted mb-0">@message</p>
+</div>

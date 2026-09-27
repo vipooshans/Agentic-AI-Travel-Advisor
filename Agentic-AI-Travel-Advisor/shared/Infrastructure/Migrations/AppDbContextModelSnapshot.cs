@@ -356,6 +356,9 @@ namespace TravelAdvisor.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("ApprovalStatus")
+                        .HasColumnType("integer");
+
                     b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("text");
@@ -390,14 +393,23 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("DestinationId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("EstimatedCost")
+                        .HasColumnType("numeric");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Summary")
+                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -408,6 +420,8 @@ namespace TravelAdvisor.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DestinationId");
 
                     b.HasIndex("UserId");
 
@@ -446,6 +460,40 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.HasIndex("ItineraryId");
 
                     b.ToTable("ItineraryItems");
+                });
+
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.PackageActivity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DayNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TravelPackageId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TravelPackageId");
+
+                    b.ToTable("PackageActivities");
                 });
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.Role", b =>
@@ -514,6 +562,9 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.Property<string>("AgentId")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("ApprovalStatus")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -681,11 +732,18 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.Itinerary", b =>
                 {
+                    b.HasOne("TravelAdvisor.Core.Entities.Destination", "Destination")
+                        .WithMany("Itineraries")
+                        .HasForeignKey("DestinationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("TravelAdvisor.Core.Entities.ApplicationUser", "User")
                         .WithMany("Itineraries")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Destination");
 
                     b.Navigation("User");
                 });
@@ -699,6 +757,17 @@ namespace TravelAdvisor.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Itinerary");
+                });
+
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.PackageActivity", b =>
+                {
+                    b.HasOne("TravelAdvisor.Core.Entities.TravelPackage", "TravelPackage")
+                        .WithMany("Activities")
+                        .HasForeignKey("TravelPackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TravelPackage");
                 });
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.Room", b =>
@@ -759,6 +828,8 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.Destination", b =>
                 {
+                    b.Navigation("Itineraries");
+
                     b.Navigation("TravelPackages");
                 });
 
@@ -784,6 +855,8 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.TravelPackage", b =>
                 {
+                    b.Navigation("Activities");
+
                     b.Navigation("Bookings");
                 });
 #pragma warning restore 612, 618
