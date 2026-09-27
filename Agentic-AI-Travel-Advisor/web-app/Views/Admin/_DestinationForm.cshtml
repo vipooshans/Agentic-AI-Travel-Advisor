@@ -20,7 +20,7 @@
     <span asp-validation-for="ImageUrl" class="text-danger"></span>
 </div>
 <div class="mb-3">
-    <img id="destinationPreview" alt="Destination preview" src="@Model.ImageUrl" style="max-width:320px;height:160px;object-fit:cover;border-radius:8px;@(string.IsNullOrWhiteSpace(Model.ImageUrl) ? "display:none" : null)" />
+    <img id="destinationPreview" class="destination-preview" alt="Destination preview" src="@Model.ImageUrl" style="@(string.IsNullOrWhiteSpace(Model.ImageUrl) ? "display:none" : null)" />
 </div>
 
 <script>
