@@ -7,6 +7,8 @@
         && string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase)
             ? "nav-link active"
             : "nav-link";
+    var displayName = User.Identity?.Name ?? "";
+    var initial = string.IsNullOrWhiteSpace(displayName) ? "T" : char.ToUpperInvariant(displayName.Trim()[0]).ToString();
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -14,7 +16,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Travel Advisor</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
 </head>
 <body>
@@ -22,46 +27,100 @@
     <div class="admin-wrapper">
         <aside class="admin-sidebar">
             <div class="sidebar-brand">
-                <h4>Travel Advisor</h4>
-                <small>@ViewData["Role"]</small>
+                <div class="brand-lockup">
+                    <span class="brand-mark" aria-hidden="true">TA</span>
+                    <div>
+                        <h4>Travel Advisor</h4>
+                        <small>@ViewData["Role"]</small>
+                    </div>
+                </div>
             </div>
             <nav class="sidebar-nav">
                 @if (portal == "Owner")
                 {
-                    <a class="@NavClass("Owner", "Dashboard")" asp-controller="Owner" asp-action="Dashboard">Dashboard</a>
-                    <a class="@NavClass("Owner", "Hotels")" asp-controller="Owner" asp-action="Hotels">My Hotels</a>
-                    <a class="@NavClass("Owner", "CreateHotel")" asp-controller="Owner" asp-action="CreateHotel">Add Hotel</a>
-                    <a class="@NavClass("Owner", "Bookings")" asp-controller="Owner" asp-action="Bookings">Bookings</a>
+                    <a class="@NavClass("Owner", "Dashboard")" asp-controller="Owner" asp-action="Dashboard">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                        Dashboard
+                    </a>
+                    <a class="@NavClass("Owner", "Hotels")" asp-controller="Owner" asp-action="Hotels">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V8l8-4 8 4v12"/><path d="M9 20v-6h6v6"/></svg>
+                        My Hotels
+                    </a>
+                    <a class="@NavClass("Owner", "CreateHotel")" asp-controller="Owner" asp-action="CreateHotel">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                        Add Hotel
+                    </a>
+                    <a class="@NavClass("Owner", "Bookings")" asp-controller="Owner" asp-action="Bookings">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>
+                        Bookings
+                    </a>
                 }
                 else if (portal == "Agent")
                 {
-                    <a class="@NavClass("Agent", "Dashboard")" asp-controller="Agent" asp-action="Dashboard">Dashboard</a>
-                    <a class="@NavClass("Agent", "Packages")" asp-controller="Agent" asp-action="Packages">My Packages</a>
-                    <a class="@NavClass("Agent", "CreatePackage")" asp-controller="Agent" asp-action="CreatePackage">Create Package</a>
-                    <a class="@NavClass("Agent", "Bookings")" asp-controller="Agent" asp-action="Bookings">Bookings</a>
+                    <a class="@NavClass("Agent", "Dashboard")" asp-controller="Agent" asp-action="Dashboard">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                        Dashboard
+                    </a>
+                    <a class="@NavClass("Agent", "Packages")" asp-controller="Agent" asp-action="Packages">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v11H4z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg>
+                        My Packages
+                    </a>
+                    <a class="@NavClass("Agent", "CreatePackage")" asp-controller="Agent" asp-action="CreatePackage">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                        Create Package
+                    </a>
+                    <a class="@NavClass("Agent", "Bookings")" asp-controller="Agent" asp-action="Bookings">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>
+                        Bookings
+                    </a>
                 }
                 else
                 {
-                    <a class="@NavClass("Admin", "Dashboard")" asp-controller="Admin" asp-action="Dashboard">Dashboard</a>
-                    <a class="@NavClass("Admin", "Users")" asp-controller="Admin" asp-action="Users">Users</a>
-                    <a class="@NavClass("Admin", "CreateUser")" asp-controller="Admin" asp-action="CreateUser">Create owner / agent</a>
-                    <a class="@NavClass("Admin", "Hotels")" asp-controller="Admin" asp-action="Hotels">Hotels</a>
-                    <a class="@NavClass("Admin", "Packages")" asp-controller="Admin" asp-action="Packages">Packages</a>
-                    <a class="@NavClass("Admin", "Bookings")" asp-controller="Admin" asp-action="Bookings">Bookings</a>
+                    <a class="@NavClass("Admin", "Dashboard")" asp-controller="Admin" asp-action="Dashboard">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                        Dashboard
+                    </a>
+                    <a class="@NavClass("Admin", "Users")" asp-controller="Admin" asp-action="Users">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 19c.6-3 2.8-4.5 6-4.5s5.4 1.5 6 4.5"/><circle cx="17" cy="9" r="2.2"/><path d="M16 14.6c2.2.3 3.8 1.5 4.4 4.4"/></svg>
+                        Users
+                    </a>
+                    <a class="@NavClass("Admin", "CreateUser")" asp-controller="Admin" asp-action="CreateUser">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                        Create owner / agent
+                    </a>
+                    <a class="@NavClass("Admin", "Hotels")" asp-controller="Admin" asp-action="Hotels">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V8l8-4 8 4v12"/><path d="M9 20v-6h6v6"/></svg>
+                        Hotels
+                    </a>
+                    <a class="@NavClass("Admin", "Packages")" asp-controller="Admin" asp-action="Packages">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v11H4z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg>
+                        Packages
+                    </a>
+                    <a class="@NavClass("Admin", "Bookings")" asp-controller="Admin" asp-action="Bookings">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>
+                        Bookings
+                    </a>
                 }
             </nav>
+            <div class="sidebar-foot">Private desk</div>
         </aside>
         <div class="admin-main">
             <header class="admin-header">
-                <div class="d-flex align-items-center gap-2">
-                    <button type="button" class="btn btn-outline-secondary btn-sm d-lg-none" id="sidebarToggle">Menu</button>
-                    <h5 class="mb-0">@ViewData["Title"]</h5>
+                <div class="header-title">
+                    <button type="button" class="icon-btn d-lg-none" id="sidebarToggle" aria-label="Open menu">
+                        <span></span><span></span><span></span>
+                    </button>
+                    <div>
+                        <p class="eyebrow">@portal portal</p>
+                        <h1>@ViewData["Title"]</h1>
+                    </div>
                 </div>
-                <div class="d-flex align-items-center gap-3">
-                    <span class="text-muted">@User.Identity?.Name</span>
+                <div class="header-user">
+                    <span class="avatar" aria-hidden="true">@initial</span>
+                    <span class="user-email">@displayName</span>
                     <form asp-controller="Account" asp-action="Logout" method="post">
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">Sign out</button>
                     </form>
                 </div>
             </header>
@@ -78,7 +137,7 @@
             </main>
         </div>
     </div>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

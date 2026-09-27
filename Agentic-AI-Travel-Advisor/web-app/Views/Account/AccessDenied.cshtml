@@ -8,15 +8,21 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>@ViewData["Title"] - Travel Advisor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
 </head>
-<body class="d-flex align-items-center justify-content-center vh-100 bg-light">
-    <div class="text-center">
-        <h1 class="display-6">Access Denied</h1>
-        <p class="text-muted">Your account does not have access to the admin portal.</p>
-        <p class="text-muted">Regular users should use the mobile app.</p>
-        <a asp-controller="Account" asp-action="Login" class="btn btn-primary">Back to Login</a>
-    </div>
+<body>
+    <main class="access-denied">
+        <div>
+            <p class="eyebrow">Private desk</p>
+            <h1>This door stays closed.</h1>
+            <p class="text-muted mx-auto" style="max-width: 28rem;">This portal is for administrators, hotel owners, and travel agents. Traveler accounts belong in the mobile app.</p>
+            <a asp-controller="Account" asp-action="Login" class="btn btn-primary mt-3">Back to sign in</a>
+        </div>
+    </main>
 </body>
 </html>

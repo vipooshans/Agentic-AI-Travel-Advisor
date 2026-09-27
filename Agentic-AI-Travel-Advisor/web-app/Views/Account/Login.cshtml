@@ -9,43 +9,60 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Travel Advisor Admin</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>@ViewData["Title"] - Travel Advisor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
 </head>
 <body class="login-page">
-    <div class="login-card">
-        <div class="text-center mb-4">
-            <h2>Travel Advisor</h2>
-            <p class="text-muted">Admin Portal Sign In</p>
-        </div>
-
-        <form asp-action="Login" method="post">
-            @Html.AntiForgeryToken()
-            <input type="hidden" asp-for="ReturnUrl" />
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label"></label>
-                <input asp-for="Email" class="form-control" placeholder="admin@traveladvisor.com" />
-                <span asp-validation-for="Email" class="text-danger"></span>
+    <div class="login-stage">
+        <section class="login-editorial">
+            <div>
+                <div class="editorial-kicker">
+                    <span class="brand-mark" aria-hidden="true">TA</span>
+                    Travel Advisor
+                </div>
+                <h1>A quieter desk<br />for the journey.</h1>
+                <p class="lede">Hotels, packages, and guest bookings, composed in one private portal for the people who run them.</p>
             </div>
+            <p class="editorial-foot">Staff sign-in · Admin, owners, and agents</p>
+        </section>
+        <section class="login-panel">
+            <div class="login-card">
+                <p class="eyebrow">Welcome back</p>
+                <h2>Sign in</h2>
+                <p class="sub">Use your staff account to open the desk.</p>
 
-            <div class="mb-3">
-                <label asp-for="Password" class="form-label"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
+                <form asp-action="Login" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="ReturnUrl" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" placeholder="name@traveladvisor.com" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2">Enter the desk</button>
+                </form>
+
+                <div class="demo-keys">
+                    <p class="eyebrow">House keys</p>
+                    <p>Admin · admin@traveladvisor.com / Admin@123</p>
+                    <p>Owner · owner@traveladvisor.com / Owner@123</p>
+                    <p>Agent · agent@traveladvisor.com / Agent@123</p>
+                </div>
             </div>
-
-            <button type="submit" class="btn btn-primary w-100">Sign In</button>
-        </form>
-
-        <div class="mt-4 text-center text-muted small">
-            <p>Demo accounts:</p>
-            <p class="mb-0">Admin: admin@traveladvisor.com / Admin@123</p>
-            <p class="mb-0">Owner: owner@traveladvisor.com / Owner@123</p>
-            <p>Agent: agent@traveladvisor.com / Agent@123</p>
-        </div>
+        </section>
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

@@ -2,7 +2,7 @@
 @{ Layout = "_AdminLayout"; }
 
 <h5 class="mb-3">Create hotel owner or travel agent</h5>
-<form asp-action="CreateUser" method="post" class="card card-body" style="max-width: 32rem;">
+<form asp-action="CreateUser" method="post">
     @Html.AntiForgeryToken()
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="mb-3">
