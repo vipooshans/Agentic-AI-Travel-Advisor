@@ -1,0 +1,240 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\web-api\\TravelAdvisor.Api.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj",
+        "projectName": "TravelAdvisor.Core",
+        "projectPath": "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj",
+        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\shared\\Core\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.Extensions.Identity.Stores": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj",
+        "projectName": "TravelAdvisor.Infrastructure",
+        "projectPath": "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj": {
+                "projectPath": "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
+            "Microsoft.Extensions.Configuration.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.3.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\web-api\\TravelAdvisor.Api.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\web-api\\TravelAdvisor.Api.csproj",
+        "projectName": "TravelAdvisor.Api",
+        "projectPath": "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\web-api\\TravelAdvisor.Api.csproj",
+        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\web-api\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj": {
+                "projectPath": "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj"
+              },
+              "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\HP\\Downloads\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor-main\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.11, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.6.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.423/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
