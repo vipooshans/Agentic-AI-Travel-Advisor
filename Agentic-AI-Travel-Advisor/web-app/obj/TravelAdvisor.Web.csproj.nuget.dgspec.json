@@ -1,29 +1,37 @@
 {
   "format": 1,
   "restore": {
-    "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\web-app\\TravelAdvisor.Web.csproj": {}
+    "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\web-app\\TravelAdvisor.Web.csproj": {}
   },
   "projects": {
-    "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj": {
+    "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj",
+        "projectUniqueName": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj",
         "projectName": "TravelAdvisor.Core",
-        "projectPath": "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj",
-        "packagesPath": "C:\\Users\\LOQ\\.nuget\\packages\\",
-        "outputPath": "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\shared\\Core\\obj\\",
+        "projectPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj",
+        "packagesPath": "C:\\Users\\Ajay pc\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Core\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\LOQ\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Ajay pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
+            "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {}
           }
@@ -38,10 +46,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.300"
       },
       "frameworks": {
         "net8.0": {
+          "framework": "net8.0",
           "targetAlias": "net8.0",
           "dependencies": {
             "Microsoft.Extensions.Identity.Stores": {
@@ -63,15 +72,15 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.24, 8.0.24]"
+              "version": "[8.0.29, 8.0.29]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.24, 8.0.24]"
+              "version": "[8.0.29, 8.0.29]"
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.24, 8.0.24]"
+              "version": "[8.0.29, 8.0.29]"
             }
           ],
           "frameworkReferences": {
@@ -79,34 +88,42 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj": {
+    "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj",
         "projectName": "TravelAdvisor.Infrastructure",
-        "projectPath": "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\LOQ\\.nuget\\packages\\",
-        "outputPath": "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\obj\\",
+        "projectPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\Ajay pc\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\LOQ\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Ajay pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
+            "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {
-              "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj": {
-                "projectPath": "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj"
+              "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj": {
+                "projectPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj"
               }
             }
           }
@@ -121,10 +138,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.300"
       },
       "frameworks": {
         "net8.0": {
+          "framework": "net8.0",
           "targetAlias": "net8.0",
           "dependencies": {
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
@@ -162,15 +180,15 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.24, 8.0.24]"
+              "version": "[8.0.29, 8.0.29]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.24, 8.0.24]"
+              "version": "[8.0.29, 8.0.29]"
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.24, 8.0.24]"
+              "version": "[8.0.29, 8.0.29]"
             }
           ],
           "frameworkReferences": {
@@ -178,37 +196,45 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\web-app\\TravelAdvisor.Web.csproj": {
+    "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\web-app\\TravelAdvisor.Web.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\web-app\\TravelAdvisor.Web.csproj",
+        "projectUniqueName": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\web-app\\TravelAdvisor.Web.csproj",
         "projectName": "TravelAdvisor.Web",
-        "projectPath": "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\web-app\\TravelAdvisor.Web.csproj",
-        "packagesPath": "C:\\Users\\LOQ\\.nuget\\packages\\",
-        "outputPath": "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\web-app\\obj\\",
+        "projectPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\web-app\\TravelAdvisor.Web.csproj",
+        "packagesPath": "C:\\Users\\Ajay pc\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\web-app\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\LOQ\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Ajay pc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
+            "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {
-              "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj": {
-                "projectPath": "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj"
+              "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj": {
+                "projectPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj"
               },
-              "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj": {
-                "projectPath": "E:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj"
+              "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj"
               }
             }
           }
@@ -223,10 +249,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.300"
       },
       "frameworks": {
         "net8.0": {
+          "framework": "net8.0",
           "targetAlias": "net8.0",
           "imports": [
             "net461",
@@ -242,19 +269,19 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.24, 8.0.24]"
+              "version": "[8.0.29, 8.0.29]"
             },
             {
               "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[8.0.24, 8.0.24]"
+              "version": "[8.0.29, 8.0.29]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.24, 8.0.24]"
+              "version": "[8.0.29, 8.0.29]"
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.24, 8.0.24]"
+              "version": "[8.0.29, 8.0.29]"
             }
           ],
           "frameworkReferences": {
@@ -265,7 +292,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
