@@ -19,6 +19,7 @@ import '../screens/edit_profile_screen.dart';
 import '../screens/preferences_screen.dart';
 import '../screens/register_screen.dart';
 import '../screens/splash_screen.dart';
+import '../theme/app_theme.dart';
 import '../widgets/main_shell.dart';
 
 GoRouter createAppRouter(AuthProvider authProvider) {
@@ -102,11 +103,10 @@ class TravelAdvisorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Travel Advisor',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      title: 'Agentic AI Travel Advisor',
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
       routerConfig: router,
     );
   }
