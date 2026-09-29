@@ -6,6 +6,8 @@ class AuthTextField extends StatelessWidget {
   final bool obscureText;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
+  final Widget? suffixIcon;
+  final Widget? prefixIcon;
 
   const AuthTextField({
     super.key,
@@ -14,6 +16,8 @@ class AuthTextField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.validator,
+    this.suffixIcon,
+    this.prefixIcon,
   });
 
   @override
@@ -28,6 +32,8 @@ class AuthTextField extends StatelessWidget {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
         fillColor: Colors.grey.shade50,
+        suffixIcon: suffixIcon,
+        prefixIcon: prefixIcon,
       ),
     );
   }

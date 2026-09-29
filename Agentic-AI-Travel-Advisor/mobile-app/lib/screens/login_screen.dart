@@ -16,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -54,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(Icons.flight_takeoff, size: 56, color: Colors.blue),
+                  const Icon(Icons.flight_takeoff, size: 56, color: Color(0xFF1E56A0)),
                   const SizedBox(height: 16),
                   Text(
                     'Welcome Back',
@@ -80,16 +81,29 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailController,
                     label: 'Email',
                     keyboardType: TextInputType.emailAddress,
-                    validator: (v) =>
-                        v == null || v.isEmpty ? 'Email is required' : null,
+                    prefixIcon: const Icon(Icons.email_outlined),
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Email is required';
+                      final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                      if (!emailRegex.hasMatch(v)) return 'Enter a valid email address';
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
                   AuthTextField(
                     controller: _passwordController,
                     label: 'Password',
-                    obscureText: true,
-                    validator: (v) =>
-                        v == null || v.isEmpty ? 'Password is required' : null,
+                    obscureText: _obscurePassword,
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    suffixIcon: IconButton(
+                      icon: Icon(_obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    ),
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Password is required';
+                      if (v.length < 6) return 'Password must be at least 6 characters';
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 24),
                   FilledButton(

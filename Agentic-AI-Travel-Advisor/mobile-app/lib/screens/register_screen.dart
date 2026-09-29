@@ -18,6 +18,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -77,6 +78,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 AuthTextField(
                   controller: _firstNameController,
                   label: 'First Name',
+                  prefixIcon: const Icon(Icons.person_outline),
                   validator: (v) =>
                       v == null || v.isEmpty ? 'First name is required' : null,
                 ),
@@ -84,6 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 AuthTextField(
                   controller: _lastNameController,
                   label: 'Last Name',
+                  prefixIcon: const Icon(Icons.person_outline),
                   validator: (v) =>
                       v == null || v.isEmpty ? 'Last name is required' : null,
                 ),
@@ -92,17 +95,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _emailController,
                   label: 'Email',
                   keyboardType: TextInputType.emailAddress,
-                  validator: (v) =>
-                      v == null || v.isEmpty ? 'Email is required' : null,
+                  prefixIcon: const Icon(Icons.email_outlined),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Email is required';
+                    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                    if (!emailRegex.hasMatch(v)) return 'Enter a valid email address';
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
                 AuthTextField(
                   controller: _passwordController,
                   label: 'Password',
-                  obscureText: true,
+                  obscureText: _obscurePassword,
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  ),
                   validator: (v) {
                     if (v == null || v.isEmpty) return 'Password is required';
-                    if (v.length < 6) return 'Minimum 6 characters';
+                    if (v.length < 6) return 'Password must be at least 6 characters';
                     return null;
                   },
                 ),
@@ -122,11 +135,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Text('Register'),
-                ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () => context.go('/login'),
-                  child: const Text('Already have an account? Sign In'),
                 ),
               ],
             ),
