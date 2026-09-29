@@ -1,0 +1,44 @@
+@model TravelAdvisor.Web.Models.DestinationFormViewModel
+
+<div class="mb-3">
+    <label asp-for="Name" class="form-label"></label>
+    <input asp-for="Name" class="form-control" />
+    <span asp-validation-for="Name" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Country" class="form-label"></label>
+    <input asp-for="Country" class="form-control" />
+    <span asp-validation-for="Country" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <label asp-for="Description" class="form-label"></label>
+    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+</div>
+<div class="mb-3">
+    <label asp-for="ImageUrl" class="form-label">Image URL</label>
+    <input asp-for="ImageUrl" class="form-control" id="ImageUrl" placeholder="https://..." />
+    <span asp-validation-for="ImageUrl" class="text-danger"></span>
+</div>
+<div class="mb-3">
+    <img id="destinationPreview" alt="Destination preview" src="@Model.ImageUrl" style="max-width:320px;height:160px;object-fit:cover;border-radius:8px;@(string.IsNullOrWhiteSpace(Model.ImageUrl) ? "display:none" : null)" />
+</div>
+
+<script>
+    (function () {
+        const input = document.getElementById('ImageUrl');
+        const preview = document.getElementById('destinationPreview');
+        if (!input || !preview) return;
+        const show = () => {
+            const value = input.value.trim();
+            if (!value) {
+                preview.style.display = 'none';
+                preview.removeAttribute('src');
+                return;
+            }
+            preview.style.display = 'block';
+            preview.src = value;
+        };
+        input.addEventListener('input', show);
+        preview.addEventListener('error', () => { preview.style.display = 'none'; });
+    })();
+</script>
