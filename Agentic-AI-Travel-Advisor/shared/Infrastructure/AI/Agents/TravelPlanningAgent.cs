@@ -88,13 +88,15 @@ public class TravelPlanningAgent
             }
         }
 
-        var budgetMatch = Regex.Match(text, @"(?:rs\.?|lkr|usd|\$|budget|under|below)\s*:?\s*([\d,]+)", RegexOptions.IgnoreCase);
-        if (!budgetMatch.Success)
-            budgetMatch = Regex.Match(text, @"([\d,]+)\s*(?:rs\.?|lkr)", RegexOptions.IgnoreCase);
-        if (budgetMatch.Success &&
-            decimal.TryParse(budgetMatch.Groups[1].Value.Replace(",", ""), NumberStyles.Number, CultureInfo.InvariantCulture, out var budget))
+        var userMessages = history.Where(m => m.Role == "user").Select(m => m.Content).Reverse();
+        foreach (var message in userMessages)
         {
-            req.Budget = budget;
+            var budget = ParseBudget(message);
+            if (budget is > 0)
+            {
+                req.Budget = budget;
+                break;
+            }
         }
 
         var daysMatch = Regex.Match(text, @"(\d+)\s*-?\s*days?", RegexOptions.IgnoreCase);
@@ -112,7 +114,7 @@ public class TravelPlanningAgent
         else if (Regex.IsMatch(text, @"culture|temple|heritage|history", RegexOptions.IgnoreCase))
             req.Interests = "culture, heritage";
 
-        if (Regex.IsMatch(text, @"budget|cheap|hostel", RegexOptions.IgnoreCase))
+        if (Regex.IsMatch(text, @"\bbudget\s+(?:hotels?|stays?|accommodation|rooms?|options?)\b|cheap|hostel", RegexOptions.IgnoreCase))
             req.AccommodationPreference = "budget";
         else if (Regex.IsMatch(text, @"luxury|suite|5[\s-]?star", RegexOptions.IgnoreCase))
             req.AccommodationPreference = "luxury";
@@ -120,6 +122,30 @@ public class TravelPlanningAgent
             req.AccommodationPreference = "mid-range";
 
         return req;
+    }
+
+    private static decimal? ParseBudget(string message)
+    {
+        const string amount = @"(\d[\d,]*(?:\.\d+)?)";
+        var patterns = new[]
+        {
+            $@"(?:rs\.?|lkr|usd|\$|budget|under|below|max(?:imum)?)\s*(?:is|of|:|=|around|about|approx(?:imately)?|up\s*to|\s)*\s*{amount}",
+            $@"{amount}\s*(?:rs\.?|lkr|rupees|/-)",
+            // A reply that is only a number, e.g. "400000" after being asked for a budget.
+            $@"^\s*{amount}\s*$"
+        };
+
+        foreach (var pattern in patterns)
+        {
+            var match = Regex.Match(message, pattern, RegexOptions.IgnoreCase);
+            if (!match.Success)
+                continue;
+            if (decimal.TryParse(match.Groups[1].Value.Replace(",", ""), NumberStyles.Number, CultureInfo.InvariantCulture, out var value)
+                && value >= 1000)
+                return value;
+        }
+
+        return null;
     }
 
     public static void ApplyDefaults(TripRequirements req)
@@ -143,12 +169,15 @@ public class TravelPlanningAgent
         req.AccommodationPreference ??= "mid-range";
     }
 
-    public string BuildClarifyingMessage(TripRequirements req)
+    public string BuildClarifyingMessage(TripRequirements req, IReadOnlyList<string> knownDestinations)
     {
+        var options = knownDestinations.Count > 0
+            ? string.Join(", ", knownDestinations)
+            : "Ella, Kandy, or Galle";
         if (req.MissingFields.Contains("destination") && req.MissingFields.Contains("budget"))
-            return "I can plan that. Where would you like to go, and what is your total budget (for example Rs. 50,000)?";
+            return $"I can plan that. Which destination would you like (I can currently plan trips to {options}), and what is your total budget (for example Rs. 50,000)?";
         if (req.MissingFields.Contains("destination"))
-            return "Happy to help. Which destination should I plan for? (for example Ella, Kandy, or Galle)";
+            return $"Got your budget. Which destination should I plan for? I can currently plan trips to {options}.";
         if (req.MissingFields.Contains("budget"))
             return "Great destination. What is your total budget for the trip?";
         return "Tell me the destination and budget and I will put a plan together.";

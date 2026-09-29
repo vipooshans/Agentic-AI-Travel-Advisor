@@ -57,7 +57,7 @@ public class AgenticAiService : IAgenticAiService
 
         if (!requirements.HasEnoughToPlan)
         {
-            reply = _planning.BuildClarifyingMessage(requirements);
+            reply = _planning.BuildClarifyingMessage(requirements, knownDestinations);
             if (_llm.IsConfigured)
             {
                 try
