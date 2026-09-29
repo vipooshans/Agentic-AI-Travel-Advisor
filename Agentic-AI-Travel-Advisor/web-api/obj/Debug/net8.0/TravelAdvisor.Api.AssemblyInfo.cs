@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TravelAdvisor.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fd145a91fc0145eefb214e204176dd4a7d65aa89")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b6e04de08636564b8c6e60722872d9e98b39de03")]
 [assembly: System.Reflection.AssemblyProductAttribute("TravelAdvisor.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TravelAdvisor.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

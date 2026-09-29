@@ -54,7 +54,16 @@ class ApiService {
   String? parseErrorMessage(http.Response response) {
     try {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
-      return data['message'] as String?;
+      final message = data['message'] as String?;
+      final errors = data['errors'];
+      final details = <String>[
+        if (errors is List) ...errors.map((e) => e.toString()),
+        if (errors is Map)
+          for (final value in errors.values)
+            if (value is List) ...value.map((e) => e.toString()) else value.toString(),
+      ];
+      if (details.isEmpty) return message ?? 'Request failed (${response.statusCode})';
+      return [if (message != null) message, ...details].join('\n');
     } catch (_) {
       return 'Request failed (${response.statusCode})';
     }

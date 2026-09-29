@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TravelAdvisor.Core.Entities;
 
 namespace TravelAdvisor.Infrastructure.Data;
@@ -21,6 +22,25 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Itinerary> Itineraries => Set<Itinerary>();
     public DbSet<ItineraryItem> ItineraryItems => Set<ItineraryItem>();
     public DbSet<AIConversation> AIConversations => Set<AIConversation>();
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        // Npgsql only accepts UTC for timestamptz; clients post dates like "2026-10-05" with no offset.
+        configurationBuilder.Properties<DateTime>().HaveConversion<UtcDateTimeConverter>();
+        configurationBuilder.Properties<DateTime?>().HaveConversion<UtcDateTimeConverter>();
+    }
+
+    internal sealed class UtcDateTimeConverter : ValueConverter<DateTime, DateTime>
+    {
+        public UtcDateTimeConverter()
+            : base(
+                v => v.Kind == DateTimeKind.Utc ? v
+                    : v.Kind == DateTimeKind.Local ? v.ToUniversalTime()
+                    : DateTime.SpecifyKind(v, DateTimeKind.Utc),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc))
+        {
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
