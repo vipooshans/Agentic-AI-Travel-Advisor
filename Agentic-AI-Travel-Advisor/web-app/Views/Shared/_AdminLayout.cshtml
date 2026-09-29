@@ -88,6 +88,10 @@
                         <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
                         Create owner / agent
                     </a>
+                    <a class="@(currentAction is "Destinations" or "CreateDestination" or "EditDestination" ? "nav-link active" : "nav-link")" asp-controller="Admin" asp-action="Destinations">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+                        Destinations
+                    </a>
                     <a class="@NavClass("Admin", "Hotels")" asp-controller="Admin" asp-action="Hotels">
                         <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V8l8-4 8 4v12"/><path d="M9 20v-6h6v6"/></svg>
                         Hotels

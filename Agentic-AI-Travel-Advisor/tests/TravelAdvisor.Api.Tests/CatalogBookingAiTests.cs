@@ -86,6 +86,47 @@ public class CatalogBookingAiTests
     }
 
     [SkippableFact]
+    public async Task Admin_can_create_and_update_destination()
+    {
+        Skip.If(!_fx.Available, _fx.SkipReason);
+        var admin = await Login("admin@traveladvisor.com", "Admin@123");
+        var name = $"Lisbon {Guid.NewGuid():N}"[..20];
+        _fx.Client.DefaultRequestHeaders.Authorization = null;
+
+        var denied = await _fx.Client.PostAsJsonAsync("/api/destinations", new
+        {
+            name,
+            country = "Portugal",
+            description = "Should fail",
+            imageUrl = "https://example.com/lisbon.jpg"
+        });
+        Assert.Equal(HttpStatusCode.Unauthorized, denied.StatusCode);
+
+        var created = await Authed(admin.Token).PostAsJsonAsync("/api/destinations", new
+        {
+            name,
+            country = "Portugal",
+            description = "Hills and trams",
+            imageUrl = "https://example.com/lisbon.jpg"
+        });
+        Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        var destination = await created.Content.ReadFromJsonAsync<DestinationDto>(Json);
+
+        var updated = await Authed(admin.Token).PutAsJsonAsync($"/api/destinations/{destination!.Id}", new
+        {
+            name,
+            country = "Portugal",
+            description = "Updated detail",
+            imageUrl = "https://example.com/lisbon-2.jpg"
+        });
+        Assert.Equal(HttpStatusCode.OK, updated.StatusCode);
+
+        var fetched = await _fx.Client.GetFromJsonAsync<DestinationDetailDto>($"/api/destinations/{destination.Id}", Json);
+        Assert.Equal("Updated detail", fetched!.Description);
+        Assert.Equal("https://example.com/lisbon-2.jpg", fetched.ImageUrl);
+    }
+
+    [SkippableFact]
     public async Task Booking_lifecycle_and_illegal_status()
     {
         Skip.If(!_fx.Available, _fx.SkipReason);

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TravelAdvisor.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b9b76abbd308e817d58bc493202b828b2906a011")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e8047505a2512b241ed9c2d91e155d6db8dfa628")]
 [assembly: System.Reflection.AssemblyProductAttribute("TravelAdvisor.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TravelAdvisor.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

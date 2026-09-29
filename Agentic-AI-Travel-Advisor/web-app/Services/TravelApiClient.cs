@@ -23,6 +23,21 @@ public class TravelApiClient
     public async Task<List<DestinationDto>> GetDestinationsAsync()
         => await Client.GetFromJsonAsync<List<DestinationDto>>("/api/destinations") ?? [];
 
+    public async Task<DestinationDetailDto?> GetDestinationAsync(int id)
+        => await Client.GetFromJsonAsync<DestinationDetailDto>($"/api/destinations/{id}");
+
+    public async Task<DestinationDto?> CreateDestinationAsync(SaveDestinationRequest request)
+    {
+        var response = await Client.PostAsJsonAsync("/api/destinations", request);
+        return response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<DestinationDto>() : null;
+    }
+
+    public async Task<bool> UpdateDestinationAsync(int id, SaveDestinationRequest request)
+    {
+        var response = await Client.PutAsJsonAsync($"/api/destinations/{id}", request);
+        return response.IsSuccessStatusCode;
+    }
+
     public async Task<List<HotelDto>> GetMyHotelsAsync()
         => await Client.GetFromJsonAsync<List<HotelDto>>("/api/hotels/mine") ?? [];
 

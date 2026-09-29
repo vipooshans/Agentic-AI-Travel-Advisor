@@ -34,12 +34,24 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQm9va2luZ3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Admin/CreateDestination.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ3JlYXRlRGVzdGluYXRpb24uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Admin/CreateUser.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ3JlYXRlVXNlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Admin/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGFzaGJvYXJkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Admin/Destinations.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGVzdGluYXRpb25zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Admin/EditDestination.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRWRpdERlc3RpbmF0aW9uLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Admin/Hotels.cshtml]
@@ -52,6 +64,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Admin/Users.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVXNlcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Admin/_DestinationForm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cX0Rlc3RpbmF0aW9uRm9ybS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-app/Views/Agent/Activities.cshtml]
