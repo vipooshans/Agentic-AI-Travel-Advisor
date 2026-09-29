@@ -56,6 +56,7 @@ public class PackagesController : ControllerBase
                 DestinationId = p.DestinationId,
                 DestinationName = p.Destination.Name,
                 DestinationCountry = p.Destination.Country,
+                ImageUrl = p.ImageUrl ?? p.Destination.ImageUrl,
                 ActivityCount = p.Activities.Count,
                 ApprovalStatus = p.ApprovalStatus
             })
@@ -84,6 +85,7 @@ public class PackagesController : ControllerBase
                 DestinationId = p.DestinationId,
                 DestinationName = p.Destination.Name,
                 DestinationCountry = p.Destination.Country,
+                ImageUrl = p.ImageUrl ?? p.Destination.ImageUrl,
                 ActivityCount = p.Activities.Count,
                 ApprovalStatus = p.ApprovalStatus
             })
@@ -141,6 +143,7 @@ public class PackagesController : ControllerBase
             DestinationId = package.DestinationId,
             DestinationName = destination!.Name,
             DestinationCountry = destination.Country,
+            ImageUrl = package.ImageUrl ?? destination.ImageUrl,
             ActivityCount = 0,
             ApprovalStatus = package.ApprovalStatus
         });
@@ -188,6 +191,7 @@ public class PackagesController : ControllerBase
             DestinationId = package.DestinationId,
             DestinationName = destination!.Name,
             DestinationCountry = destination.Country,
+            ImageUrl = package.ImageUrl ?? destination.ImageUrl,
             ActivityCount = package.Activities.Count,
             ApprovalStatus = package.ApprovalStatus
         });
@@ -277,6 +281,7 @@ public class PackagesController : ControllerBase
             DestinationId = package.DestinationId,
             DestinationName = package.Destination.Name,
             DestinationCountry = package.Destination.Country,
+            ImageUrl = package.ImageUrl ?? package.Destination.ImageUrl,
             ActivityCount = package.Activities.Count,
             ApprovalStatus = package.ApprovalStatus
         });
@@ -304,6 +309,7 @@ public class PackagesController : ControllerBase
         DestinationId = package.DestinationId,
         DestinationName = package.Destination.Name,
         DestinationCountry = package.Destination.Country,
+        ImageUrl = string.IsNullOrWhiteSpace(package.ImageUrl) ? package.Destination.ImageUrl : package.ImageUrl,
         ActivityCount = package.Activities.Count,
         ApprovalStatus = package.ApprovalStatus,
         Activities = package.Activities

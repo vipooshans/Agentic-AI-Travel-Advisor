@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/destination.dart';
+import 'catalog_image.dart';
 
 class DestinationCard extends StatelessWidget {
   final Destination destination;
@@ -11,16 +12,17 @@ class DestinationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       clipBehavior: Clip.antiAlias,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
       child: InkWell(
         onTap: onTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (destination.imageUrl != null)
-              Image.network(destination.imageUrl!, height: 120, width: double.infinity, fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(height: 120, color: Colors.blue.shade100, child: const Icon(Icons.landscape, size: 48)))
-            else
-              Container(height: 120, color: Colors.blue.shade100, child: const Icon(Icons.landscape, size: 48)),
+            CatalogImage(imageUrl: destination.imageUrl, height: 120, fallbackIcon: Icons.landscape),
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(

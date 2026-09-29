@@ -9,6 +9,7 @@ class TravelPackage {
   final int destinationId;
   final String destinationName;
   final String destinationCountry;
+  final String? imageUrl;
   final int activityCount;
   final List<PackageActivity>? activities;
 
@@ -21,6 +22,7 @@ class TravelPackage {
     required this.destinationId,
     required this.destinationName,
     required this.destinationCountry,
+    this.imageUrl,
     required this.activityCount,
     this.activities,
   });
@@ -35,6 +37,7 @@ class TravelPackage {
       destinationId: json['destinationId'] as int,
       destinationName: json['destinationName'] as String,
       destinationCountry: json['destinationCountry'] as String,
+      imageUrl: json['imageUrl'] as String?,
       activityCount: json['activityCount'] as int? ?? 0,
       activities: json['activities'] != null
           ? (json['activities'] as List)

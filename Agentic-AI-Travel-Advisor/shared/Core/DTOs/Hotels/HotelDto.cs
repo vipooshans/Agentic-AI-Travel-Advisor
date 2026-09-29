@@ -10,6 +10,7 @@ public class HotelDto
     public string City { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
     public string? Description { get; set; }
+    public string? ImageUrl { get; set; }
     public int RoomCount { get; set; }
     public ApprovalStatus ApprovalStatus { get; set; }
 }

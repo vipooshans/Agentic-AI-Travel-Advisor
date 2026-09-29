@@ -54,6 +54,7 @@ public class HotelsController : ControllerBase
                 City = h.City,
                 Country = h.Country,
                 Description = h.Description,
+                ImageUrl = h.ImageUrl,
                 RoomCount = h.Rooms.Count,
                 ApprovalStatus = h.ApprovalStatus
             })
@@ -78,6 +79,7 @@ public class HotelsController : ControllerBase
                 City = h.City,
                 Country = h.Country,
                 Description = h.Description,
+                ImageUrl = h.ImageUrl,
                 RoomCount = h.Rooms.Count,
                 ApprovalStatus = h.ApprovalStatus
             })
@@ -184,6 +186,7 @@ public class HotelsController : ControllerBase
         City = h.City,
         Country = h.Country,
         Description = h.Description,
+        ImageUrl = h.ImageUrl,
         RoomCount = roomCount ?? h.Rooms?.Count ?? 0,
         ApprovalStatus = h.ApprovalStatus
     };
@@ -196,6 +199,7 @@ public class HotelsController : ControllerBase
         City = hotel.City,
         Country = hotel.Country,
         Description = hotel.Description,
+        ImageUrl = hotel.ImageUrl,
         RoomCount = hotel.Rooms.Count,
         ApprovalStatus = hotel.ApprovalStatus,
         Rooms = hotel.Rooms.Select(r => new RoomDto

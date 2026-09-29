@@ -11,6 +11,7 @@ public class Hotel
     public string City { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
     public string? Description { get; set; }
+    public string? ImageUrl { get; set; }
     public ApprovalStatus ApprovalStatus { get; set; } = ApprovalStatus.Pending;
 
     public ApplicationUser Owner { get; set; } = null!;

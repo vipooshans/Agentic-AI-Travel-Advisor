@@ -7,6 +7,7 @@ class Hotel {
   final String city;
   final String country;
   final String? description;
+  final String? imageUrl;
   final int roomCount;
   final List<Room>? rooms;
 
@@ -17,6 +18,7 @@ class Hotel {
     required this.city,
     required this.country,
     this.description,
+    this.imageUrl,
     required this.roomCount,
     this.rooms,
   });
@@ -29,6 +31,7 @@ class Hotel {
       city: json['city'] as String,
       country: json['country'] as String,
       description: json['description'] as String?,
+      imageUrl: json['imageUrl'] as String?,
       roomCount: json['roomCount'] as int? ?? 0,
       rooms: json['rooms'] != null
           ? (json['rooms'] as List).map((r) => Room.fromJson(r)).toList()

@@ -96,6 +96,7 @@ public static class DbSeeder
                 City = "Paris",
                 Country = "France",
                 Description = "Luxury hotel in the heart of Paris",
+                ImageUrl = HotelImages["Le Grand Paris Hotel"],
                 ApprovalStatus = ApprovalStatus.Approved
             };
             var tokyoHotel = new Hotel
@@ -106,6 +107,7 @@ public static class DbSeeder
                 City = "Tokyo",
                 Country = "Japan",
                 Description = "Modern hotel near Shibuya crossing",
+                ImageUrl = HotelImages["Sakura Inn Tokyo"],
                 ApprovalStatus = ApprovalStatus.Approved
             };
             context.Hotels.AddRange(parisHotel, tokyoHotel);
@@ -134,6 +136,7 @@ public static class DbSeeder
                 Description = "5 days exploring Paris including Eiffel Tower, Louvre, and Seine cruise",
                 Price = 1299,
                 DurationDays = 5,
+                ImageUrl = PackageImages["Paris Romance Getaway"],
                 ApprovalStatus = ApprovalStatus.Approved
             };
             var baliPkg = new TravelPackage
@@ -144,6 +147,7 @@ public static class DbSeeder
                 Description = "7 days of beaches, temples, and rice terraces",
                 Price = 899,
                 DurationDays = 7,
+                ImageUrl = PackageImages["Bali Adventure Package"],
                 ApprovalStatus = ApprovalStatus.Approved
             };
             var tokyoPkg = new TravelPackage
@@ -154,6 +158,7 @@ public static class DbSeeder
                 Description = "4 days discovering Tokyo's highlights",
                 Price = 749,
                 DurationDays = 4,
+                ImageUrl = PackageImages["Tokyo Explorer"],
                 ApprovalStatus = ApprovalStatus.Approved
             };
             context.TravelPackages.AddRange(parisPkg, baliPkg, tokyoPkg);
@@ -171,6 +176,7 @@ public static class DbSeeder
         }
 
         await SeedSriLankaCatalogAsync(context, owner, agent);
+        await BackfillCatalogImagesAsync(context);
     }
 
     private static async Task SeedSriLankaCatalogAsync(
@@ -215,6 +221,7 @@ public static class DbSeeder
                 City = "Ella",
                 Country = "Sri Lanka",
                 Description = "Budget-friendly inn with views over Ella Gap",
+                ImageUrl = HotelImages["Ella Gap View Inn"],
                 ApprovalStatus = ApprovalStatus.Approved
             };
             var ellaLodge = new Hotel
@@ -225,6 +232,7 @@ public static class DbSeeder
                 City = "Ella",
                 Country = "Sri Lanka",
                 Description = "Mid-range lodge near Little Adam's Peak",
+                ImageUrl = HotelImages["Ella Heights Lodge"],
                 ApprovalStatus = ApprovalStatus.Approved
             };
             var kandyHotel = new Hotel
@@ -235,6 +243,7 @@ public static class DbSeeder
                 City = "Kandy",
                 Country = "Sri Lanka",
                 Description = "Lakeside stay walking distance from the Temple of the Tooth",
+                ImageUrl = HotelImages["Kandy Lake House"],
                 ApprovalStatus = ApprovalStatus.Approved
             };
             var galleHotel = new Hotel
@@ -245,6 +254,7 @@ public static class DbSeeder
                 City = "Galle",
                 Country = "Sri Lanka",
                 Description = "Heritage guesthouse inside the Dutch Fort",
+                ImageUrl = HotelImages["Galle Fort Stay"],
                 ApprovalStatus = ApprovalStatus.Approved
             };
             context.Hotels.AddRange(ellaInn, ellaLodge, kandyHotel, galleHotel);
@@ -276,6 +286,7 @@ public static class DbSeeder
                 Description = "3 days of hill-country hikes, Nine Arch Bridge, and tea estates. Hotel not included.",
                 Price = 28000,
                 DurationDays = 3,
+                ImageUrl = PackageImages["Ella Hills Escape"],
                 ApprovalStatus = ApprovalStatus.Approved
             };
             var kandyPkg = new TravelPackage
@@ -286,6 +297,7 @@ public static class DbSeeder
                 Description = "3 days covering the Temple of the Tooth, Peradeniya Gardens, and city walks.",
                 Price = 30000,
                 DurationDays = 3,
+                ImageUrl = PackageImages["Kandy Cultural Weekend"],
                 ApprovalStatus = ApprovalStatus.Approved
             };
             var gallePkg = new TravelPackage
@@ -296,6 +308,7 @@ public static class DbSeeder
                 Description = "3 days exploring Galle Fort, Unawatuna beach, and the lighthouse.",
                 Price = 29000,
                 DurationDays = 3,
+                ImageUrl = PackageImages["Galle Fort Getaway"],
                 ApprovalStatus = ApprovalStatus.Approved
             };
             context.TravelPackages.AddRange(ellaPkg, kandyPkg, gallePkg);
@@ -318,4 +331,49 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
     }
+
+    private static async Task BackfillCatalogImagesAsync(AppDbContext context)
+    {
+        var changed = false;
+        var hotels = await context.Hotels.Where(h => h.ImageUrl == null).ToListAsync();
+        foreach (var hotel in hotels)
+        {
+            if (!HotelImages.TryGetValue(hotel.Name, out var url))
+                continue;
+            hotel.ImageUrl = url;
+            changed = true;
+        }
+
+        var packages = await context.TravelPackages.Where(p => p.ImageUrl == null).ToListAsync();
+        foreach (var package in packages)
+        {
+            if (!PackageImages.TryGetValue(package.Title, out var url))
+                continue;
+            package.ImageUrl = url;
+            changed = true;
+        }
+
+        if (changed)
+            await context.SaveChangesAsync();
+    }
+
+    private static readonly Dictionary<string, string> HotelImages = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Le Grand Paris Hotel"] = "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80",
+        ["Sakura Inn Tokyo"] = "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1200&q=80",
+        ["Ella Gap View Inn"] = "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1200&q=80",
+        ["Ella Heights Lodge"] = "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=1200&q=80",
+        ["Kandy Lake House"] = "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1200&q=80",
+        ["Galle Fort Stay"] = "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=80"
+    };
+
+    private static readonly Dictionary<string, string> PackageImages = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Paris Romance Getaway"] = "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80",
+        ["Bali Adventure Package"] = "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80",
+        ["Tokyo Explorer"] = "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1200&q=80",
+        ["Ella Hills Escape"] = "https://images.unsplash.com/photo-1564760055775-d63b17a55c44?auto=format&fit=crop&w=1200&q=80",
+        ["Kandy Cultural Weekend"] = "https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=1200&q=80",
+        ["Galle Fort Getaway"] = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"
+    };
 }

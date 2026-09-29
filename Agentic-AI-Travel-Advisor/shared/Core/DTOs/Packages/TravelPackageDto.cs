@@ -12,6 +12,7 @@ public class TravelPackageDto
     public int DestinationId { get; set; }
     public string DestinationName { get; set; } = string.Empty;
     public string DestinationCountry { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
     public int ActivityCount { get; set; }
     public ApprovalStatus ApprovalStatus { get; set; }
 }
