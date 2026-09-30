@@ -18,7 +18,7 @@ else
     @foreach (var a in Model.Activities)
     {
         <tr>
-            <td>@a.DayNumber</td><td>@a.Title</td><td>@a.Description</td><td>$@a.Price</td>
+            <td>@a.DayNumber</td><td>@a.Title</td><td>@a.Description</td><td>LKR @a.Price.ToString("N2")</td>
             <td>
                 <form asp-action="DeleteActivity" method="post" class="d-inline">
                     @Html.AntiForgeryToken()
