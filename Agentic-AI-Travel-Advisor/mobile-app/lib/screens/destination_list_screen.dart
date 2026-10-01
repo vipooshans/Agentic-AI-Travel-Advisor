@@ -9,12 +9,13 @@ import '../providers/auth_provider.dart';
 import '../services/destination_service.dart';
 import '../services/hotel_service.dart';
 import '../services/package_service.dart';
+import '../widgets/category_filter_chips.dart';
 import '../widgets/destination_card.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/error_widget.dart';
 import '../widgets/hotel_card.dart';
-import '../widgets/loading_widget.dart';
 import '../widgets/package_card.dart';
+import '../widgets/skeleton_loader.dart';
 
 class DestinationListScreen extends StatefulWidget {
   final String? initialTab;
@@ -64,7 +65,7 @@ class _DestinationListScreenState extends State<DestinationListScreen> with Sing
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Explore'),
+        title: const Text('Explore Sri Lanka'),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -96,6 +97,10 @@ class _DestinationsTab extends StatefulWidget {
 
 class _DestinationsTabState extends State<_DestinationsTab> {
   late Future<List<Destination>> _future;
+  String _searchQuery = '';
+  String _selectedCategory = 'All';
+
+  static const _categories = ['All', 'Cultural', 'Nature', 'Beaches', 'Hill Country'];
 
   @override
   void initState() {
@@ -105,33 +110,76 @@ class _DestinationsTabState extends State<_DestinationsTab> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<Destination>>(
-      future: _future,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) return const LoadingWidget();
-        if (snapshot.hasError) {
-          return ErrorDisplayWidget(message: snapshot.error.toString(), onRetry: () => setState(() => _future = widget.service.getAll()));
-        }
-        final items = snapshot.data ?? [];
-        if (items.isEmpty) {
-          return EmptyStateWidget(
-            icon: Icons.public,
-            title: 'No destinations',
-            message: 'Travel destinations will appear here when they are added.',
-            actionLabel: 'Retry',
-            onAction: () => setState(() => _future = widget.service.getAll()),
-          );
-        }
-        return RefreshIndicator(
-          onRefresh: () async => setState(() => _future = widget.service.getAll()),
-          child: GridView.builder(
-            padding: const EdgeInsets.all(12),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.75, crossAxisSpacing: 12, mainAxisSpacing: 12),
-            itemCount: items.length,
-            itemBuilder: (_, i) => DestinationCard(destination: items[i], onTap: () => context.push('/destinations/${items[i].id}')),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+          child: TextField(
+            decoration: InputDecoration(
+              hintText: 'Search destinations (e.g. Ella, Kandy, Galle)...',
+              prefixIcon: const Icon(Icons.search),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onChanged: (q) => setState(() => _searchQuery = q.trim().toLowerCase()),
           ),
-        );
-      },
+        ),
+        CategoryFilterChips(
+          categories: _categories,
+          selectedCategory: _selectedCategory,
+          onSelected: (cat) => setState(() => _selectedCategory = cat),
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: FutureBuilder<List<Destination>>(
+            future: _future,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SkeletonCardList(itemCount: 4);
+              }
+              if (snapshot.hasError) {
+                return ErrorDisplayWidget(
+                  message: snapshot.error.toString(),
+                  onRetry: () => setState(() => _future = widget.service.getAll()),
+                );
+              }
+              var items = snapshot.data ?? [];
+              if (_searchQuery.isNotEmpty) {
+                items = items.where((d) => d.name.toLowerCase().contains(_searchQuery) || (d.description?.toLowerCase().contains(_searchQuery) ?? false)).toList();
+              }
+              if (items.isEmpty) {
+                return EmptyStateWidget(
+                  icon: Icons.public,
+                  title: 'No destinations found',
+                  message: 'Try adjusting your search query or selected filter category.',
+                  actionLabel: 'Reset Filters',
+                  onAction: () => setState(() {
+                    _searchQuery = '';
+                    _selectedCategory = 'All';
+                  }),
+                );
+              }
+              return RefreshIndicator(
+                onRefresh: () async => setState(() => _future = widget.service.getAll()),
+                child: GridView.builder(
+                  padding: const EdgeInsets.all(12),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.75,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
+                  itemCount: items.length,
+                  itemBuilder: (_, i) => DestinationCard(
+                    destination: items[i],
+                    onTap: () => context.push('/destinations/${items[i].id}'),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -155,10 +203,10 @@ class _HotelsTabState extends State<_HotelsTab> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return FutureBuilder<List<Hotel>>(
       future: _future,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) return const LoadingWidget();
+        if (snapshot.connectionState == ConnectionState.waiting) return const SkeletonCardList(itemCount: 4);
         if (snapshot.hasError) {
           return ErrorDisplayWidget(message: snapshot.error.toString(), onRetry: () => setState(() => _future = widget.service.getAll()));
         }
@@ -166,21 +214,19 @@ class _HotelsTabState extends State<_HotelsTab> {
         if (items.isEmpty) {
           return EmptyStateWidget(
             icon: Icons.hotel_outlined,
-            title: 'No hotels yet',
-            message: 'Approved hotels will show up here.',
-            actionLabel: 'Retry',
+            title: 'No hotels found',
+            message: 'Browse back soon for certified accommodations.',
+            actionLabel: 'Refresh',
             onAction: () => setState(() => _future = widget.service.getAll()),
           );
         }
         return RefreshIndicator(
           onRefresh: () async => setState(() => _future = widget.service.getAll()),
-          child: ListView.builder(
+          child: ListView.separated(
             padding: const EdgeInsets.all(12),
             itemCount: items.length,
-            itemBuilder: (_, i) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: HotelCard(hotel: items[i], onTap: () => context.push('/hotels/${items[i].id}')),
-            ),
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemBuilder: (_, i) => HotelCard(hotel: items[i], onTap: () => context.push('/hotels/${items[i].id}')),
           ),
         );
       },
@@ -207,32 +253,30 @@ class _PackagesTabState extends State<_PackagesTab> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return FutureBuilder<List<TravelPackage>>(
       future: _future,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) return const LoadingWidget();
+        if (snapshot.connectionState == ConnectionState.waiting) return const SkeletonCardList(itemCount: 4);
         if (snapshot.hasError) {
           return ErrorDisplayWidget(message: snapshot.error.toString(), onRetry: () => setState(() => _future = widget.service.getAll()));
         }
         final items = snapshot.data ?? [];
         if (items.isEmpty) {
           return EmptyStateWidget(
-            icon: Icons.card_travel,
-            title: 'No packages yet',
-            message: 'Approved travel packages will show up here.',
-            actionLabel: 'Retry',
+            icon: Icons.card_travel_outlined,
+            title: 'No travel packages',
+            message: 'Curated travel packages will appear once released.',
+            actionLabel: 'Refresh',
             onAction: () => setState(() => _future = widget.service.getAll()),
           );
         }
         return RefreshIndicator(
           onRefresh: () async => setState(() => _future = widget.service.getAll()),
-          child: ListView.builder(
+          child: ListView.separated(
             padding: const EdgeInsets.all(12),
             itemCount: items.length,
-            itemBuilder: (_, i) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: PackageCard(package: items[i], onTap: () => context.push('/packages/${items[i].id}')),
-            ),
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemBuilder: (_, i) => PackageCard(package: items[i], onTap: () => context.push('/packages/${items[i].id}')),
           ),
         );
       },
