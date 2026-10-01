@@ -28,3 +28,5 @@ public sealed class BusinessRuleException(string message, IDictionary<string, st
     : AppException(400, message, errors);
 
 public sealed class UnauthorizedAppException(string message) : AppException(401, message);
+
+public sealed class ServiceUnavailableException(string message) : AppException(503, message);

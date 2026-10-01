@@ -15,6 +15,7 @@ public sealed class BookingService(
     IPackageRepository packages,
     IRoomAvailabilityRepository availability,
     ISystemSettingRepository settings,
+    IPaymentRepository payments,
     IUnitOfWork unitOfWork,
     TimeProvider clock) : IBookingService
 {
@@ -130,7 +131,17 @@ public sealed class BookingService(
 
         booking.Status = request.Status;
         if (request.Status == BookingStatus.Cancelled)
+        {
             booking.CancelledAt = now;
+            // Simulated payments: money taken is refunded and anything still awaiting confirmation is voided.
+            foreach (var payment in await payments.ListByBookingAsync(booking.Id, cancellationToken))
+            {
+                if (payment.Status == PaymentStatus.Completed)
+                    payment.Status = PaymentStatus.Refunded;
+                else if (payment.Status == PaymentStatus.Pending)
+                    payment.Status = PaymentStatus.Failed;
+            }
+        }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return booking.ToDto();
@@ -146,7 +157,7 @@ public sealed class BookingService(
 
     internal static DateTime ToUtcDate(DateTime value) => DateTime.SpecifyKind(value.Date, DateTimeKind.Utc);
 
-    private static bool CanAccess(UserContext caller, Booking booking) => caller.Role switch
+    internal static bool CanAccess(UserContext caller, Booking booking) => caller.Role switch
     {
         RoleNames.Admin => true,
         RoleNames.HotelOwner => booking.Room?.Hotel.OwnerId == caller.UserId,

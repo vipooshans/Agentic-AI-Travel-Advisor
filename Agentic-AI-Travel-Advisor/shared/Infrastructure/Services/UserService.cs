@@ -14,10 +14,33 @@ public sealed class UserService(
     IRoleRepository roles,
     IUserRepository users,
     ITravelPreferencesRepository preferences,
+    IUserProfileRepository profiles,
     IUnitOfWork unitOfWork,
     IUserStatusCache statusCache) : IUserService
 {
     private static readonly string[] StaffRoles = [RoleNames.HotelOwner, RoleNames.TravelAgent];
+
+    public async Task<UserProfileDto> GetProfileAsync(string userId, CancellationToken cancellationToken = default) =>
+        (await profiles.GetByUserIdAsync(userId, cancellationToken))?.ToDto() ?? new UserProfileDto();
+
+    public async Task<UserProfileDto> UpdateProfileAsync(string userId, UserProfileDto request, CancellationToken cancellationToken = default)
+    {
+        var profile = await profiles.GetByUserIdAsync(userId, cancellationToken);
+        if (profile is null)
+        {
+            profile = new UserProfile { UserId = userId };
+            profiles.Add(profile);
+        }
+
+        profile.PhoneNumber = Ownership.Clean(request.PhoneNumber);
+        profile.Nationality = Ownership.Clean(request.Nationality);
+        profile.DateOfBirth = request.DateOfBirth;
+        profile.AvatarUrl = Ownership.Clean(request.AvatarUrl);
+        profile.Bio = Ownership.Clean(request.Bio);
+        profile.PreferredCurrency = string.IsNullOrWhiteSpace(request.PreferredCurrency) ? "LKR" : request.PreferredCurrency.Trim().ToUpperInvariant();
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        return profile.ToDto();
+    }
 
     public async Task<TravelPreferencesDto> GetPreferencesAsync(string userId, CancellationToken cancellationToken = default) =>
         (await preferences.GetByUserAsync(userId, cancellationToken)).ToDto();

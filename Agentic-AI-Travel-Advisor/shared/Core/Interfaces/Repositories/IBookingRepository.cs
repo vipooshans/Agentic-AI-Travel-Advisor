@@ -37,6 +37,9 @@ public interface IBookingRepository
     /// <summary>Takes a row lock on the package (inside the current transaction) to serialise concurrent bookings.</summary>
     Task LockPackageAsync(int packageId, CancellationToken cancellationToken = default);
 
+    /// <summary>Takes a row lock on the booking (inside the current transaction), e.g. to serialise payments.</summary>
+    Task LockBookingAsync(int bookingId, CancellationToken cancellationToken = default);
+
     void Add(Booking booking);
 }
 

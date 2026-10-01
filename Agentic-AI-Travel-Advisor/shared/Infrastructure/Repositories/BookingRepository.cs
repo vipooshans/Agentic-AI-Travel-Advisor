@@ -64,6 +64,9 @@ public sealed class BookingRepository(AppDbContext context) : IBookingRepository
     public Task LockPackageAsync(int packageId, CancellationToken cancellationToken = default) =>
         context.Database.ExecuteSqlInterpolatedAsync($"SELECT 1 FROM \"TravelPackages\" WHERE \"Id\" = {packageId} FOR UPDATE", cancellationToken);
 
+    public Task LockBookingAsync(int bookingId, CancellationToken cancellationToken = default) =>
+        context.Database.ExecuteSqlInterpolatedAsync($"SELECT 1 FROM \"Bookings\" WHERE \"Id\" = {bookingId} FOR UPDATE", cancellationToken);
+
     public void Add(Booking booking) => context.Bookings.Add(booking);
 
     internal static IQueryable<Booking> Apply(IQueryable<Booking> query, BookingFilter filter)
@@ -98,6 +101,29 @@ public sealed class ReportRepository(AppDbContext context) : IReportRepository
             .Select(g => new { Status = g.Key, Count = g.Count(), Total = g.Sum(b => b.TotalPrice) })
             .ToListAsync(cancellationToken);
         return rows.Select(r => new BookingStatusTotals(r.Status, r.Count, r.Total)).ToList();
+    }
+
+    public Task<List<BookingFact>> GetBookingFactsAsync(BookingFilter filter, CancellationToken cancellationToken = default) =>
+        BookingRepository.Apply(context.Bookings.AsNoTracking(), filter)
+            .Select(b => new BookingFact(
+                b.Status,
+                b.TotalPrice,
+                b.Guests,
+                b.CreatedAt,
+                b.Room != null ? (int?)b.Room.HotelId : null,
+                b.Room != null ? b.Room.Hotel.Name : null,
+                b.TravelPackageId,
+                b.TravelPackage != null ? b.TravelPackage.Title : null))
+            .ToListAsync(cancellationToken);
+
+    public Task<List<ReviewFact>> GetReviewFactsAsync(string? hotelOwnerId, string? agentId, CancellationToken cancellationToken = default)
+    {
+        var reviews = context.Reviews.AsNoTracking().Where(r => r.Status == ReviewStatus.Visible);
+        if (hotelOwnerId is not null)
+            reviews = reviews.Where(r => r.Hotel != null && r.Hotel.OwnerId == hotelOwnerId);
+        if (agentId is not null)
+            reviews = reviews.Where(r => r.TravelPackage != null && r.TravelPackage.AgentId == agentId);
+        return reviews.Select(r => new ReviewFact(r.HotelId, r.TravelPackageId, r.Rating)).ToListAsync(cancellationToken);
     }
 
     public async Task<CatalogCounts> GetCatalogCountsAsync(string? hotelOwnerId, string? agentId, CancellationToken cancellationToken = default)

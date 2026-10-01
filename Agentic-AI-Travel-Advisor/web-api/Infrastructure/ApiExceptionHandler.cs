@@ -19,7 +19,7 @@ public sealed class ApiExceptionHandler(ILogger<ApiExceptionHandler> logger) : I
             return true;
 
         var (status, message, errors) = Map(exception);
-        if (status >= 500)
+        if (status >= 500 && exception is not AppException)
             logger.LogError(exception, "Unhandled exception for {Method} {Path}", httpContext.Request.Method, httpContext.Request.Path);
         else
             logger.LogInformation("Request failed with {Status}: {Message}", status, message);

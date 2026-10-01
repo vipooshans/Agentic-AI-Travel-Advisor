@@ -5,6 +5,7 @@ using TravelAdvisor.Api.Infrastructure;
 using TravelAdvisor.Core.Common;
 using TravelAdvisor.Core.DTOs.AI;
 using TravelAdvisor.Core.Interfaces;
+using TravelAdvisor.Core.Interfaces.Services;
 using TravelAdvisor.Infrastructure;
 
 namespace TravelAdvisor.Api.Controllers;
@@ -12,13 +13,16 @@ namespace TravelAdvisor.Api.Controllers;
 [ApiController]
 [Route("api/ai")]
 [Authorize]
-public class AiController(IAgenticAiService ai) : ControllerBase
+public class AiController(IAgenticAiService ai, ISystemSettingsService settings) : ControllerBase
 {
     [Authorize(Policy = AuthPolicies.RequireUser)]
     [EnableRateLimiting(RateLimitPolicies.Ai)]
     [HttpPost("chat")]
     public async Task<ActionResult<ChatResponse>> Chat([FromBody] ChatRequest request, CancellationToken cancellationToken)
     {
+        if (!await settings.IsAiAssistantEnabledAsync(cancellationToken))
+            throw new ServiceUnavailableException("The AI travel assistant is currently turned off by the administrator.");
+
         var userId = User.ToUserContext().UserId;
         try
         {

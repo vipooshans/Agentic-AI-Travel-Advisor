@@ -5,7 +5,11 @@ using TravelAdvisor.Core.DTOs.Destinations;
 using TravelAdvisor.Core.DTOs.Hotels;
 using TravelAdvisor.Core.DTOs.Itineraries;
 using TravelAdvisor.Core.DTOs.Packages;
+using TravelAdvisor.Core.DTOs.Payments;
 using TravelAdvisor.Core.DTOs.Reports;
+using TravelAdvisor.Core.DTOs.Reviews;
+using TravelAdvisor.Core.DTOs.Settings;
+using TravelAdvisor.Core.DTOs.Transportation;
 using TravelAdvisor.Core.DTOs.Users;
 
 namespace TravelAdvisor.Core.Interfaces.Services;
@@ -25,6 +29,8 @@ public interface IUserService
     Task<List<UserDto>> ListAsync(string? role, CancellationToken cancellationToken = default);
     Task<UserDto> CreateStaffAsync(CreateStaffUserRequest request, CancellationToken cancellationToken = default);
     Task<UserDto> SetActiveAsync(UserContext caller, string userId, bool isActive, CancellationToken cancellationToken = default);
+    Task<UserProfileDto> GetProfileAsync(string userId, CancellationToken cancellationToken = default);
+    Task<UserProfileDto> UpdateProfileAsync(string userId, UserProfileDto request, CancellationToken cancellationToken = default);
 }
 
 public interface IHotelService
@@ -92,4 +98,42 @@ public interface IItineraryService
 public interface IReportService
 {
     Task<ReportSummaryDto> GetSummaryAsync(UserContext caller, CancellationToken cancellationToken = default);
+    Task<StatisticsDto> GetStatisticsAsync(UserContext caller, StatisticsQuery query, CancellationToken cancellationToken = default);
+}
+
+public interface IReviewService
+{
+    Task<ReviewDto> CreateAsync(UserContext caller, CreateReviewRequest request, CancellationToken cancellationToken = default);
+    Task<ReviewDto> UpdateAsync(UserContext caller, int id, UpdateReviewRequest request, CancellationToken cancellationToken = default);
+    Task DeleteAsync(UserContext caller, int id, CancellationToken cancellationToken = default);
+    /// <summary>Admins: all reviews. Providers: visible reviews of their listings. Users: their own reviews.</summary>
+    Task<List<ReviewDto>> ListAsync(UserContext caller, ReviewQuery query, CancellationToken cancellationToken = default);
+    Task<List<ReviewDto>> ListForHotelAsync(UserContext? caller, int hotelId, CancellationToken cancellationToken = default);
+    Task<List<ReviewDto>> ListForPackageAsync(UserContext? caller, int packageId, CancellationToken cancellationToken = default);
+    Task<ReviewDto> SetStatusAsync(int id, UpdateReviewStatusRequest request, CancellationToken cancellationToken = default);
+}
+
+public interface ITransportationService
+{
+    Task<List<TransportationDto>> SearchAsync(TransportationSearchQuery query, CancellationToken cancellationToken = default);
+    Task<List<TransportationDto>> ListMineAsync(UserContext caller, CancellationToken cancellationToken = default);
+    Task<TransportationDto> GetAsync(UserContext? caller, int id, CancellationToken cancellationToken = default);
+    Task<TransportationDto> CreateAsync(UserContext caller, SaveTransportationRequest request, CancellationToken cancellationToken = default);
+    Task<TransportationDto> UpdateAsync(UserContext caller, int id, SaveTransportationRequest request, CancellationToken cancellationToken = default);
+    Task DeleteAsync(UserContext caller, int id, CancellationToken cancellationToken = default);
+}
+
+public interface ISystemSettingsService
+{
+    Task<List<SystemSettingDto>> ListAsync(CancellationToken cancellationToken = default);
+    Task<PublicSettingsDto> GetPublicAsync(CancellationToken cancellationToken = default);
+    Task<SystemSettingDto> UpdateAsync(UserContext caller, string key, UpdateSystemSettingRequest request, CancellationToken cancellationToken = default);
+    Task<bool> IsAiAssistantEnabledAsync(CancellationToken cancellationToken = default);
+}
+
+public interface IPaymentService
+{
+    Task<List<PaymentDto>> ListAsync(UserContext caller, int bookingId, CancellationToken cancellationToken = default);
+    Task<PaymentDto> CreateAsync(UserContext caller, int bookingId, CreatePaymentRequest request, CancellationToken cancellationToken = default);
+    Task<PaymentDto> UpdateStatusAsync(UserContext caller, int bookingId, int paymentId, UpdatePaymentStatusRequest request, CancellationToken cancellationToken = default);
 }

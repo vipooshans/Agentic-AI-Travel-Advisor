@@ -316,68 +316,18 @@ public class BookingRulesTests(ApiFixture fx)
         Assert.Equal(ApprovalStatus.Pending, afterActivity!.ApprovalStatus);
     }
 
-    private async Task<BookingDto> BookAndConfirmAsync(HttpClient owner, HttpClient user, int roomId, DateTime checkIn)
-    {
-        var created = await user.PostAsJsonAsync("/api/bookings", new { roomId, checkIn, checkOut = checkIn.AddDays(1) });
-        Assert.True(created.StatusCode == HttpStatusCode.Created, await created.Content.ReadAsStringAsync());
-        var booking = (await created.Content.ReadFromJsonAsync<BookingDto>(Json))!;
-        var confirm = await owner.PatchAsJsonAsync($"/api/bookings/{booking.Id}/status", new { status = 1 });
-        Assert.Equal(HttpStatusCode.OK, confirm.StatusCode);
-        return booking;
-    }
+    private Task<BookingDto> BookAndConfirmAsync(HttpClient owner, HttpClient user, int roomId, DateTime checkIn) =>
+        BookAndConfirmRoomAsync(owner, user, roomId, checkIn);
 
     private async Task<RoomDto> CreateApprovedRoomAsync(int capacity = 2, decimal price = 10000) =>
-        (await CreateApprovedRoomWithOwnerAsync(capacity, price)).Room;
+        (await fx.CreateApprovedRoomWithOwnerAsync(capacity, price)).Room;
 
-    private async Task<(HttpClient Owner, RoomDto Room)> CreateApprovedRoomWithOwnerAsync(int capacity = 2, decimal price = 10000)
-    {
-        var owner = fx.Authed((await fx.CreateStaffAsync(RoleNames.HotelOwner)).Token);
-        var admin = fx.Authed((await fx.LoginAsync(AdminEmail, AdminPassword)).Token);
-
-        var hotelResponse = await owner.PostAsJsonAsync("/api/hotels", new
-        {
-            name = $"Rules Hotel {Guid.NewGuid():N}"[..24],
-            address = "1 Test Rd",
-            city = "Kandy",
-            country = "Sri Lanka",
-            description = "Booking rules test hotel"
-        });
-        Assert.Equal(HttpStatusCode.Created, hotelResponse.StatusCode);
-        var hotel = (await hotelResponse.Content.ReadFromJsonAsync<HotelDto>(Json))!;
-        Assert.Equal(HttpStatusCode.OK, (await admin.PatchAsJsonAsync($"/api/hotels/{hotel.Id}/approval", new { status = 1 })).StatusCode);
-
-        var roomResponse = await owner.PostAsJsonAsync($"/api/hotels/{hotel.Id}/rooms", new
-        {
-            name = "Test Room",
-            roomType = "Double",
-            pricePerNight = price,
-            capacity
-        });
-        Assert.Equal(HttpStatusCode.Created, roomResponse.StatusCode);
-        return (owner, (await roomResponse.Content.ReadFromJsonAsync<RoomDto>(Json))!);
-    }
+    private Task<(HttpClient Owner, RoomDto Room)> CreateApprovedRoomWithOwnerAsync(int capacity = 2, decimal price = 10000) =>
+        fx.CreateApprovedRoomWithOwnerAsync(capacity, price);
 
     private async Task<TravelPackageDto> CreateApprovedPackageAsync(decimal price = 10000, int maxTravelers = 10) =>
-        (await CreateApprovedPackageWithAgentAsync(price, maxTravelers)).Package;
+        (await fx.CreateApprovedPackageWithAgentAsync(price, maxTravelers)).Package;
 
-    private async Task<(HttpClient Agent, TravelPackageDto Package)> CreateApprovedPackageWithAgentAsync(decimal price = 10000, int maxTravelers = 10)
-    {
-        var agent = fx.Authed((await fx.CreateStaffAsync(RoleNames.TravelAgent)).Token);
-        var admin = fx.Authed((await fx.LoginAsync(AdminEmail, AdminPassword)).Token);
-        var destinations = await fx.CreateClient().GetFromJsonAsync<List<DestinationDto>>("/api/destinations", Json);
-
-        var created = await agent.PostAsJsonAsync("/api/packages", new
-        {
-            destinationId = destinations![0].Id,
-            title = $"Rules Tour {Guid.NewGuid():N}"[..22],
-            description = "Booking rules test package",
-            price,
-            durationDays = 3,
-            maxTravelers
-        });
-        Assert.Equal(HttpStatusCode.Created, created.StatusCode);
-        var package = (await created.Content.ReadFromJsonAsync<TravelPackageDto>(Json))!;
-        Assert.Equal(HttpStatusCode.OK, (await admin.PatchAsJsonAsync($"/api/packages/{package.Id}/approval", new { status = 1 })).StatusCode);
-        return (agent, package);
-    }
+    private Task<(HttpClient Agent, TravelPackageDto Package)> CreateApprovedPackageWithAgentAsync(decimal price = 10000, int maxTravelers = 10) =>
+        fx.CreateApprovedPackageWithAgentAsync(price, maxTravelers);
 }

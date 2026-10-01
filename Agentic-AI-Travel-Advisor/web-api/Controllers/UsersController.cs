@@ -13,6 +13,15 @@ namespace TravelAdvisor.Api.Controllers;
 [Authorize]
 public class UsersController(IUserService userService) : ControllerBase
 {
+    /// <summary>Contact and personal details of the signed-in user (any role).</summary>
+    [HttpGet("me/profile")]
+    public async Task<ActionResult<UserProfileDto>> GetProfile(CancellationToken cancellationToken) =>
+        Ok(await userService.GetProfileAsync(User.ToUserContext().UserId, cancellationToken));
+
+    [HttpPut("me/profile")]
+    public async Task<ActionResult<UserProfileDto>> UpdateProfile([FromBody] UserProfileDto request, CancellationToken cancellationToken) =>
+        Ok(await userService.UpdateProfileAsync(User.ToUserContext().UserId, request, cancellationToken));
+
     [Authorize(Policy = AuthPolicies.RequireUser)]
     [HttpGet("me/preferences")]
     public async Task<ActionResult<TravelPreferencesDto>> GetPreferences(CancellationToken cancellationToken) =>

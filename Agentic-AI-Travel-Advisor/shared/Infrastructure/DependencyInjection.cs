@@ -29,6 +29,7 @@ public static class AuthPolicies
     public const string RequireUser = "RequireUser";
     public const string HotelOwnerOrAdmin = "HotelOwnerOrAdmin";
     public const string TravelAgentOrAdmin = "TravelAgentOrAdmin";
+    public const string ProviderOrAdmin = "ProviderOrAdmin";
 }
 
 public static class DependencyInjection
@@ -85,7 +86,8 @@ public static class DependencyInjection
             .AddPolicy(AuthPolicies.RequireTravelAgent, policy => policy.RequireRole(RoleNames.TravelAgent))
             .AddPolicy(AuthPolicies.RequireUser, policy => policy.RequireRole(RoleNames.User))
             .AddPolicy(AuthPolicies.HotelOwnerOrAdmin, policy => policy.RequireRole(RoleNames.HotelOwner, RoleNames.Admin))
-            .AddPolicy(AuthPolicies.TravelAgentOrAdmin, policy => policy.RequireRole(RoleNames.TravelAgent, RoleNames.Admin));
+            .AddPolicy(AuthPolicies.TravelAgentOrAdmin, policy => policy.RequireRole(RoleNames.TravelAgent, RoleNames.Admin))
+            .AddPolicy(AuthPolicies.ProviderOrAdmin, policy => policy.RequireRole(RoleNames.HotelOwner, RoleNames.TravelAgent, RoleNames.Admin));
 
         return services;
     }
@@ -105,6 +107,10 @@ public static class DependencyInjection
         services.AddScoped<IReportRepository, ReportRepository>();
         services.AddScoped<IRoomAvailabilityRepository, RoomAvailabilityRepository>();
         services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
+        services.AddScoped<IReviewRepository, ReviewRepository>();
+        services.AddScoped<ITransportationRepository, TransportationRepository>();
+        services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<IUserProfileRepository, UserProfileRepository>();
     }
 
     private static void AddApplicationServices(IServiceCollection services)
@@ -119,6 +125,10 @@ public static class DependencyInjection
         services.AddScoped<IBookingService, BookingService>();
         services.AddScoped<IItineraryService, ItineraryService>();
         services.AddScoped<IReportService, ReportService>();
+        services.AddScoped<IReviewService, ReviewService>();
+        services.AddScoped<ITransportationService, TransportationService>();
+        services.AddScoped<ISystemSettingsService, SystemSettingsService>();
+        services.AddScoped<IPaymentService, PaymentService>();
     }
 
     private static void AddJwtAuthentication(IServiceCollection services, IConfiguration configuration)
