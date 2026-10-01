@@ -3,7 +3,7 @@ services:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vipoo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: travel_advisor
     ports:
       # Host 5433 avoids clashing with a local PostgreSQL install on 5432.
@@ -26,17 +26,20 @@ services:
     environment:
       ASPNETCORE_URLS: http://+:8080
       ASPNETCORE_ENVIRONMENT: Production
-      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=travel_advisor;Username=postgres;Password=${POSTGRES_PASSWORD:-vipoo}
-      Jwt__Key: ${JWT_KEY:-TravelAdvisorSuperSecretKeyForJwtTokenGeneration2026!}
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=travel_advisor;Username=postgres;Password=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      Jwt__Key: ${JWT_KEY:?Set JWT_KEY in .env}
       Jwt__Issuer: TravelAdvisor.Api
       Jwt__Audience: TravelAdvisor.Clients
       Jwt__ExpireHours: "24"
       Cors__AllowedOrigins__0: http://localhost:7000
       Cors__AllowedOrigins__1: http://127.0.0.1:7000
       Cors__AllowedOrigins__2: http://localhost:5000
+      Cors__AllowedOrigins__3: http://localhost:3000
       Ai__ApiKey: ${AI_API_KEY:-}
       Ai__BaseUrl: ${AI_BASE_URL:-https://api.openai.com/v1}
       Ai__Model: ${AI_MODEL:-gpt-4o-mini}
+      Seed__DemoUsers: ${SEED_DEMO_USERS:-false}
+      Swagger__Enabled: ${SWAGGER_ENABLED:-true}
     depends_on:
       postgres:
         condition: service_healthy

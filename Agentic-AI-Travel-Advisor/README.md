@@ -46,6 +46,17 @@ Env vars (see `.env.example`): `POSTGRES_PASSWORD`, `JWT_KEY` / `Jwt__Key`, `Con
 
 ## Quick Start (local without Docker)
 
+### 0. Secrets (required once)
+
+No secrets are stored in the repository. The API refuses to start until these are set:
+
+```bash
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=travel_advisor;Username=postgres;Password=YOUR_PASSWORD" --project web-api/TravelAdvisor.Api.csproj
+dotnet user-secrets set "Jwt:Key" "A_RANDOM_STRING_OF_AT_LEAST_32_CHARACTERS" --project web-api/TravelAdvisor.Api.csproj
+```
+
+Environment variables (`ConnectionStrings__DefaultConnection`, `Jwt__Key`) work too.
+
 ### 1. Database
 
 ```bash

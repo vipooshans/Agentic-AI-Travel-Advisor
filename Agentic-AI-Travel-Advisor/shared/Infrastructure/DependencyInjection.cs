@@ -19,8 +19,12 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new InvalidOperationException(
+                "ConnectionStrings:DefaultConnection is not configured. Set it with user-secrets or the ConnectionStrings__DefaultConnection environment variable.");
+
+        services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
         services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
@@ -45,7 +49,11 @@ public static class DependencyInjection
         services.AddScoped<IAgenticAiService, AI.AgenticAiService>();
 
         var jwtSettings = configuration.GetSection("Jwt");
-        var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
+        var rawKey = jwtSettings["Key"];
+        if (string.IsNullOrWhiteSpace(rawKey) || rawKey.Length < 32)
+            throw new InvalidOperationException(
+                "Jwt:Key must be configured with at least 32 characters. Set it with user-secrets or the Jwt__Key environment variable.");
+        var key = Encoding.UTF8.GetBytes(rawKey);
 
         services.AddAuthentication(options =>
             {
