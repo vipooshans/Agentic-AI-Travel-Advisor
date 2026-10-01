@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using TravelAdvisor.Core.Entities;
 using TravelAdvisor.Core.Enums;
@@ -102,10 +103,13 @@ public static class DependencyInjection
         services.AddScoped<IItineraryRepository, ItineraryRepository>();
         services.AddScoped<IBookingRepository, BookingRepository>();
         services.AddScoped<IReportRepository, ReportRepository>();
+        services.AddScoped<IRoomAvailabilityRepository, RoomAvailabilityRepository>();
+        services.AddScoped<ISystemSettingRepository, SystemSettingRepository>();
     }
 
     private static void AddApplicationServices(IServiceCollection services)
     {
+        services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IHotelService, HotelService>();

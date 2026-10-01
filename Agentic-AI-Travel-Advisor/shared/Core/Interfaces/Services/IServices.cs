@@ -45,6 +45,8 @@ public interface IRoomService
     Task<RoomDto> UpdateAsync(UserContext caller, int hotelId, int roomId, UpdateRoomRequest request, CancellationToken cancellationToken = default);
     Task<RoomDto> SetAvailabilityAsync(UserContext caller, int hotelId, int roomId, bool isAvailable, CancellationToken cancellationToken = default);
     Task DeleteAsync(UserContext caller, int hotelId, int roomId, CancellationToken cancellationToken = default);
+    Task<RoomCalendarDto> GetCalendarAsync(UserContext caller, int hotelId, int roomId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default);
+    Task<RoomCalendarDto> SaveCalendarAsync(UserContext caller, int hotelId, int roomId, SaveRoomCalendarRequest request, CancellationToken cancellationToken = default);
 }
 
 public interface IPackageService
@@ -75,6 +77,8 @@ public interface IBookingService
     Task<List<BookingDto>> ListAsync(UserContext caller, CancellationToken cancellationToken = default);
     Task<BookingDto> GetAsync(UserContext caller, int id, CancellationToken cancellationToken = default);
     Task<BookingDto> UpdateStatusAsync(UserContext caller, int id, UpdateBookingStatusRequest request, CancellationToken cancellationToken = default);
+    /// <summary>Runs the same checks as booking creation without reserving anything.</summary>
+    Task<AvailabilityQuoteDto> CheckAvailabilityAsync(UserContext? caller, AvailabilityQuery query, CancellationToken cancellationToken = default);
 }
 
 public interface IItineraryService

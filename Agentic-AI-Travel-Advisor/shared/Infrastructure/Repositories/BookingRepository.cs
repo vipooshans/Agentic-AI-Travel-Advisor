@@ -25,6 +25,45 @@ public sealed class BookingRepository(AppDbContext context) : IBookingRepository
             b.CheckOut > checkIn &&
             (excludeBookingId == null || b.Id != excludeBookingId), cancellationToken);
 
+    public async Task<List<DateOnly>> GetBookedNightsAsync(int roomId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default)
+    {
+        var start = from.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+        var end = to.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+        var ranges = await context.Bookings.AsNoTracking()
+            .Where(b => b.RoomId == roomId && b.Status != BookingStatus.Cancelled && b.CheckIn < end && b.CheckOut > start)
+            .Select(b => new { b.CheckIn, b.CheckOut })
+            .ToListAsync(cancellationToken);
+
+        var nights = new SortedSet<DateOnly>();
+        foreach (var range in ranges)
+        {
+            for (var night = DateOnly.FromDateTime(range.CheckIn); night < DateOnly.FromDateTime(range.CheckOut); night = night.AddDays(1))
+            {
+                if (night >= from && night < to)
+                    nights.Add(night);
+            }
+        }
+        return nights.ToList();
+    }
+
+    public Task<int> CountPackageGuestsAsync(int packageId, DateTime checkIn, CancellationToken cancellationToken = default) =>
+        context.Bookings
+            .Where(b => b.TravelPackageId == packageId && b.CheckIn == checkIn && b.Status != BookingStatus.Cancelled)
+            .SumAsync(b => b.Guests, cancellationToken);
+
+    public Task<bool> HasActivePackageBookingAsync(string userId, int packageId, DateTime checkIn, CancellationToken cancellationToken = default) =>
+        context.Bookings.AnyAsync(b =>
+            b.UserId == userId &&
+            b.TravelPackageId == packageId &&
+            b.CheckIn == checkIn &&
+            b.Status != BookingStatus.Cancelled, cancellationToken);
+
+    public Task LockRoomAsync(int roomId, CancellationToken cancellationToken = default) =>
+        context.Database.ExecuteSqlInterpolatedAsync($"SELECT 1 FROM \"Rooms\" WHERE \"Id\" = {roomId} FOR UPDATE", cancellationToken);
+
+    public Task LockPackageAsync(int packageId, CancellationToken cancellationToken = default) =>
+        context.Database.ExecuteSqlInterpolatedAsync($"SELECT 1 FROM \"TravelPackages\" WHERE \"Id\" = {packageId} FOR UPDATE", cancellationToken);
+
     public void Add(Booking booking) => context.Bookings.Add(booking);
 
     internal static IQueryable<Booking> Apply(IQueryable<Booking> query, BookingFilter filter)

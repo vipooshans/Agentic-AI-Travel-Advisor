@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TravelAdvisor.Api.Infrastructure;
+using TravelAdvisor.Core.DTOs.Bookings;
 using TravelAdvisor.Core.DTOs.Hotels;
 using TravelAdvisor.Core.Interfaces.Services;
 using TravelAdvisor.Infrastructure;
@@ -32,6 +33,18 @@ public class RoomsController(IRoomService roomService) : ControllerBase
     [HttpPatch("{roomId:int}/availability")]
     public async Task<ActionResult<RoomDto>> UpdateAvailability(int hotelId, int roomId, [FromBody] UpdateRoomAvailabilityRequest request, CancellationToken cancellationToken) =>
         Ok(await roomService.SetAvailabilityAsync(User.ToUserContext(), hotelId, roomId, request.IsAvailable, cancellationToken));
+
+    /// <summary>Per-night overrides (blocked nights, special prices) and booked nights in [from, to).</summary>
+    [Authorize(Policy = AuthPolicies.HotelOwnerOrAdmin)]
+    [HttpGet("{roomId:int}/calendar")]
+    public async Task<ActionResult<RoomCalendarDto>> GetCalendar(int hotelId, int roomId, [FromQuery] DateOnly from, [FromQuery] DateOnly to, CancellationToken cancellationToken) =>
+        Ok(await roomService.GetCalendarAsync(User.ToUserContext(), hotelId, roomId, from, to, cancellationToken));
+
+    /// <summary>Upserts per-night overrides. An entry with isBlocked=false and no priceOverride clears that night.</summary>
+    [Authorize(Policy = AuthPolicies.HotelOwnerOrAdmin)]
+    [HttpPut("{roomId:int}/calendar")]
+    public async Task<ActionResult<RoomCalendarDto>> SaveCalendar(int hotelId, int roomId, [FromBody] SaveRoomCalendarRequest request, CancellationToken cancellationToken) =>
+        Ok(await roomService.SaveCalendarAsync(User.ToUserContext(), hotelId, roomId, request, cancellationToken));
 
     [Authorize(Policy = AuthPolicies.HotelOwnerOrAdmin)]
     [HttpDelete("{roomId:int}")]

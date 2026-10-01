@@ -1,4 +1,5 @@
 using TravelAdvisor.Core.Common;
+using TravelAdvisor.Core.DTOs.Bookings;
 using TravelAdvisor.Core.DTOs.Destinations;
 using TravelAdvisor.Core.DTOs.Hotels;
 using TravelAdvisor.Core.DTOs.Packages;
@@ -27,6 +28,13 @@ internal static class Ownership
     }
 
     public static string? Clean(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    /// <summary>
+    /// A provider's material edit sends the listing back for review, so customers never see unreviewed content.
+    /// Admin edits keep the current status.
+    /// </summary>
+    public static ApprovalStatus StatusAfterEdit(UserContext caller, ApprovalStatus current, bool changed) =>
+        changed && !caller.IsAdmin ? ApprovalStatus.Pending : current;
 }
 
 public sealed class HotelService(IHotelRepository hotels, IUnitOfWork unitOfWork) : IHotelService
@@ -73,9 +81,8 @@ public sealed class HotelService(IHotelRepository hotels, IUnitOfWork unitOfWork
                     ?? throw new NotFoundException("Hotel not found.");
         Ownership.EnsureOwnerOrAdmin(caller, hotel.OwnerId);
 
-        Apply(hotel, request.Name, request.Address, request.City, request.Country, request.Description, request.ImageUrl);
-        if (hotel.ApprovalStatus == ApprovalStatus.Rejected)
-            hotel.ApprovalStatus = ApprovalStatus.Pending;
+        var changed = Apply(hotel, request.Name, request.Address, request.City, request.Country, request.Description, request.ImageUrl);
+        hotel.ApprovalStatus = Ownership.StatusAfterEdit(caller, hotel.ApprovalStatus, changed);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return hotel.ToDto();
@@ -104,19 +111,97 @@ public sealed class HotelService(IHotelRepository hotels, IUnitOfWork unitOfWork
         return hotel.ToDto();
     }
 
-    private static void Apply(Hotel hotel, string name, string address, string city, string country, string? description, string? imageUrl)
+    /// <returns>True when any listing field changed.</returns>
+    private static bool Apply(Hotel hotel, string name, string address, string city, string country, string? description, string? imageUrl)
     {
+        var before = (hotel.Name, hotel.Address, hotel.City, hotel.Country, hotel.Description, hotel.ImageUrl);
         hotel.Name = name.Trim();
         hotel.Address = address.Trim();
         hotel.City = city.Trim();
         hotel.Country = country.Trim();
         hotel.Description = Ownership.Clean(description);
         hotel.ImageUrl = Ownership.Clean(imageUrl) ?? hotel.ImageUrl;
+        return before != (hotel.Name, hotel.Address, hotel.City, hotel.Country, hotel.Description, hotel.ImageUrl);
     }
 }
 
-public sealed class RoomService(IHotelRepository hotels, IRoomRepository rooms, IUnitOfWork unitOfWork) : IRoomService
+public sealed class RoomService(
+    IHotelRepository hotels,
+    IRoomRepository rooms,
+    IRoomAvailabilityRepository availability,
+    IBookingRepository bookings,
+    IUnitOfWork unitOfWork) : IRoomService
 {
+    public const int MaxCalendarDays = 366;
+
+    public async Task<RoomCalendarDto> GetCalendarAsync(UserContext caller, int hotelId, int roomId, DateOnly from, DateOnly to, CancellationToken cancellationToken = default)
+    {
+        if (to <= from || to.DayNumber - from.DayNumber > MaxCalendarDays)
+            throw new BusinessRuleException($"'to' must be after 'from' and the range can be at most {MaxCalendarDays} days.");
+
+        var room = await GetOwnedRoomAsync(caller, hotelId, roomId, cancellationToken);
+        var overrides = await availability.ListAsync(room.Id, from, to, cancellationToken);
+        return new RoomCalendarDto
+        {
+            RoomId = room.Id,
+            From = from,
+            To = to,
+            BasePricePerNight = room.PricePerNight,
+            Overrides = overrides.Select(o => new RoomCalendarEntryDto
+            {
+                Date = o.Date,
+                IsBlocked = o.IsBlocked,
+                PriceOverride = o.PriceOverride,
+                Note = o.Note
+            }).ToList(),
+            BookedNights = await bookings.GetBookedNightsAsync(room.Id, from, to, cancellationToken)
+        };
+    }
+
+    /// <summary>
+    /// Upserts one override per date. An entry that is neither blocked nor priced removes the override for that date.
+    /// Blocking a night that already has a booking is refused; cancel or move the booking first.
+    /// </summary>
+    public async Task<RoomCalendarDto> SaveCalendarAsync(UserContext caller, int hotelId, int roomId, SaveRoomCalendarRequest request, CancellationToken cancellationToken = default)
+    {
+        var room = await GetOwnedRoomAsync(caller, hotelId, roomId, cancellationToken);
+        if (request.Entries.Count == 0)
+            throw new BusinessRuleException("At least one calendar entry is required.");
+        if (request.Entries.Select(e => e.Date).Distinct().Count() != request.Entries.Count)
+            throw new BusinessRuleException("Each date may appear only once.");
+
+        var from = request.Entries.Min(e => e.Date);
+        var to = request.Entries.Max(e => e.Date).AddDays(1);
+        var booked = (await bookings.GetBookedNightsAsync(room.Id, from, to, cancellationToken)).ToHashSet();
+        var clash = request.Entries.Where(e => e.IsBlocked && booked.Contains(e.Date)).Select(e => e.Date.ToString("yyyy-MM-dd")).ToList();
+        if (clash.Count > 0)
+            throw new ConflictException($"These nights already have bookings and cannot be blocked: {string.Join(", ", clash)}.");
+
+        var existing = (await availability.ListAsync(room.Id, from, to, cancellationToken)).ToDictionary(a => a.Date);
+        foreach (var entry in request.Entries)
+        {
+            existing.TryGetValue(entry.Date, out var current);
+            if (!entry.IsBlocked && entry.PriceOverride is null)
+            {
+                if (current is not null)
+                    availability.Remove(current);
+                continue;
+            }
+
+            if (current is null)
+            {
+                current = new RoomAvailability { RoomId = room.Id, Date = entry.Date };
+                availability.Add(current);
+            }
+            current.IsBlocked = entry.IsBlocked;
+            current.PriceOverride = entry.PriceOverride;
+            current.Note = Ownership.Clean(entry.Note);
+        }
+
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        return await GetCalendarAsync(caller, hotelId, roomId, from, to, cancellationToken);
+    }
+
     public async Task<List<RoomDto>> ListAsync(UserContext? caller, int hotelId, CancellationToken cancellationToken = default)
     {
         var hotel = await hotels.GetByIdAsync(hotelId, cancellationToken: cancellationToken);
@@ -236,16 +321,16 @@ public sealed class PackageService(
                       ?? throw new NotFoundException("Package not found.");
         Ownership.EnsureOwnerOrAdmin(caller, package.AgentId);
 
-        if (package.DestinationId != request.DestinationId)
+        var destinationChanged = package.DestinationId != request.DestinationId;
+        if (destinationChanged)
         {
             package.Destination = await destinations.GetByIdAsync(request.DestinationId, cancellationToken)
                                   ?? throw new BusinessRuleException("Destination not found.");
             package.DestinationId = request.DestinationId;
         }
 
-        Apply(package, request.Title, request.Description, request.Price, request.DurationDays, request.ImageUrl, request.MaxTravelers);
-        if (package.ApprovalStatus == ApprovalStatus.Rejected)
-            package.ApprovalStatus = ApprovalStatus.Pending;
+        var changed = Apply(package, request.Title, request.Description, request.Price, request.DurationDays, request.ImageUrl, request.MaxTravelers);
+        package.ApprovalStatus = Ownership.StatusAfterEdit(caller, package.ApprovalStatus, changed || destinationChanged);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return package.ToDto();
@@ -285,6 +370,7 @@ public sealed class PackageService(
             SortOrder = request.SortOrder
         };
         packages.AddActivity(activity);
+        package.ApprovalStatus = Ownership.StatusAfterEdit(caller, package.ApprovalStatus, changed: true);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return activity.ToDto();
     }
@@ -295,6 +381,7 @@ public sealed class PackageService(
                        ?? throw new NotFoundException("Activity not found.");
         Ownership.EnsureOwnerOrAdmin(caller, activity.TravelPackage.AgentId);
         packages.RemoveActivity(activity);
+        activity.TravelPackage.ApprovalStatus = Ownership.StatusAfterEdit(caller, activity.TravelPackage.ApprovalStatus, changed: true);
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
@@ -308,14 +395,17 @@ public sealed class PackageService(
         return package.ToDto();
     }
 
-    private static void Apply(TravelPackage package, string title, string? description, decimal price, int durationDays, string? imageUrl, int maxTravelers)
+    /// <returns>True when any listing field changed.</returns>
+    private static bool Apply(TravelPackage package, string title, string? description, decimal price, int durationDays, string? imageUrl, int maxTravelers)
     {
+        var before = (package.Title, package.Description, package.Price, package.DurationDays, package.ImageUrl, package.MaxTravelers);
         package.Title = title.Trim();
         package.Description = Ownership.Clean(description);
         package.Price = price;
         package.DurationDays = durationDays;
         package.ImageUrl = Ownership.Clean(imageUrl) ?? package.ImageUrl;
         package.MaxTravelers = maxTravelers;
+        return before != (package.Title, package.Description, package.Price, package.DurationDays, package.ImageUrl, package.MaxTravelers);
     }
 }
 

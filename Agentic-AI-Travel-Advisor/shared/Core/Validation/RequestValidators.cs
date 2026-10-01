@@ -214,6 +214,35 @@ public sealed class CreateBookingRequestValidator : AbstractValidator<CreateBook
             .When(x => x.RoomId.HasValue && x.CheckOut.HasValue)
             .WithName("checkOut")
             .WithMessage("CheckOut must be after CheckIn.");
+        RuleFor(x => x.Guests).InclusiveBetween(1, 50).WithMessage("Guests must be between 1 and 50.");
+        RuleFor(x => x.Notes).MaximumLength(1000);
+    }
+}
+
+public sealed class AvailabilityQueryValidator : AbstractValidator<AvailabilityQuery>
+{
+    public AvailabilityQueryValidator()
+    {
+        RuleFor(x => x).Must(x => x.RoomId.HasValue != x.TravelPackageId.HasValue)
+            .WithName("roomId")
+            .WithMessage("Specify either a room or a travel package, not both.");
+        RuleFor(x => x.CheckIn).NotEqual(default(DateTime)).WithMessage("CheckIn is required.");
+        RuleFor(x => x.Guests).InclusiveBetween(1, 50).WithMessage("Guests must be between 1 and 50.");
+    }
+}
+
+public sealed class SaveRoomCalendarRequestValidator : AbstractValidator<SaveRoomCalendarRequest>
+{
+    public SaveRoomCalendarRequestValidator()
+    {
+        RuleFor(x => x.Entries).NotEmpty().Must(e => e.Count <= 366).WithMessage("Between 1 and 366 entries are allowed.");
+        RuleForEach(x => x.Entries).ChildRules(entry =>
+        {
+            entry.RuleFor(e => e.Date).NotEqual(default(DateOnly)).WithMessage("Date is required.");
+            entry.RuleFor(e => e.PriceOverride).GreaterThan(0).When(e => e.PriceOverride.HasValue)
+                .WithMessage("Price override must be greater than 0.");
+            entry.RuleFor(e => e.Note).MaximumLength(200);
+        });
     }
 }
 

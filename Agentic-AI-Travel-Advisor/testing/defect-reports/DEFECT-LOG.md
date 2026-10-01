@@ -25,9 +25,13 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Expected:** Exactly one succeeds; the other gets 409 Conflict.
 - **Actual:** Both can succeed.
 - **Evidence:** `shared/Infrastructure/Helpers/BookingHelper.cs` lines 43-50 at `4833828`.
-- **Status:** Open
-- **Fix:**
-- **Retest result:**
+- **Status:** Retested (Closed)
+- **Fix:** Two layers.
+  - `BookingService.CreateAsync` runs inside `IUnitOfWork.ExecuteInTransactionAsync`. It first takes `SELECT ... FOR UPDATE` on the room (or package) row, so concurrent requests queue up and each one's overlap check sees the bookings committed before it.
+  - The `EX_Bookings_Room_NoOverlap` exclusion constraint (added in Phase 2) is the database-level backstop. A `23P01` violation maps to 409.
+- **Retest result:** Phase 3 (`testing/execution-results/phase3-booking/`).
+  - `Concurrent_requests_for_the_same_room_and_dates_create_exactly_one_booking`: 8 parallel requests gave 1 × 201 and 7 × 409. It passed in the full run and 5/5 repeat runs.
+  - `Database_exclusion_constraint_rejects_overlapping_rows_inserted_directly`: a raw SQL insert gets `23P01`.
 
 ## DEF-003 Deactivated users keep working JWTs
 - **Severity / Priority:** High / P1
@@ -69,9 +73,23 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Expected:** 400 Bad Request / 409 Conflict.
 - **Actual:** 201 Created.
 - **Evidence:** `BookingHelper.cs` at `4833828`.
-- **Status:** Open
+- **Status:** Retested (Closed)
 - **Fix:**
-- **Retest result:**
+  - `CreateBookingRequestValidator` requires check-in and limits guests to 1-50.
+  - Dates are normalised to UTC dates.
+  - `BookingService` rejects:
+    - check-in before today
+    - check-in beyond `Booking.MaxAdvanceDays` (system setting, default 365)
+    - stays over 30 nights
+    - guests above room capacity or package `MaxTravelers`
+    - blocked calendar nights
+    - package dates whose remaining places are fewer than the party size
+    - a second active booking by the same user for the same package and date (409)
+- **Retest result:** Phase 3 (`testing/execution-results/phase3-booking/`). These tests passed:
+  - `Room_booking_rejects_past_too_far_too_long_and_over_capacity`
+  - `Package_capacity_duplicates_and_group_pricing_are_enforced`
+  - `Concurrent_package_bookings_never_exceed_max_travelers` (6 parallel, 3 places: 3 × 201, 3 × 409)
+  - `Blocked_nights_and_price_overrides_from_the_room_calendar_are_enforced`
 
 ## DEF-007 AI plan can exceed the user's budget
 - **Severity / Priority:** Medium / P2
@@ -113,9 +131,9 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Expected:** Material edits return the listing to Pending.
 - **Actual:** Stays Approved.
 - **Evidence:** `HotelsController.Update`, `PackagesController.Update` at `4833828`.
-- **Status:** Open
-- **Fix:**
-- **Retest result:**
+- **Status:** Retested (Closed)
+- **Fix:** `Ownership.StatusAfterEdit` in `CatalogServices.cs` covers hotel and package updates, and adding or removing a package activity. When a provider changes any listing field, the listing returns to Pending. A save with no changes, or an edit by an admin, keeps the current status.
+- **Retest result:** Phase 3. `Provider_edits_send_approved_listings_back_for_review_but_admin_edits_do_not` passed. It covers an unchanged save, an admin edit and an owner edit; after the owner edit the hotel is publicly 404 and booking is refused, and adding an activity sets the package to Pending.
 
 ## DEF-011 Admin bypass in provider update endpoints is unreachable
 - **Severity / Priority:** Low / P3

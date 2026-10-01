@@ -49,6 +49,30 @@ public class BookingStatusHelperTests
         Assert.False(BookingStatusHelper.CanTransition(BookingStatus.Pending, BookingStatus.Completed, RoleNames.Admin, false));
     }
 
+    [Theory]
+    [InlineData(48, 24, true)]
+    [InlineData(25, 24, true)]
+    [InlineData(24, 24, false)]
+    [InlineData(2, 24, false)]
+    [InlineData(-5, 24, false)]
+    [InlineData(1, 0, true)]
+    [InlineData(1, -10, true)]
+    public void Cancellation_cutoff(int hoursUntilCheckIn, int cutoffHours, bool expected)
+    {
+        var now = new DateTime(2026, 10, 1, 12, 0, 0, DateTimeKind.Utc);
+        Assert.Equal(expected, BookingStatusHelper.IsBeforeCancellationCutoff(now.AddHours(hoursUntilCheckIn), now, cutoffHours));
+    }
+
+    [Theory]
+    [InlineData(-1, true)]
+    [InlineData(0, true)]
+    [InlineData(1, false)]
+    public void Completion_requires_check_in_day_to_have_arrived(int daysUntilCheckIn, bool expected)
+    {
+        var now = new DateTime(2026, 10, 1, 9, 30, 0, DateTimeKind.Utc);
+        Assert.Equal(expected, BookingStatusHelper.CanComplete(now.Date.AddDays(daysUntilCheckIn), now));
+    }
+
     [Fact]
     public void CanManageListing_admin_always()
     {

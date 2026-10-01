@@ -20,6 +20,15 @@ public class BookingsController(IBookingService bookingService) : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = booking.Id }, booking);
     }
 
+    /// <summary>
+    /// Checks dates, capacity and price for a room (checkIn + checkOut) or package (checkIn) without reserving anything.
+    /// Returns 200 with available=false and a reason when the booking would be refused.
+    /// </summary>
+    [AllowAnonymous]
+    [HttpGet("availability")]
+    public async Task<ActionResult<AvailabilityQuoteDto>> CheckAvailability([FromQuery] AvailabilityQuery query, CancellationToken cancellationToken) =>
+        Ok(await bookingService.CheckAvailabilityAsync(User.ToOptionalUserContext(), query, cancellationToken));
+
     /// <summary>Guests see their own bookings, providers see bookings for their listings, admins see all.</summary>
     [HttpGet]
     public async Task<ActionResult<List<BookingDto>>> GetAll(CancellationToken cancellationToken) =>
