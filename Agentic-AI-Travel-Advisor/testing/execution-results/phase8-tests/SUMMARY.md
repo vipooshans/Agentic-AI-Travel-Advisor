@@ -193,7 +193,7 @@ Flutter 3.47.5. Visual Studio is not installed, so there is no Windows desktop t
 
 | Run | Result | Evidence |
 |---|---|---|
-| `flutter test` | **94 passed, 0 failed** (was 65) | `flutter-test.log` |
+| `flutter test` | **94 passed, 0 failed** (was 65); rerun after the DEF-024 client change | `flutter-test.log` |
 | `flutter analyze` | No issues found | `flutter-analyze.log` |
 
 **Checking that the tests can fail.** Four rules were broken on purpose in product code, then restored:
@@ -218,7 +218,9 @@ Command: `flutter drive --driver=test_driver/integration_test.dart --target=inte
 
 | Run | Result | Evidence |
 |---|---|---|
-| Run 8 (final) | **3 passed, 0 failed** ("All tests passed.") | `flutter-integration.log`, `flutter-integration-console.log` (per-test output from the browser console) |
+| Run 8 | **3 passed, 0 failed** ("All tests passed.") | `flutter-integration.log`, `flutter-integration-console.log` (per-test output from the browser console) |
+| Run 9, after DEF-024 (test 2 also checks the saved itinerary's `travelers` and `conversationId`) | **3 passed, 0 failed** | `flutter-integration-run9.log`, `flutter-integration-run9-console.log` |
+| Run 10, final API build after DEF-025 | **3 passed, 0 failed** | `flutter-integration-run10.log`, `flutter-integration-run10-console.log` |
 
 Runs 1 to 7 failed. They are kept, and the cause of each is listed below:
 
@@ -233,3 +235,42 @@ Runs 1 to 7 failed. They are kept, and the cause of each is listed below:
 - **DEF-023 (Medium):** found by the integration test, as described above.
 
 Details: `testing/defect-reports/DEFECT-LOG.md`.
+
+## 8f. Full end-to-end workflow with database verification
+
+`web-react/e2e/ai-journey.spec.ts` follows one traveler through every layer: React UI → ASP.NET Core API → AI orchestrator and its catalog tools → PostgreSQL → recommendations → saved itinerary → booking proposal → booking → provider confirmation. After each step it reads PostgreSQL directly instead of trusting the API's answers. It uses the `pg` client over a read-only session (`e2e/db.ts`), with the API's connection string passed in `E2E_DB_CONNECTION`. That value is loaded from user secrets into the shell for the run and is not stored anywhere. How to run it: `testing/integration/README.md`.
+
+| Step | UI action | Checked in the database |
+|---|---|---|
+| Register | React register page | `AspNetUsers` row, active, `RoleId` → `USER` |
+| Plan | "Plan a 3-day trip to Ella starting {run-specific date} for 2 people with a budget of LKR 50000. We like hiking." | The stay shown is a real, approved Ella hotel (`Hotels`). One `AIConversations` row holds the request, and the page URL carries its id. `AIRecommendations` rows belong to that conversation and include the hotel shown |
+| Save | Save as itinerary | One `Itineraries` row: the plan's dates, 2 travelers, budget 50,000, linked to the conversation, Draft. `ItineraryItems` in the same days and order as the plan stored in the conversation |
+| Propose | "Book the hotel please" | Proposal card shown ("Nothing is booked until you confirm"); **no** `Bookings` row exists yet |
+| Confirm | Confirm booking | One `Bookings` row: Pending, the recommended hotel, the plan's dates, 2 guests. `TotalPrice` = room rate × nights × rooms needed, read from `Rooms`, and equal to the total shown. The reply never says "Confirmed" |
+| Provider | Owner signs in, Bookings → Confirm | Same row now Confirmed, `UpdatedAt` later than `CreatedAt`. The hotel's owner (from `Hotels.OwnerId`) is the account that confirmed it |
+| Traveler | My bookings | Card shows Confirmed |
+
+Each run asks for a different start date (60-359 days ahead, derived from the run id), so repeated runs never compete for the same room nights.
+
+| Run | Result | Evidence |
+|---|---|---|
+| Journey spec, first run | **1 failed**: saved itinerary had `Travelers = 1` for a 2-person plan (DEF-024) | `e2e-journey-run1.log` |
+| Journey spec after the DEF-024 fix | **1 passed** | `e2e-journey-run2.log` |
+| Whole Playwright suite (16 earlier tests + the journey), final API build after DEF-025 | **17 passed, 0 failed** | `e2e-full-suite.log`, `e2e-full-suite-junit.xml` |
+| Rows written by that journey | user, conversation, plan day order, 4 recommendations, itinerary (2 travelers, budget, conversation 34), 5 items in plan order, booking #30 Confirmed at 2 × 12,000 | `e2e-journey-db-rows.txt` (read-only query; no password hashes or connection details) |
+
+The mobile half of the workflow is the Flutter integration test in 8e: real app → API → AI → PostgreSQL, checked through the API, 3 of 3 passed on the final build (run 10).
+
+### Defects found by the end-to-end run
+
+- **DEF-024 (Medium), product defect, fixed:** the `Itineraries` columns `Travelers`, `Budget` and `ConversationId` were never set. The API did not accept them and the clients did not send them, so every saved plan was stored as 1 traveler with no budget and no link to its conversation. The API now accepts and returns them, rejects another user's conversation id, and both clients send them. The API regression test failed before the fix (`def024-before-fix.log`) and passes after (`def024-after-fix.log`).
+- **DEF-025 (Medium), product defect, fixed:** found by reading the journey's database rows. `ItineraryService` swapped a per-day sort order of 0 for the item's position in the whole trip, so on every day after the first, the first item moved to the end ("Check out of the hotel" before "Explore Ella"). Items are now numbered in day, sort-order, request order. The API regression test failed before the fix (`def025-before-fix.log`) and passes after (`def025-after-fix.log`). The journey spec now also compares item order with the plan.
+
+Suites rerun after these fixes:
+
+| Suite | Result | Evidence |
+|---|---|---|
+| Backend unit | 432 tests: **397 passed, 0 failed, 35 skipped** (the live-LLM cases, no key on this machine) | `backend-unit-tests-def025.log` |
+| Backend API integration | **130 passed, 0 failed** (128 before, plus the DEF-024 and DEF-025 tests) | `backend-api-tests-def025.log` |
+| Vitest | **286 passed** (`planToItinerary` test extended) | `web-vitest-def024.log` |
+| Flutter | **94 passed**, analyze clean (request-mapping tests extended) | `flutter-test.log`, `flutter-analyze.log` |

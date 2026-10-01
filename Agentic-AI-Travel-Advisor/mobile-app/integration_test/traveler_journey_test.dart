@@ -205,6 +205,8 @@ void main() {
     final traveler = await Api.token(travelerEmail, travelerPassword);
     final (_, itineraries) = await Api.call(traveler, 'GET', '/api/itineraries');
     expect(itineraries, hasLength(1), reason: 'the saved plan is stored for this traveler');
+    expect(itineraries[0]['travelers'], 2, reason: 'the plan was for 2 people (DEF-024)');
+    expect(itineraries[0]['conversationId'], isNotNull);
     // The snackbar's View action floats over the message box until it closes.
     await pumpUntilGone(tester, find.text('Itinerary saved'));
 

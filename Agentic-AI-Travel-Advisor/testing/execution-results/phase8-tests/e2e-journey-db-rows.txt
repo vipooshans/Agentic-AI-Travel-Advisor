@@ -1,0 +1,32 @@
+﻿Database rows written by the journey test in the final full-suite run (e2e-full-suite.log, test 1). Read-only query, 2026-10-01 20:57. Status codes: booking 0 Pending, 1 Confirmed; itinerary 0 Draft.
+
+== AspNetUsers (traveler created through the React register page)
+{"Email":"e2e.journey.muposmylv8@example.test","role":"USER","CreatedAt":"2026-10-01T15:26:23.133Z"}
+
+== AIConversations
+{"Id":34,"Title":"Plan a 3-day trip to Ella starting 2027-01-13 for 2 people with a bud...","CreatedAt":"2026-10-01T15:26:23.498Z","UpdatedAt":"2026-10-01T15:26:28.498Z","messages_json_length":6350}
+
+== Plan day order as stored in the conversation
+{"day":1,"items":["Check in at Ella Gap View Inn","Pending Ella Walk (day 1 of 2)"]}
+{"day":2,"items":["Pending Ella Walk (day 2 of 2)"]}
+{"day":3,"items":["Explore Ella at your own pace","Check out of the hotel"]}
+
+== AIRecommendations
+{"Id":98,"ConversationId":34,"ItemType":0,"Title":"Ella Gap View Inn ΓÇô Family Room","HotelId":3,"RoomId":6,"TravelPackageId":null,"TransportationId":null,"EstimatedCost":"24000.00","Score":4.505}
+{"Id":99,"ConversationId":34,"ItemType":0,"Title":"E2E Booking Hotel mupolsbbkt ΓÇô E2E Garden Double","HotelId":26,"RoomId":30,"TravelPackageId":null,"TransportationId":null,"EstimatedCost":"22000.00","Score":3.604}
+{"Id":100,"ConversationId":34,"ItemType":0,"Title":"E2E Booking Hotel mupm0kaq2p ΓÇô E2E Garden Double","HotelId":13,"RoomId":17,"TravelPackageId":null,"TransportationId":null,"EstimatedCost":"22000.00","Score":3.604}
+{"Id":101,"ConversationId":34,"ItemType":1,"Title":"Pending Ella Walk","HotelId":null,"RoomId":null,"TravelPackageId":7,"TransportationId":null,"EstimatedCost":"24000.00","Score":4.505}
+
+== Itineraries
+{"Id":12,"Title":"Ella trip","StartDate":"2027-01-13T00:00:00.000Z","EndDate":"2027-01-15T00:00:00.000Z","Travelers":2,"Budget":"50000.00","EstimatedCost":"48000.00","ConversationId":34,"Status":0}
+
+== ItineraryItems (ORDER BY DayNumber, SortOrder)
+{"DayNumber":1,"SortOrder":0,"Title":"Check in at Ella Gap View Inn"}
+{"DayNumber":1,"SortOrder":1,"Title":"Pending Ella Walk (day 1 of 2)"}
+{"DayNumber":2,"SortOrder":2,"Title":"Pending Ella Walk (day 2 of 2)"}
+{"DayNumber":3,"SortOrder":3,"Title":"Explore Ella at your own pace"}
+{"DayNumber":3,"SortOrder":4,"Title":"Check out of the hotel"}
+
+== Bookings (joined to room, hotel and owner)
+{"Id":30,"Status":1,"CheckIn":"2027-01-13T00:00:00.000Z","CheckOut":"2027-01-15T00:00:00.000Z","Guests":2,"TotalPrice":"24000.00","room":"Family Room","PricePerNight":"12000.00","hotel":"Ella Gap View Inn","owner":"owner@traveladvisor.com","CreatedAt":"2026-10-01T15:26:28.433Z","UpdatedAt":"2026-10-01T15:26:29.533Z"}
+
