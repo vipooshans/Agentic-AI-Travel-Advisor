@@ -1,0 +1,505 @@
+﻿
+> travel-advisor-web@0.1.0 test
+> node node_modules/vitest/vitest.mjs run --reporter=verbose
+
+
+ RUN  v5.0.3 T:/web-react
+
+ Γ£ô src/api/client.test.ts > api client > sends the bearer token from the stored session 79ms
+ Γ£ô src/api/client.test.ts > api client > uses the ProblemDetails detail as the error message 22ms
+ Γ£ô src/api/client.test.ts > api client > keeps validation field errors 23ms
+ Γ£ô src/api/client.test.ts > api client > reports an unreachable server clearly 26ms
+ Γ£ô src/api/client.test.ts > api client > clears the session and announces expiry when the API rejects the token 15ms
+ Γ£ô src/api/client.test.ts > api client > does not treat a failed login as an expired session 29ms
+ Γ£ô src/auth/RequireRole.test.tsx > RequireRole > sends anonymous visitors to the login page 113ms
+ Γ£ô src/auth/RequireRole.test.tsx > RequireRole > blocks USER from admin pages 20ms
+ Γ£ô src/auth/RequireRole.test.tsx > RequireRole > blocks HOTEL_OWNER from admin pages 42ms
+ Γ£ô src/auth/RequireRole.test.tsx > RequireRole > blocks TRAVEL_AGENT from admin pages 12ms
+ Γ£ô src/auth/RequireRole.test.tsx > RequireRole > lets an admin in 383ms
+ Γ£ô src/pages/owner/OwnerHotelsPage.test.tsx > OwnerHotelsPage > shows a loading state and then the ownerΓÇÖs hotels with their approval status 744ms
+ Γ£ô src/components/BookingPanel.test.tsx > BookingPanel > asks anonymous visitors to sign in 674ms
+ Γ£ô src/components/BookingPanel.test.tsx > BookingPanel > does not offer booking to HOTEL_OWNER accounts 34ms
+ Γ£ô src/pages/owner/OwnerHotelsPage.test.tsx > OwnerHotelsPage > shows the empty state for a new owner 79ms
+ Γ£ô src/pages/owner/OwnerHotelsPage.test.tsx > OwnerHotelsPage > shows the API error when hotels cannot be loaded 39ms
+ Γ£ô src/pages/admin/AdminApprovalsPage.test.tsx > AdminApprovalsPage > lists pending hotels and packages by default 875ms
+ Γ£ô src/components/BookingPanel.test.tsx > BookingPanel > does not offer booking to TRAVEL_AGENT accounts 51ms
+ Γ£ô src/components/BookingPanel.test.tsx > BookingPanel > does not offer booking to ADMIN accounts 15ms
+ Γ£ô src/pages/shared/ManageBookingsPage.test.tsx > ManageBookingsPage > confirms a pending booking through the status endpoint 1006ms
+node.exe : stderr | src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > rejects an empty title without 
+calling the API
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | src/pa...calling the API:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+An update to AgentPackagesPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+stderr | src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > rejects an empty title without calling the 
+API
+An update to AgentPackagesPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ Γ£ô src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > lists the agentΓÇÖs packages with total price and approval status 869ms
+ Γ£ô src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > shows the empty state when the agent has no packages 45ms
+ Γ£ô src/components/BookingPanel.test.tsx > BookingPanel > only offers rooms that are open for booking 164ms
+ Γ£ô src/components/BookingPanel.test.tsx > BookingPanel > says so when no room is bookable 11ms
+ Γ£ô src/pages/admin/AdminDashboardPage.test.tsx > AdminDashboardPage > shows the platform totals and the pending approval count from the API 933ms
+ Γ£ô src/pages/public/HomePage.test.tsx > HomePage search > shows a loading state, then approved hotels with price and rating 923ms
+ Γ£ô src/pages/admin/AdminApprovalsPage.test.tsx > AdminApprovalsPage > approves a hotel, reloads the queue and shows the empty state 253ms
+ Γ£ô src/pages/shared/ManageBookingsPage.test.tsx > ManageBookingsPage > shows the server reason when a transition is rejected 213ms
+ Γ£ô src/pages/shared/ManageBookingsPage.test.tsx > ManageBookingsPage > shows 403 from the API as a permission error 54ms
+ Γ£ô src/pages/admin/AdminUsersPage.test.tsx > AdminUsersPage > lists every account with role and status, and never offers to deactivate the signed-in admin 1004ms
+ Γ£ô src/pages/admin/AdminDashboardPage.test.tsx > AdminDashboardPage > shows the last-12-month statistics, booking counts by status and top listings 178ms
+ Γ£ô src/components/BookingPanel.test.tsx > BookingPanel > rejects check-out on the check-in day without calling the API 171ms
+ Γ£ô src/pages/admin/AdminDashboardPage.test.tsx > AdminDashboardPage > shows loading indicators until the reports arrive 154ms
+ Γ£ô src/components/BookingPanel.test.tsx > BookingPanel > rejects zero guests without calling the API 122ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /assistant to the login page 536ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /bookings to the login page 61ms
+ Γ£ô src/pages/admin/AdminApprovalsPage.test.tsx > AdminApprovalsPage > rejects a package and leaves the hotel queue untouched 264ms
+stderr | src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > rejects a zero price without calling the API
+An update to AgentPackagesPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+stderr | src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > rejects a zero price without calling the API
+An update to AgentPackagesPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ Γ£ô src/pages/admin/AdminDashboardPage.test.tsx > AdminDashboardPage > shows empty states when there are no bookings yet 56ms
+ Γ£ô src/pages/admin/AdminDashboardPage.test.tsx > AdminDashboardPage > shows each API error instead of a spinner 85ms
+ Γ£ô src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > rejects an empty title without calling the API 418ms
+ Γ£ô src/pages/public/LoginPage.test.tsx > LoginPage > signs in and routes each role to its home page 1675ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /itineraries to the login page 62ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /owner to the login page 72ms
+ Γ£ô src/pages/admin/AdminApprovalsPage.test.tsx > AdminApprovalsPage > switches to rejected listings, where only Approve is offered 153ms
+ Γ£ô src/pages/admin/AdminApprovalsPage.test.tsx > AdminApprovalsPage > keeps the listing and shows the error when the decision fails 164ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /owner/hotels to the login page 58ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /owner/hotels/3 to the login page 47ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /owner/bookings to the login page 28ms
+ Γ£ô src/pages/user/MyBookingsPage.test.tsx > MyBookingsPage payments > pays the outstanding amount and then reports the booking as paid in full 1573ms
+ Γ£ô src/pages/user/MyBookingsPage.test.tsx > MyBookingsPage payments > hides the pay form while a cash payment awaits provider confirmation 132ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /agent to the login page 36ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /agent/packages to the login page 56ms
+ Γ£ô src/pages/public/RegisterPage.test.tsx > RegisterPage > rejects missing last name without calling the API 1681ms
+ Γ£ô src/pages/public/HomePage.test.tsx > HomePage search > sends the trimmed filters as query parameters and shows the matching hotels 752ms
+ Γ£ô src/pages/public/HomePage.test.tsx > HomePage search > shows the empty state when nothing matches 40ms
+ Γ£ô src/pages/public/HomePage.test.tsx > HomePage search > shows a readable error when the API is down 48ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /agent/packages/7 to the login page 60ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /agent/transport to the login page 48ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /agent/bookings to the login page 35ms
+stderr | src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > rejects a fractional duration without 
+calling the API
+An update to AgentPackagesPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+stderr | src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > rejects a fractional duration without 
+calling the API
+An update to AgentPackagesPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ Γ£ô src/components/BookingPanel.test.tsx > BookingPanel > quotes the selected room, then creates a pending booking the backend confirms 631ms
+ Γ£ô src/pages/admin/AdminUsersPage.test.tsx > AdminUsersPage > filters by role and by search text 844ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /admin to the login page 39ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /admin/approvals to the login page 35ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /admin/users to the login page 36ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /admin/destinations to the login page 26ms
+ Γ£ô src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > rejects a zero price without calling the API 541ms
+ Γ£ô src/pages/user/AssistantPage.test.tsx > AssistantPage > renders the structured plan and books only after explicit confirmation 1760ms
+ Γ£ô src/pages/public/LoginPage.test.tsx > LoginPage > submits with the Enter key from the password field 544ms
+ Γ£ô src/components/BookingPanel.test.tsx > BookingPanel > shows why a room is unavailable and offers no booking button 101ms
+stderr | src/App.test.tsx > App route protection > /assistant as USER ΓåÆ allowed: true
+An update to AssistantPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to AssistantPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to AssistantPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /admin/bookings to the login page 36ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /admin/reviews to the login page 42ms
+ Γ£ô src/App.test.tsx > App route protection > sends anonymous visitors from /admin/settings to the login page 29ms
+ Γ£ô src/pages/owner/OwnerHotelsPage.test.tsx > OwnerHotelsPage > creates a hotel with trimmed values and lists it as pending approval 1332ms
+ Γ£ô src/pages/public/HomePage.test.tsx > HomePage search > searches travel packages by destination on the packages tab 315ms
+ Γ£ô src/pages/public/HomePage.test.tsx > HomePage search > links travelers to the AI assistant and tells everyone else to sign in 59ms
+ Γ£ô src/App.test.tsx > App route protection > /assistant as USER ΓåÆ allowed: true 54ms
+ Γ£ô src/App.test.tsx > App route protection > /assistant as HOTEL_OWNER ΓåÆ allowed: false 25ms
+ Γ£ô src/App.test.tsx > App route protection > /assistant as TRAVEL_AGENT ΓåÆ allowed: false 21ms
+ Γ£ô src/App.test.tsx > App route protection > /assistant as ADMIN ΓåÆ allowed: false 28ms
+ Γ£ô src/pages/admin/AdminUsersPage.test.tsx > AdminUsersPage > deactivates a user after confirmation 244ms
+ Γ£ô src/components/BookingPanel.test.tsx > BookingPanel > reports the backend rejection instead of claiming the booking succeeded 151ms
+ Γ£ô src/components/BookingPanel.test.tsx > BookingPanel > books a package by start date and shows the remaining places 152ms
+ Γ£ô src/App.test.tsx > App route protection > /bookings as USER ΓåÆ allowed: true 29ms
+ Γ£ô src/App.test.tsx > App route protection > /bookings as HOTEL_OWNER ΓåÆ allowed: false 21ms
+ Γ£ô src/App.test.tsx > App route protection > /bookings as TRAVEL_AGENT ΓåÆ allowed: false 24ms
+ Γ£ô src/App.test.tsx > App route protection > /bookings as ADMIN ΓåÆ allowed: false 30ms
+ Γ£ô src/pages/admin/AdminUsersPage.test.tsx > AdminUsersPage > reactivates without asking for confirmation 164ms
+ Γ£ô src/App.test.tsx > App route protection > /itineraries as USER ΓåÆ allowed: true 22ms
+ Γ£ô src/App.test.tsx > App route protection > /itineraries as HOTEL_OWNER ΓåÆ allowed: false 33ms
+ Γ£ô src/App.test.tsx > App route protection > /itineraries as TRAVEL_AGENT ΓåÆ allowed: false 25ms
+ Γ£ô src/App.test.tsx > App route protection > /itineraries as ADMIN ΓåÆ allowed: false 37ms
+stderr | src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > rejects zero days without calling the API
+An update to AgentPackagesPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+stderr | src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > rejects zero days without calling the API
+An update to AgentPackagesPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ Γ£ô src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > rejects a fractional duration without calling the API 544ms
+ Γ£ô src/App.test.tsx > App route protection > /owner as USER ΓåÆ allowed: false 16ms
+ Γ£ô src/App.test.tsx > App route protection > /owner as HOTEL_OWNER ΓåÆ allowed: true 22ms
+ Γ£ô src/App.test.tsx > App route protection > /owner as TRAVEL_AGENT ΓåÆ allowed: false 20ms
+ Γ£ô src/App.test.tsx > App route protection > /owner as ADMIN ΓåÆ allowed: false 15ms
+ Γ£ô src/App.test.tsx > App route protection > /owner/hotels as USER ΓåÆ allowed: false 18ms
+ Γ£ô src/App.test.tsx > App route protection > /owner/hotels as HOTEL_OWNER ΓåÆ allowed: true 17ms
+ Γ£ô src/pages/public/LoginPage.test.tsx > LoginPage > shows the API error and stores nothing when credentials are wrong 530ms
+ Γ£ô src/App.test.tsx > App route protection > /owner/hotels as TRAVEL_AGENT ΓåÆ allowed: false 18ms
+ Γ£ô src/App.test.tsx > App route protection > /owner/hotels as ADMIN ΓåÆ allowed: false 17ms
+ Γ£ô src/App.test.tsx > App route protection > /owner/hotels/3 as USER ΓåÆ allowed: false 20ms
+ Γ£ô src/App.test.tsx > App route protection > /owner/hotels/3 as HOTEL_OWNER ΓåÆ allowed: true 12ms
+ Γ£ô src/App.test.tsx > App route protection > /owner/hotels/3 as TRAVEL_AGENT ΓåÆ allowed: false 17ms
+ Γ£ô src/App.test.tsx > App route protection > /owner/hotels/3 as ADMIN ΓåÆ allowed: false 15ms
+ Γ£ô src/App.test.tsx > App route protection > /owner/bookings as USER ΓåÆ allowed: false 19ms
+ Γ£ô src/App.test.tsx > App route protection > /owner/bookings as HOTEL_OWNER ΓåÆ allowed: true 21ms
+ Γ£ô src/App.test.tsx > App route protection > /owner/bookings as TRAVEL_AGENT ΓåÆ allowed: false 14ms
+ Γ£ô src/App.test.tsx > App route protection > /owner/bookings as ADMIN ΓåÆ allowed: false 17ms
+ Γ£ô src/App.test.tsx > App route protection > /agent as USER ΓåÆ allowed: false 25ms
+ Γ£ô src/App.test.tsx > App route protection > /agent as HOTEL_OWNER ΓåÆ allowed: false 18ms
+ Γ£ô src/App.test.tsx > App route protection > /agent as TRAVEL_AGENT ΓåÆ allowed: true 17ms
+ Γ£ô src/App.test.tsx > App route protection > /agent as ADMIN ΓåÆ allowed: false 19ms
+ Γ£ô src/App.test.tsx > App route protection > /agent/packages as USER ΓåÆ allowed: false 23ms
+ Γ£ô src/App.test.tsx > App route protection > /agent/packages as HOTEL_OWNER ΓåÆ allowed: false 15ms
+ Γ£ô src/App.test.tsx > App route protection > /agent/packages as TRAVEL_AGENT ΓåÆ allowed: true 18ms
+ Γ£ô src/App.test.tsx > App route protection > /agent/packages as ADMIN ΓåÆ allowed: false 19ms
+ Γ£ô src/pages/public/RegisterPage.test.tsx > RegisterPage > rejects whitespace-only first name without calling the API 1080ms
+stderr | src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > rejects zero travelers without calling the 
+API
+An update to AgentPackagesPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+stderr | src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > rejects zero travelers without calling the 
+API
+An update to AgentPackagesPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ Γ£ô src/App.test.tsx > App route protection > /agent/packages/7 as USER ΓåÆ allowed: false 22ms
+ Γ£ô src/App.test.tsx > App route protection > /agent/packages/7 as HOTEL_OWNER ΓåÆ allowed: false 22ms
+ Γ£ô src/App.test.tsx > App route protection > /agent/packages/7 as TRAVEL_AGENT ΓåÆ allowed: true 12ms
+ Γ£ô src/App.test.tsx > App route protection > /agent/packages/7 as ADMIN ΓåÆ allowed: false 20ms
+ Γ£ô src/App.test.tsx > App route protection > /agent/transport as USER ΓåÆ allowed: false 22ms
+ Γ£ô src/App.test.tsx > App route protection > /agent/transport as HOTEL_OWNER ΓåÆ allowed: false 15ms
+ Γ£ô src/pages/user/AssistantPage.test.tsx > AssistantPage > shows a refusal without any plan or booking controls 968ms
+ Γ£ô src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > rejects zero days without calling the API 531ms
+ Γ£ô src/App.test.tsx > App route protection > /agent/transport as TRAVEL_AGENT ΓåÆ allowed: true 20ms
+ Γ£ô src/App.test.tsx > App route protection > /agent/transport as ADMIN ΓåÆ allowed: false 17ms
+ Γ£ô src/App.test.tsx > App route protection > /agent/bookings as USER ΓåÆ allowed: false 15ms
+ Γ£ô src/App.test.tsx > App route protection > /agent/bookings as HOTEL_OWNER ΓåÆ allowed: false 17ms
+ Γ£ô src/App.test.tsx > App route protection > /agent/bookings as TRAVEL_AGENT ΓåÆ allowed: true 13ms
+ Γ£ô src/App.test.tsx > App route protection > /agent/bookings as ADMIN ΓåÆ allowed: false 19ms
+ Γ£ô src/pages/public/LoginPage.test.tsx > LoginPage > returns to the page the visitor was sent away from (DEF-021) 575ms
+ Γ£ô src/pages/public/LoginPage.test.tsx > LoginPage > validates empty fields without calling the API 65ms
+ Γ£ô src/pages/user/AssistantPage.test.tsx > AssistantPage > surfaces API errors such as the rate limit 251ms
+ Γ£ô src/pages/user/AssistantPage.test.tsx > AssistantPage > disables the composer when the admin has turned the assistant off 33ms
+ Γ£ô src/App.test.tsx > App route protection > /admin as USER ΓåÆ allowed: false 21ms
+ Γ£ô src/App.test.tsx > App route protection > /admin as HOTEL_OWNER ΓåÆ allowed: false 14ms
+ Γ£ô src/App.test.tsx > App route protection > /admin as TRAVEL_AGENT ΓåÆ allowed: false 16ms
+ Γ£ô src/App.test.tsx > App route protection > /admin as ADMIN ΓåÆ allowed: true 20ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/approvals as USER ΓåÆ allowed: false 24ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/approvals as HOTEL_OWNER ΓåÆ allowed: false 23ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/approvals as TRAVEL_AGENT ΓåÆ allowed: false 27ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/approvals as ADMIN ΓåÆ allowed: true 25ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/users as USER ΓåÆ allowed: false 34ms
+ Γ£ô src/lib/lib.test.ts > planToItinerary > maps every plan day item to an itinerary item with an HH:mm:ss start time 3ms
+ Γ£ô src/lib/lib.test.ts > statusCount > reads enum-name keys 1ms
+ Γ£ô src/lib/lib.test.ts > statusCount > reads numeric keys 0ms
+ Γ£ô src/lib/lib.test.ts > statusCount > defaults to zero 0ms
+ Γ£ô src/lib/lib.test.ts > format helpers > formats money with the currency code 13ms
+ Γ£ô src/lib/lib.test.ts > format helpers > formats the date part without time-zone drift 4ms
+ Γ£ô src/lib/lib.test.ts > format helpers > parses optional numbers 2ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/users as HOTEL_OWNER ΓåÆ allowed: false 20ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/users as TRAVEL_AGENT ΓåÆ allowed: false 12ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/users as ADMIN ΓåÆ allowed: true 22ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/destinations as USER ΓåÆ allowed: false 17ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/destinations as HOTEL_OWNER ΓåÆ allowed: false 15ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/destinations as TRAVEL_AGENT ΓåÆ allowed: false 28ms
+stderr | src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > creates a package for the chosen destination 
+and lists it as pending
+An update to AgentPackagesPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+stderr | src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > creates a package for the chosen destination 
+and lists it as pending
+An update to AgentPackagesPage inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ Γ£ô src/App.test.tsx > App route protection > /admin/destinations as ADMIN ΓåÆ allowed: true 19ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/bookings as USER ΓåÆ allowed: false 11ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/bookings as HOTEL_OWNER ΓåÆ allowed: false 12ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/bookings as TRAVEL_AGENT ΓåÆ allowed: false 13ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/bookings as ADMIN ΓåÆ allowed: true 27ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/reviews as USER ΓåÆ allowed: false 19ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/reviews as HOTEL_OWNER ΓåÆ allowed: false 14ms
+ Γ£ô src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > rejects zero travelers without calling the API 499ms
+ Γ£ô src/pages/admin/AdminUsersPage.test.tsx > AdminUsersPage > creates a staff account with the chosen role 1247ms
+ Γ£ô src/pages/admin/AdminUsersPage.test.tsx > AdminUsersPage > shows the API error when the user list cannot be loaded 34ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/reviews as TRAVEL_AGENT ΓåÆ allowed: false 14ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/reviews as ADMIN ΓåÆ allowed: true 17ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/settings as USER ΓåÆ allowed: false 26ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/settings as HOTEL_OWNER ΓåÆ allowed: false 12ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/settings as TRAVEL_AGENT ΓåÆ allowed: false 14ms
+ Γ£ô src/App.test.tsx > App route protection > /admin/settings as ADMIN ΓåÆ allowed: true 15ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /assistant as USER returns there only when allowed (true) 1ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /assistant as HOTEL_OWNER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /assistant as TRAVEL_AGENT returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /assistant as ADMIN returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /bookings as USER returns there only when allowed (true) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /bookings as HOTEL_OWNER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /bookings as TRAVEL_AGENT returns there only when allowed (false) 2ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /bookings as ADMIN returns there only when allowed (false) 2ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /itineraries as USER returns there only when allowed (true) 1ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /itineraries as HOTEL_OWNER returns there only when allowed (false) 1ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /itineraries as TRAVEL_AGENT returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /itineraries as ADMIN returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner as USER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner as HOTEL_OWNER returns there only when allowed (true) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner as TRAVEL_AGENT returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner as ADMIN returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner/hotels as USER returns there only when allowed (false) 1ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner/hotels as HOTEL_OWNER returns there only when allowed (true) 2ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner/hotels as TRAVEL_AGENT returns there only when allowed (false) 1ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner/hotels as ADMIN returns there only when allowed (false) 1ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner/hotels/3 as USER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner/hotels/3 as HOTEL_OWNER returns there only when allowed (true) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner/hotels/3 as TRAVEL_AGENT returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner/hotels/3 as ADMIN returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner/bookings as USER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner/bookings as HOTEL_OWNER returns there only when allowed (true) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner/bookings as TRAVEL_AGENT returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /owner/bookings as ADMIN returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent as USER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent as HOTEL_OWNER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent as TRAVEL_AGENT returns there only when allowed (true) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent as ADMIN returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/packages as USER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/packages as HOTEL_OWNER returns there only when allowed (false) 1ms
+ Γ£ô src/auth/session.test.ts > session storage > round-trips a valid session 3ms
+ Γ£ô src/auth/session.test.ts > session storage > drops an expired session instead of sending a stale token 1ms
+ Γ£ô src/auth/session.test.ts > session storage > drops corrupt JSON 0ms
+ Γ£ô src/auth/session.test.ts > session storage > clearSession removes the token 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/packages as TRAVEL_AGENT returns there only when allowed (true) 2ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/packages as ADMIN returns there only when allowed (false) 1ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/packages/7 as USER returns there only when allowed (false) 1ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/packages/7 as HOTEL_OWNER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/packages/7 as TRAVEL_AGENT returns there only when allowed (true) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/packages/7 as ADMIN returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/transport as USER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/transport as HOTEL_OWNER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/transport as TRAVEL_AGENT returns there only when allowed (true) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/transport as ADMIN returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/bookings as USER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/bookings as HOTEL_OWNER returns there only when allowed (false) 1ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/bookings as TRAVEL_AGENT returns there only when allowed (true) 2ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /agent/bookings as ADMIN returns there only when allowed (false) 1ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin as USER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin as HOTEL_OWNER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin as TRAVEL_AGENT returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin as ADMIN returns there only when allowed (true) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/approvals as USER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/approvals as HOTEL_OWNER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/approvals as TRAVEL_AGENT returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/approvals as ADMIN returns there only when allowed (true) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/users as USER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/users as HOTEL_OWNER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/users as TRAVEL_AGENT returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/users as ADMIN returns there only when allowed (true) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/destinations as USER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/destinations as HOTEL_OWNER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/destinations as TRAVEL_AGENT returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/destinations as ADMIN returns there only when allowed (true) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/bookings as USER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/bookings as HOTEL_OWNER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/bookings as TRAVEL_AGENT returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/bookings as ADMIN returns there only when allowed (true) 1ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/reviews as USER returns there only when allowed (false) 1ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/reviews as HOTEL_OWNER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/reviews as TRAVEL_AGENT returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/reviews as ADMIN returns there only when allowed (true) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/settings as USER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/settings as HOTEL_OWNER returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/settings as TRAVEL_AGENT returns there only when allowed (false) 0ms
+ Γ£ô src/App.test.tsx > App route protection > after sign-in, /admin/settings as ADMIN returns there only when allowed (true) 0ms
+ Γ£ô src/App.test.tsx > App route protection > lets USER open their profile 18ms
+ Γ£ô src/App.test.tsx > App route protection > lets HOTEL_OWNER open their profile 9ms
+ Γ£ô src/App.test.tsx > App route protection > lets TRAVEL_AGENT open their profile 10ms
+ Γ£ô src/App.test.tsx > App route protection > lets ADMIN open their profile 10ms
+ Γ£ô src/App.test.tsx > App route protection > keeps / public 12ms
+ Γ£ô src/App.test.tsx > App route protection > keeps /login public 10ms
+ Γ£ô src/App.test.tsx > App route protection > keeps /register public 10ms
+ Γ£ô src/pages/public/RegisterPage.test.tsx > RegisterPage > rejects malformed email without calling the API 942ms
+ Γ£ô src/App.test.tsx > App route protection > keeps /hotels/3 public 8ms
+ Γ£ô src/App.test.tsx > App route protection > keeps /packages/7 public 8ms
+ Γ£ô src/App.test.tsx > App route protection > shows the 404 page for unknown paths 13ms
+ Γ£ô src/App.test.tsx > App route protection > shows USER only their own navigation 22ms
+ Γ£ô src/App.test.tsx > App route protection > shows HOTEL_OWNER only their own navigation 16ms
+ Γ£ô src/App.test.tsx > App route protection > shows TRAVEL_AGENT only their own navigation 15ms
+ Γ£ô src/App.test.tsx > App route protection > shows ADMIN only their own navigation 16ms
+ Γ£ô src/pages/owner/OwnerHotelsPage.test.tsx > OwnerHotelsPage > keeps the form open and shows the validation error the API returns 1282ms
+ Γ£ô src/pages/owner/OwnerHotelsPage.test.tsx > OwnerHotelsPage > edits a hotel and shows the re-approval status the API returns 551ms
+ Γ£ô src/pages/owner/OwnerHotelsPage.test.tsx > OwnerHotelsPage > deletes a hotel after confirmation 97ms
+ Γ£ô src/pages/owner/OwnerHotelsPage.test.tsx > OwnerHotelsPage > does nothing when the delete is not confirmed 76ms
+ Γ£ô src/pages/owner/OwnerHotelsPage.test.tsx > OwnerHotelsPage > keeps the hotel and explains why when the API refuses the delete 94ms
+ Γ£ô src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > creates a package for the chosen destination and lists it as pending 882ms
+ Γ£ô src/App.test.tsx > App route protection > does not send the next user to the previous userΓÇÖs page after an explicit sign-out (DEF-021) 617ms
+ Γ£ô src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > pre-fills the edit form and sends the update to that package 262ms
+ Γ£ô src/pages/public/RegisterPage.test.tsx > RegisterPage > rejects short password without calling the API 890ms
+ Γ£ô src/pages/agent/AgentPackagesPage.test.tsx > AgentPackagesPage > explains when another agentΓÇÖs package cannot be changed 154ms
+ Γ£ô src/App.test.tsx > App route protection > sends the next user of the same role to their home page, not the page the last one signed out on 677ms
+ Γ£ô src/App.test.tsx > App route protection > signs the user out and asks them to sign in again when the API rejects the token 67ms
+ Γ£ô src/pages/public/RegisterPage.test.tsx > RegisterPage > rejects mismatched confirmation without calling the API 1035ms
+ Γ£ô src/pages/public/RegisterPage.test.tsx > RegisterPage > registers a traveler with trimmed fields and opens the assistant 1116ms
+ Γ£ô src/pages/public/RegisterPage.test.tsx > RegisterPage > shows the API message when the email is already registered 1015ms
+ Γ£ô src/pages/public/RegisterPage.test.tsx > RegisterPage > lists every password rule the server rejected 961ms
+ Γ£ô src/pages/public/RegisterPage.test.tsx > RegisterPage > sends a signed-in user to their own home page 3ms
+
+ Test Files  17 passed (17)
+      Tests  286 passed (286)
+   Start at  22:22:40
+   Duration  14.86s (environment 41%, tests 32%, setup 15%, import 7%, transform 4%)
+
+EXIT=0

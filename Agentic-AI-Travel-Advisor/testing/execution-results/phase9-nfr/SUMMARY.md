@@ -129,3 +129,24 @@ Test names below are in `backend-api-tests-final.trx` and `backend-unit-tests-fi
 - **ZAP's generated values.** ZAP fills parameters from the OpenAPI schema (ids such as 10, strings such as "q"). Most writes therefore stop at validation or "not found", so deep business flows are not exercised by the scan. Those flows are covered by the API tests, Newman and Playwright.
 - **No admin or provider scan.** The active scan was not run as ADMIN, HOTEL_OWNER or TRAVEL_AGENT, to protect the shared development database. Those roles' access rules are covered by the access-control matrix and the ownership tests.
 - **HTTP only.** The scans used plain HTTP in Development, so transport security was not tested. The API redirects to HTTPS when it listens on an HTTPS URL, but it does not send `Strict-Transport-Security`. For a production deployment, HSTS should be added at the API (`UseHsts`) or at the TLS-terminating proxy. This was not changed here, because it cannot be verified in this HTTP-only setup.
+
+## 9c Final regression
+
+After the DEF-026 and DEF-027 fixes, every suite was run again on the final code. The API under test was the final build on port 5080, in Development, with the raised rate limits from 9a.
+
+| Suite | Files | Result |
+|---|---|---|
+| Backend unit tests | `backend-unit-tests-final.trx`, `.log` | 411 passed, 0 failed, 35 not executed |
+| API integration and database tests (Testcontainers) | `backend-api-tests-final.trx`, `.log` | 130 passed, 0 failed |
+| Newman, 79 requests on the running API | `newman-final-junit.xml`, `newman-final.log` | 315 assertions, 0 failed |
+| Playwright, real API and PostgreSQL | `e2e-full-suite-rerun-junit.xml`, `e2e-full-suite-rerun.log` | 17 passed |
+| Vitest (React) | `web-vitest-final.log` | 286 passed in 17 files |
+| Flutter tests | `flutter-test-final.jsonl`, `flutter-test-final.log` | 94 passed |
+| Flutter integration test on the real API | `flutter-integration-final.log` | 3 passed ("All tests passed.") |
+
+Notes on these runs:
+- **Live-LLM cases not run.** The 35 not-executed unit tests are the live-LLM evaluation cases. They skip themselves unless a working `Ai:ApiKey` is configured, and the local key is a placeholder that the provider rejects.
+- **Flutter test names come from the JSON file.** Flutter's text reporter does not print a line for every test, so the per-test results are taken from the JSON reporter output.
+- **Some log characters are garbled.** The k6 and Vitest logs were captured through the Windows console, so their check marks and arrows appear as code-page-437 characters (for example `Γ£ô` for ✓).
+
+The test-case catalogue `testing/test-cases/TEST-CASES.md` cites these files. `testing/scripts/verify-test-cases.ps1` checks every reference in it: 108 cases and 253 references, all resolved and consistent with their status.

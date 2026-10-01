@@ -1,0 +1,35 @@
+﻿
+> travel-advisor-web@0.1.0 e2e
+> node node_modules/@playwright/test/cli.js test
+
+
+Running 17 tests using 1 worker
+
+node.exe : (node:37808) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:37808) Wa... env being set.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 [chromium] ΓÇ║ e2e\ai-journey.spec.ts:33:3 ΓÇ║ Full journey: UI -> API -> AI -> PostgreSQL -> itinerary -> booking -> confirmation ΓÇ║ a traveler plans, saves and books with the assistant; the owner confirms; every step is in the database (13.6s)
+  ok  2 [chromium] ΓÇ║ e2e\auth.spec.ts:12:5 ΓÇ║ Authentication and role-based access (real API) ΓÇ║ ADMIN signs in, lands on their home page and sees only their navigation (1.2s)
+  ok  3 [chromium] ΓÇ║ e2e\auth.spec.ts:12:5 ΓÇ║ Authentication and role-based access (real API) ΓÇ║ HOTEL_OWNER signs in, lands on their home page and sees only their navigation (1.2s)
+  ok  4 [chromium] ΓÇ║ e2e\auth.spec.ts:12:5 ΓÇ║ Authentication and role-based access (real API) ΓÇ║ TRAVEL_AGENT signs in, lands on their home page and sees only their navigation (1.1s)
+  ok  5 [chromium] ΓÇ║ e2e\auth.spec.ts:21:3 ΓÇ║ Authentication and role-based access (real API) ΓÇ║ wrong password shows the API error and stores no session (751ms)
+  ok  6 [chromium] ΓÇ║ e2e\auth.spec.ts:28:3 ΓÇ║ Authentication and role-based access (real API) ΓÇ║ a new traveler registers, keeps the session after reload, and the account exists in the API (1.1s)
+  ok  7 [chromium] ΓÇ║ e2e\auth.spec.ts:46:3 ΓÇ║ Authentication and role-based access (real API) ΓÇ║ the server rejects a weak password that passes the client-side length check (775ms)
+  ok  8 [chromium] ΓÇ║ e2e\auth.spec.ts:59:3 ΓÇ║ Authentication and role-based access (real API) ΓÇ║ a traveler cannot open admin, owner or agent pages, and the API refuses the data too (1.6s)
+  ok  9 [chromium] ΓÇ║ e2e\auth.spec.ts:79:3 ΓÇ║ Authentication and role-based access (real API) ΓÇ║ an anonymous visitor is sent to login and returned to the page they asked for (798ms)
+  ok 10 [chromium] ΓÇ║ e2e\auth.spec.ts:89:3 ΓÇ║ Authentication and role-based access (real API) ΓÇ║ a tampered token is rejected by the API and the user is asked to sign in again (1.0s)
+  ok 11 [chromium] ΓÇ║ e2e\booking.spec.ts:45:3 ΓÇ║ Direct booking workflow: traveler -> API -> PostgreSQL -> provider confirmation ΓÇ║ a traveler checks availability and books; the booking is stored as Pending with the server-side price (1.9s)
+  ok 12 [chromium] ΓÇ║ e2e\booking.spec.ts:77:3 ΓÇ║ Direct booking workflow: traveler -> API -> PostgreSQL -> provider confirmation ΓÇ║ a second traveler cannot double-book the same room for overlapping dates (1.3s)
+  ok 13 [chromium] ΓÇ║ e2e\booking.spec.ts:88:3 ΓÇ║ Direct booking workflow: traveler -> API -> PostgreSQL -> provider confirmation ΓÇ║ the hotel owner confirms the booking and the traveler sees the confirmed status (9.7s)
+  ok 14 [chromium] ΓÇ║ e2e\listings.spec.ts:26:3 ΓÇ║ Provider listings and admin approval (real API + PostgreSQL) ΓÇ║ a hotel owner creates a hotel and a room; it stays hidden until approved (2.3s)
+  ok 15 [chromium] ΓÇ║ e2e\listings.spec.ts:55:3 ΓÇ║ Provider listings and admin approval (real API + PostgreSQL) ΓÇ║ the admin approves the hotel and travelers can find it in search (4.0s)
+  ok 16 [chromium] ΓÇ║ e2e\listings.spec.ts:73:3 ΓÇ║ Provider listings and admin approval (real API + PostgreSQL) ΓÇ║ a travel agent sees form validation, then creates a package that the admin rejects (3.5s)
+  ok 17 [chromium] ΓÇ║ e2e\listings.spec.ts:100:3 ΓÇ║ Provider listings and admin approval (real API + PostgreSQL) ΓÇ║ a second hotel owner created by the admin cannot see or edit the hotel; its owner can delete it (4.5s)
+
+  17 passed (54.0s)
+EXIT=0
