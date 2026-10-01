@@ -59,3 +59,73 @@ The request counts include the setup requests: 2 lookups for catalog, 20 registr
 - None of the endpoints came close to the thresholds. The slowest operation is sign-in, at a p95 of about 70 ms, because password hashing (PBKDF2) is deliberately expensive. That makes sign-in the part to watch first as concurrency grows.
 - The occasional maximums of 160–300 ms were single slow requests, most likely JIT warm-up or garbage collection in the Debug build. Overall p99 was 10.2 ms for catalog, 79.8 ms for login (91.7 ms for the sign-in request alone), 53.0 ms for booking and 61.3 ms for AI.
 - The AI numbers are for the deterministic planner. With a working model key, AI response time is dominated by the model provider and is not covered by these runs.
+
+## 9b Security (OWASP ZAP + security test suites)
+
+How to run the scans: `testing/security/README.md`.
+- **Tool and target:** ZAP `zaproxy/zap-stable` (weekly image, 7 weeks old on 2026-10-01). It scanned the API in Development with the rate limits raised as in 9a, at `http://host.docker.internal:5080`.
+- **Coverage:** the API scans imported all 73 operations of `/swagger/v1/swagger.json` and reached 126 URLs.
+- **Reports:** `testing/security/zap/reports/`. **Console logs:** this folder.
+
+### ZAP runs
+
+| Run | Log | Result |
+|---|---|---|
+| Baseline (passive), before fix | `zap-baseline-before-def027.log` | 66 rules passed. 1 warning: Non-Storable Content (10049) on the three 404 pages `/`, `/robots.txt`, `/sitemap.xml` |
+| API active scan, no token, before fix | `zap-api-before-def027.log` | 117 passed. 1 warning: **Cross-Origin-Resource-Policy header missing (90004)** on 7 responses. This was logged as DEF-027 |
+| API active scan as USER, first attempt | `zap-api-user-run1-token-not-applied.log` | **Not a valid authenticated run.** Its 63 responses were 401, and the account's data was unchanged, so ZAP never sent the token. The runner was corrected (it no longer sets `ZAP_AUTH_HEADER_SITE`), and the run was repeated |
+| API active scan as USER, before fix | `zap-api-user-before-def027.log` | 116 passed. 2 warnings: CORP missing (12 responses, DEF-027), and Timestamp Disclosure (10096) on `/api/auth/me` |
+| Baseline, after fix | `zap-baseline.log` | 66 passed. 1 warning: the same Non-Storable Content on 2 of the 404 pages |
+| API active scan, no token, after fix | `zap-api.log` | **118 passed, 0 warnings, 0 failures** |
+| API active scan as USER, after fix | `zap-api-user.log` | **118 passed, 0 warnings, 0 failures** |
+
+The final USER scan really ran as a signed-in user:
+- Admin and provider endpoints answered **403** (38 responses).
+- ZAP's template-injection payloads replaced the scan account's name. They were stored as plain text, and none was executed.
+
+Across all runs, no scan received a 5xx response.
+
+**The active rules that passed include:**
+- SQL injection: generic, plus time-based for PostgreSQL, MySQL, MsSQL, Oracle and Hypersonic.
+- Cross-site scripting: reflected, persistent and DOM.
+- Remote OS command injection, path traversal, remote file inclusion, server-side template injection, XXE, CRLF injection, Log4Shell and Spring4Shell.
+- Information disclosure (debug error messages, application error disclosure, PII, private IP), and the `.env` and hidden-file finders.
+
+### Triage of the findings
+
+| Finding | Risk (ZAP) | Decision |
+|---|---|---|
+| Cross-Origin-Resource-Policy header missing (90004) | Low | **Fixed (DEF-027).** `Cross-Origin-Resource-Policy: same-origin` is now sent on every response. The rerun has no warning |
+| Timestamp Disclosure - Unix (10096) on `/api/auth/me` | Low | **False positive caused by the test.** The number ZAP found, `1790872104`, was the Unix time the runner had put into the scan account's email (`zap.user.1790872104@example.test`), which `/api/auth/me` echoes. The runner now uses a random suffix, and the warning is gone in the rerun |
+| Non-Storable Content (10049) | Informational | **By design.** The API does not serve `/`, `/robots.txt` or `/sitemap.xml`. Every API response carries `Cache-Control: no-store` so that personal data is not cached |
+| "A Client Error response code was returned" | Informational | **Expected.** Without a token: 401 on protected endpoints. As USER: 403 on admin and provider endpoints and on another user's booking (`GET /api/bookings/10`), 404 for ZAP's made-up ids, and 400 for invalid input |
+| Authentication Request Identified | Informational | Expected: ZAP identified `POST /api/auth/login` and `POST /api/users` |
+
+Stored payloads are not executed by any client. None of the clients renders server data as HTML:
+- `web-react/src` has no `dangerouslySetInnerHTML` or `innerHTML`.
+- The MVC views have no `Html.Raw`.
+- The Flutter app has no HTML or WebView widgets.
+
+### Security requirements and their evidence
+
+Test names below are in `backend-api-tests-final.trx` and `backend-unit-tests-final.trx` (this folder, all passed). The Newman, Playwright and AI evaluation evidence is in `../phase8-tests/`.
+
+| Requirement | Evidence |
+|---|---|
+| Authentication | `Login_demo_accounts_succeed_and_bad_password_fails`, `Wrong_password_and_unknown_email_both_return_401_with_the_same_message`, `Password_policy_boundaries`, `Account_locks_after_five_failed_logins`, `Login_endpoint_is_rate_limited_when_enabled`, `Login_email_is_case_insensitive` |
+| Authorization and protected endpoints | `Every_protected_endpoint_enforces_its_role_policy` (every endpoint × every role), `Public_catalog_endpoints_do_not_require_a_token`; ZAP without a token: 401 on 63 requests to protected endpoints |
+| A USER calling an admin endpoint gets 403 | `Normal_user_cannot_call_admin_apis`; ZAP as USER: 403 on `GET /api/users`, `PATCH /api/users/{id}/active`, `PUT /api/settings/{key}`, approvals and destination CRUD |
+| JWT and invalid tokens | `Invalid_expired_and_unsigned_tokens_are_rejected`, `Malformed_authorization_headers_are_rejected`, `Deactivated_user_token_is_rejected_immediately`; Newman tampered-token request; Playwright "a tampered token is rejected by the API" |
+| Role escalation | `Role_supplied_at_registration_is_ignored`, `Provider_cannot_self_approve_a_new_listing`, `Client_supplied_status_price_and_owner_are_ignored_when_booking` |
+| Unauthorized resource access (IDOR) | `User_cannot_read_or_change_another_users_booking`, `Owner_cannot_touch_another_owners_rooms_or_bookings`, `Agent_cannot_modify_another_agents_package_but_admin_can`, `Provider_cannot_edit_another_providers_hotel_but_admin_can`, `Itineraries_and_conversations_are_private_even_from_admins`; ZAP as USER: 403 on another user's booking |
+| SQL injection | ZAP SQL injection rules 40018–40027 passed in all scans. Data access uses EF Core LINQ. The only raw SQL is three `SELECT … FOR UPDATE` row locks in `BookingRepository`, and they use `ExecuteSqlInterpolatedAsync`, which sends the ids as parameters |
+| XSS | ZAP XSS rules 40012, 40014, 40016, 40017 and 40026 passed. JSON responses carry `nosniff` and `Content-Security-Policy: default-src 'none'`, and clients encode all output (see above) |
+| Sensitive data exposure | `Unknown_resource_returns_problem_details_without_internals`, `Validation_errors_return_problem_details_with_message_and_errors`, `Responses_carry_security_headers`; the Newman collection-level check for secrets and stack traces on all 79 requests; ZAP information-disclosure rules passed |
+| AI does not leak secrets, prompts or other users' data | `Injection_and_exfiltration_attempts_are_refused`, `Recommendations_are_saved_and_private_to_their_owner`, `Conversation_keeps_plan_and_proposal_and_is_private`, `OutputSanitizerTests`; AI evaluation categories in `../phase8-tests/ai-evaluation/ai-evaluation-report.md` |
+| AI does not claim a booking it did not make | `Booking_needs_confirmation_creates_one_pending_booking_and_cannot_be_replayed`, `Forged_confirmation_id_books_nothing` |
+
+### Limits of this testing
+
+- **ZAP's generated values.** ZAP fills parameters from the OpenAPI schema (ids such as 10, strings such as "q"). Most writes therefore stop at validation or "not found", so deep business flows are not exercised by the scan. Those flows are covered by the API tests, Newman and Playwright.
+- **No admin or provider scan.** The active scan was not run as ADMIN, HOTEL_OWNER or TRAVEL_AGENT, to protect the shared development database. Those roles' access rules are covered by the access-control matrix and the ownership tests.
+- **HTTP only.** The scans used plain HTTP in Development, so transport security was not tested. The API redirects to HTTPS when it listens on an HTTPS URL, but it does not send `Strict-Transport-Security`. For a production deployment, HSTS should be added at the API (`UseHsts`) or at the TLS-terminating proxy. This was not changed here, because it cannot be verified in this HTTP-only setup.
