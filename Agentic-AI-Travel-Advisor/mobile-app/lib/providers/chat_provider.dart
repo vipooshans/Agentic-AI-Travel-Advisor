@@ -104,7 +104,7 @@ class ChatProvider extends ChangeNotifier {
     try {
       final service = ItineraryService(api);
       final saved = message.plan != null
-          ? await service.createFromTravelPlan(message.plan!)
+          ? await service.createFromTravelPlan(message.plan!, conversationId: _conversationId)
           : await service.createFromPlan(message.suggestedPlan!);
       _savedItineraryId = saved.id;
       return saved;

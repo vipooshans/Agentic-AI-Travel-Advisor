@@ -350,3 +350,36 @@ Defects below were found while implementing and executing tests.
 - **Status:** Retested (Closed)
 - **Fix:** The snack bar sets `persist: false`, so it closes after the default 4 seconds. The View action is still available while it is shown.
 - **Retest result:** 2026-10-01. The regression test "the "Itinerary saved" notice closes by itself and does not block the message box (DEF-023)" passes, and so does the integration journey (3 of 3).
+
+## DEF-024 Saved itineraries lose the number of travelers, the budget and the source conversation
+- **Severity / Priority:** Medium / P2
+- **Description:** Phase 2 added `Travelers`, `Budget` and `ConversationId` to the `Itineraries` table, but nothing ever set them. `CreateItineraryRequest` had no such fields, `ItineraryService` did not map them, `ItineraryDto` did not return them, and neither client sent them. Every saved plan was stored with `Travelers = 1`, no budget and no link to the AI conversation that produced it. A 2-person plan therefore became a 1-person itinerary in the database; only the free-text summary still said "2 travelers".
+- **Found by:** The full E2E journey, which checks the database directly (`web-react/e2e/ai-journey.spec.ts`). After saving a 2-person Ella plan from the React assistant, `SELECT "Travelers" FROM "Itineraries"` returned 1.
+- **Steps to reproduce:** As a traveler, ask the assistant for "a 3-day trip to Ella … for 2 people with a budget of LKR 50000", press Save as itinerary, and read the row in `Itineraries`.
+- **Expected:** `Travelers = 2`, `Budget = 50000`, `ConversationId` = the chat's id.
+- **Actual:** `Travelers = 1`, `Budget` and `ConversationId` NULL.
+- **Evidence:** `testing/execution-results/phase8-tests/e2e-journey-run1.log` (`Expected: 2, Received: 1`); `def024-before-fix.log` (new API test failed: no `travelers` in the response); `def024-after-fix.log`, `e2e-journey-run2.log` (passed).
+- **Status:** Retested (Closed)
+- **Fix:**
+  - `CreateItineraryRequest` accepts optional `travelers` (1-50, default 1), `budget` (≥ 0) and `conversationId`, and `ItineraryDto` returns all three.
+  - A conversation id must belong to the caller. Someone else's id and a missing one both get the same 400 "Conversation not found.", so ids cannot be probed.
+  - The React assistant (`planToItinerary`) and the Flutter app (`toItineraryRequest`, `ChatProvider.saveLatestPlan`) send the plan's travelers and budget and the current conversation id.
+- **Retest result:** 2026-10-01.
+  - API test `Def024_saved_plan_keeps_travelers_budget_and_its_own_conversation` passes: values stored and returned, default of 1, travelers 0 rejected, a stranger's or unknown conversation rejected. Full suites: unit 397 passed / 35 skipped (live LLM), API 129 passed (`backend-unit-tests-def024.log`, `backend-api-tests-def024.log`).
+  - Vitest 286 passed and Flutter 94 passed, with the request-mapping tests extended.
+  - The E2E journey passes with the database checks for travelers, budget and conversation. The Flutter integration test (run 9) also checks `travelers` and `conversationId` through the API and passes.
+
+## DEF-025 Saved itineraries reorder the items within a day
+- **Severity / Priority:** Medium / P2
+- **Description:** The web and mobile apps number itinerary items from 0 within each day. `ItineraryService.CreateAsync` stored `SortOrder = item.SortOrder != 0 ? item.SortOrder : index`, where `index` is the position in the whole request. On every day after the first, the first item (sort order 0) was replaced by a larger number than its neighbours, so it moved to the end of its day. The itinerary page then showed, for example, "Check out of the hotel" before "Explore Ella at your own pace" on the last day.
+- **Found by:** Reading the database rows written by the passing E2E journey. Day 3 of the plan stored in the conversation was "Explore Ella", then "Check out", but the saved items had sort orders 3 and 1. That first dump was overwritten by the after-fix dump (`e2e-journey-db-rows.txt`); `def025-before-fix.log` reproduces the defect.
+- **Steps to reproduce:** `POST /api/itineraries` with day 3 items "Explore Ella" (sortOrder 0) and "Check out" (sortOrder 1), then `GET /api/itineraries/{id}`.
+- **Expected:** Explore Ella, Check out.
+- **Actual:** Check out, Explore Ella.
+- **Evidence:** `testing/execution-results/phase8-tests/def025-before-fix.log` (`Expected: [..., "Explore Ella", "Check out"]`, `Actual: [..., "Check out", "Explore Ella"]`), `def025-after-fix.log`.
+- **Status:** Retested (Closed)
+- **Fix:** Items are ordered by day, then the given sort order, then request order. They are then numbered 0, 1, 2… in that order, so explicit sort orders are respected, ties keep the request order, and nothing moves.
+- **Retest result:** 2026-10-01.
+  - `Def025_saved_itinerary_keeps_the_order_of_items_within_each_day` passes: per-day numbering, no sort orders, and explicit reordering.
+  - Full suites: unit 397 passed / 35 skipped, API 130 passed.
+  - The E2E journey now compares the saved items, ordered by day and sort order, with the plan stored in the conversation, and passes (`e2e-full-suite.log`).

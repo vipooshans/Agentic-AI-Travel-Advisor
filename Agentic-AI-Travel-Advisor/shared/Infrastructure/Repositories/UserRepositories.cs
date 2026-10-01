@@ -51,6 +51,9 @@ public sealed class ItineraryRepository(AppDbContext context) : IItineraryReposi
             .AsSplitQuery()
             .FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId, cancellationToken);
 
+    public Task<bool> ConversationBelongsToAsync(int conversationId, string userId, CancellationToken cancellationToken = default) =>
+        context.AIConversations.AnyAsync(c => c.Id == conversationId && c.UserId == userId, cancellationToken);
+
     public void Add(Itinerary itinerary) => context.Itineraries.Add(itinerary);
 
     public void Remove(Itinerary itinerary) => context.Itineraries.Remove(itinerary);

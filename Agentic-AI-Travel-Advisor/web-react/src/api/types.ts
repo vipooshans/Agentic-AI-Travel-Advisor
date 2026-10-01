@@ -361,8 +361,11 @@ export interface Itinerary {
   endDate: string;
   status: number;
   estimatedCost?: number | null;
+  budget?: number | null;
+  travelers: number;
   destinationId?: number | null;
   destinationName?: string | null;
+  conversationId?: number | null;
   summary?: string | null;
   itemCount: number;
 }
@@ -386,6 +389,9 @@ export interface CreateItineraryRequest {
   endDate: string;
   destinationId?: number | null;
   estimatedCost?: number | null;
+  budget?: number | null;
+  travelers?: number;
+  conversationId?: number | null;
   summary?: string | null;
   items: ItineraryItem[];
 }

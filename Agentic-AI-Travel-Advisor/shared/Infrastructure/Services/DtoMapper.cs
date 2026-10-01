@@ -170,8 +170,11 @@ internal static class DtoMapper
         dto.EndDate = itinerary.EndDate;
         dto.Status = (int)itinerary.Status;
         dto.EstimatedCost = itinerary.EstimatedCost;
+        dto.Budget = itinerary.Budget;
+        dto.Travelers = itinerary.Travelers;
         dto.DestinationId = itinerary.DestinationId;
         dto.DestinationName = itinerary.Destination?.Name;
+        dto.ConversationId = itinerary.ConversationId;
         dto.Summary = itinerary.Summary;
         dto.ItemCount = itinerary.Items.Count;
         return dto;

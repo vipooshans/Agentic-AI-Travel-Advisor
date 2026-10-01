@@ -25,7 +25,8 @@ class ItineraryService {
 
   Future<Itinerary> createFromPlan(SuggestedPlan plan) => _create(plan.toCreateRequest());
 
-  Future<Itinerary> createFromTravelPlan(TravelPlan plan) => _create(plan.toItineraryRequest());
+  Future<Itinerary> createFromTravelPlan(TravelPlan plan, {int? conversationId}) =>
+      _create(plan.toItineraryRequest(conversationId: conversationId));
 
   Future<Itinerary> _create(Map<String, dynamic> body) async {
     final response = await _api.post('/api/itineraries', body);

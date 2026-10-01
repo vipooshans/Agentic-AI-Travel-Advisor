@@ -200,6 +200,7 @@ export function AssistantPage() {
             <MessageBubble
               key={i}
               message={m}
+              conversationId={conversationId}
               canConfirm={m === lastAssistant && !sending && !disabled}
               onConfirm={(p) => send(`Confirm booking: ${p.title}`, p.id)}
             />
@@ -241,10 +242,12 @@ export function AssistantPage() {
 
 function MessageBubble({
   message: m,
+  conversationId,
   canConfirm,
   onConfirm,
 }: {
   message: ThreadMessage;
+  conversationId?: number;
   canConfirm: boolean;
   onConfirm: (p: BookingProposal) => void;
 }) {
@@ -256,7 +259,7 @@ function MessageBubble({
     <div className="bubble bubble-assistant">
       {m.status && m.status !== 'info' && <Badge tone={tone ?? 'neutral'}>{m.status.replace('_', ' ')}</Badge>}
       <p className="bubble-text">{m.content}</p>
-      {m.plan && <PlanView plan={m.plan} />}
+      {m.plan && <PlanView plan={m.plan} conversationId={conversationId} />}
       {m.pendingBooking && <ProposalCard proposal={m.pendingBooking} canConfirm={canConfirm} onConfirm={onConfirm} />}
       {m.booking && (
         <div className="proposal proposal-done">

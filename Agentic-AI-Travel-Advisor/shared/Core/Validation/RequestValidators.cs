@@ -270,6 +270,8 @@ public sealed class CreateItineraryRequestValidator : AbstractValidator<CreateIt
         RuleFor(x => x.StartDate).NotEqual(default(DateTime)).WithMessage("Start date is required.");
         RuleFor(x => x.EndDate).GreaterThanOrEqualTo(x => x.StartDate).WithMessage("End date must be on or after the start date.");
         RuleFor(x => x.EstimatedCost).GreaterThanOrEqualTo(0).When(x => x.EstimatedCost.HasValue);
+        RuleFor(x => x.Budget).GreaterThanOrEqualTo(0).When(x => x.Budget.HasValue);
+        RuleFor(x => x.Travelers).InclusiveBetween(1, 50).When(x => x.Travelers.HasValue).WithMessage("Travelers must be between 1 and 50.");
         RuleFor(x => x.Summary).MaximumLength(4000);
         RuleFor(x => x.Items).NotEmpty().WithMessage("At least one itinerary item is required.");
         RuleFor(x => x.Items.Count).LessThanOrEqualTo(200).WithName("items");

@@ -6,7 +6,7 @@ import { formatDate, formatMoney } from '../../lib/format';
 import { planToItinerary } from '../../lib/plan';
 import { useAction } from '../../lib/useAction';
 
-export function PlanView({ plan }: { plan: TravelPlan }) {
+export function PlanView({ plan, conversationId }: { plan: TravelPlan; conversationId?: number }) {
   const save = useAction();
   const hotels = plan.hotels;
   const selectedHotel = hotels.find((h) => h.selected);
@@ -150,7 +150,7 @@ export function PlanView({ plan }: { plan: TravelPlan }) {
           type="button"
           className="btn btn-secondary btn-sm"
           disabled={save.busy || save.success !== null}
-          onClick={() => save.run(() => itinerariesApi.create(planToItinerary(plan)), 'Saved to your itineraries.')}
+          onClick={() => save.run(() => itinerariesApi.create(planToItinerary(plan, conversationId)), 'Saved to your itineraries.')}
         >
           {save.success ? 'Saved' : 'Save as itinerary'}
         </button>

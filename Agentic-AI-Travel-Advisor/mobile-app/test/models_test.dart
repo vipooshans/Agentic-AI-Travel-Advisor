@@ -47,6 +47,10 @@ void main() {
       expect(request['destinationId'], 4);
       expect(request['estimatedCost'], 76000);
       expect(request['summary'], '2 travelers, 3 days · Ella Gap View Inn + Ella Hill Country Escape');
+      expect(request['travelers'], 2);
+      expect(request['budget'], plan.budget);
+      expect(request['conversationId'], isNull);
+      expect(plan.toItineraryRequest(conversationId: 7)['conversationId'], 7);
       final items = request['items'] as List;
       expect(items, hasLength(3));
       expect(items[0], {

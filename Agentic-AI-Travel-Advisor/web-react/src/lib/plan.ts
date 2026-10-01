@@ -1,6 +1,6 @@
 import type { CreateItineraryRequest, TravelPlan } from '../api/types';
 
-export function planToItinerary(plan: TravelPlan): CreateItineraryRequest {
+export function planToItinerary(plan: TravelPlan, conversationId?: number): CreateItineraryRequest {
   const parts = [plan.hotels.find((h) => h.selected)?.name, plan.travelPackages.find((p) => p.selected)?.title].filter(Boolean);
   return {
     title: `${plan.destination} trip`,
@@ -8,6 +8,9 @@ export function planToItinerary(plan: TravelPlan): CreateItineraryRequest {
     endDate: plan.endDate,
     destinationId: plan.destinationId ?? null,
     estimatedCost: plan.estimatedTotal,
+    budget: plan.budget,
+    travelers: plan.travelers,
+    conversationId: conversationId ?? null,
     summary: `${plan.travelers} traveler${plan.travelers === 1 ? '' : 's'}, ${plan.duration} days${parts.length ? ` · ${parts.join(' + ')}` : ''}`,
     items: plan.itinerary.flatMap((day) =>
       day.items.map((item, index) => ({

@@ -254,6 +254,82 @@ public class OwnershipAndContractTests(ApiFixture fx)
         Assert.Equal(HttpStatusCode.OK, (await traveler.GetAsync($"/api/ai/conversations/{conversationId}")).StatusCode);
     }
 
+    [SkippableFact]
+    public async Task Def024_saved_plan_keeps_travelers_budget_and_its_own_conversation()
+    {
+        Skip.If(!fx.Available, fx.SkipReason);
+        var traveler = fx.Authed((await fx.RegisterUserAsync()).Token);
+        var chat = await traveler.PostAsJsonAsync("/api/ai/chat", new { message = "Plan a 3-day trip to Ella for 2 people under Rs. 50000" });
+        var conversationId = (await chat.ReadJsonAsync()).GetProperty("conversationId").GetInt32();
+        object Plan(int? travelers, int? conversation) => new
+        {
+            title = "Ella for two",
+            startDate = TodayUtc.AddDays(30),
+            endDate = TodayUtc.AddDays(32),
+            travelers,
+            budget = 50000m,
+            conversationId = conversation,
+            items = new[] { new { dayNumber = 1, title = "Nine Arch Bridge", sortOrder = 0 } }
+        };
+
+        var saved = await traveler.PostAsJsonAsync("/api/itineraries", Plan(2, conversationId));
+        Assert.Equal(HttpStatusCode.Created, saved.StatusCode);
+        var id = (await saved.ReadJsonAsync()).GetProperty("id").GetInt32();
+        var stored = await (await traveler.GetAsync($"/api/itineraries/{id}")).ReadJsonAsync();
+        Assert.Equal(2, stored.GetProperty("travelers").GetInt32());
+        Assert.Equal(50000m, stored.GetProperty("budget").GetDecimal());
+        Assert.Equal(conversationId, stored.GetProperty("conversationId").GetInt32());
+
+        var withoutTravelers = await (await traveler.PostAsJsonAsync("/api/itineraries", Plan(null, null))).ReadJsonAsync();
+        Assert.Equal(1, withoutTravelers.GetProperty("travelers").GetInt32());
+
+        Assert.Equal(HttpStatusCode.BadRequest, (await traveler.PostAsJsonAsync("/api/itineraries", Plan(0, null))).StatusCode);
+        var stranger = fx.Authed((await fx.RegisterUserAsync()).Token);
+        Assert.Equal(HttpStatusCode.BadRequest, (await stranger.PostAsJsonAsync("/api/itineraries", Plan(2, conversationId))).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await traveler.PostAsJsonAsync("/api/itineraries", Plan(2, 999999))).StatusCode);
+    }
+
+    [SkippableFact]
+    public async Task Def025_saved_itinerary_keeps_the_order_of_items_within_each_day()
+    {
+        Skip.If(!fx.Available, fx.SkipReason);
+        var traveler = fx.Authed((await fx.RegisterUserAsync()).Token);
+        async Task<string[]> SaveAndRead(object[] items)
+        {
+            var saved = await traveler.PostAsJsonAsync("/api/itineraries", new
+            {
+                title = "Order check",
+                startDate = TodayUtc.AddDays(30),
+                endDate = TodayUtc.AddDays(32),
+                items
+            });
+            Assert.Equal(HttpStatusCode.Created, saved.StatusCode);
+            var id = (await saved.ReadJsonAsync()).GetProperty("id").GetInt32();
+            var detail = await (await traveler.GetAsync($"/api/itineraries/{id}")).ReadJsonAsync();
+            return detail.GetProperty("items").EnumerateArray().Select(i => i.GetProperty("title").GetString()!).ToArray();
+        }
+
+        // The web and mobile apps number items from 0 within each day.
+        Assert.Equal(["Check in", "Hike", "Waterfall", "Explore Ella", "Check out"], await SaveAndRead(
+        [
+            new { dayNumber = 1, title = "Check in", sortOrder = 0 },
+            new { dayNumber = 1, title = "Hike", sortOrder = 1 },
+            new { dayNumber = 2, title = "Waterfall", sortOrder = 0 },
+            new { dayNumber = 3, title = "Explore Ella", sortOrder = 0 },
+            new { dayNumber = 3, title = "Check out", sortOrder = 1 }
+        ]));
+
+        // Without sort orders, the request order is kept; explicit sort orders still win.
+        Assert.Equal(["A", "B", "C"], await SaveAndRead(
+        [
+            new { dayNumber = 1, title = "A" }, new { dayNumber = 1, title = "B" }, new { dayNumber = 1, title = "C" }
+        ]));
+        Assert.Equal(["Y", "X"], await SaveAndRead(
+        [
+            new { dayNumber = 1, title = "X", sortOrder = 2 }, new { dayNumber = 1, title = "Y", sortOrder = 1 }
+        ]));
+    }
+
     // ---------- Mass assignment ----------
 
     [SkippableFact]

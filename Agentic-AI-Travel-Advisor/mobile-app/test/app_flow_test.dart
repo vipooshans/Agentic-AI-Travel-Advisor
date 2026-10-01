@@ -364,7 +364,10 @@ void main() {
       expect(find.text('Save itinerary'), findsOneWidget, reason: 'only the latest plan can be saved');
       await tapAndSettle(tester, find.text('Save itinerary'));
       expect(find.text('Itinerary saved'), findsOneWidget);
-      expect(app.bodiesFor('/api/itineraries').single['items'], isA<List>());
+      final savedBody = app.bodiesFor('/api/itineraries').single;
+      expect(savedBody['items'], isA<List>());
+      expect(savedBody['conversationId'], 7, reason: 'the itinerary is linked to this chat (DEF-024)');
+      expect(savedBody['travelers'], isA<int>());
 
       await tapAndSettle(tester, find.text('View'));
       expect(app.location, '/itineraries/12');

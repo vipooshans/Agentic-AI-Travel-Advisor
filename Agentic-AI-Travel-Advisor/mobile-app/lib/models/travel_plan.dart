@@ -90,7 +90,7 @@ class TravelPlan {
   List<PlanTransport> get selectedTransport => transportation.where((t) => t.selected).toList();
 
   /// Body for `POST /api/itineraries`, matching the web app's mapping.
-  Map<String, dynamic> toItineraryRequest() {
+  Map<String, dynamic> toItineraryRequest({int? conversationId}) {
     final parts = [selectedHotel?.name, selectedPackage?.title].whereType<String>().toList();
     final summary = StringBuffer('$travelers traveler${travelers == 1 ? '' : 's'}, $duration days');
     if (parts.isNotEmpty) summary.write(' · ${parts.join(' + ')}');
@@ -102,6 +102,9 @@ class TravelPlan {
       'endDate': endDate,
       'destinationId': destinationId,
       'estimatedCost': estimatedTotal,
+      'budget': budget,
+      'travelers': travelers,
+      'conversationId': conversationId,
       'summary': summary.toString(),
       'items': [
         for (final day in itinerary)

@@ -23,6 +23,7 @@ public interface IItineraryRepository
 {
     Task<List<Itinerary>> ListByUserAsync(string userId, CancellationToken cancellationToken = default);
     Task<Itinerary?> GetForUserAsync(int id, string userId, CancellationToken cancellationToken = default);
+    Task<bool> ConversationBelongsToAsync(int conversationId, string userId, CancellationToken cancellationToken = default);
     void Add(Itinerary itinerary);
     void Remove(Itinerary itinerary);
 }

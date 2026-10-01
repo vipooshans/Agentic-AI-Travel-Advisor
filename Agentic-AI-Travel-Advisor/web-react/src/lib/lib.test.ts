@@ -13,6 +13,10 @@ describe('planToItinerary', () => {
     expect(request.destinationId).toBe(6);
     expect(request.estimatedCost).toBe(76000);
     expect(request.summary).toContain('Ella Gap View Inn + Ella Hiking Escape');
+    expect(request.travelers).toBe(ellaPlan.travelers);
+    expect(request.budget).toBe(ellaPlan.budget);
+    expect(request.conversationId).toBeNull();
+    expect(planToItinerary(ellaPlan, 7).conversationId).toBe(7);
     expect(request.items).toEqual([
       { dayNumber: 1, title: 'Train Kandy → Ella', description: null, startTime: '08:47:00', sortOrder: 0 },
       { dayNumber: 2, title: 'Little Adam’s Peak hike', description: 'Sunrise hike', startTime: '09:00:00', sortOrder: 0 },

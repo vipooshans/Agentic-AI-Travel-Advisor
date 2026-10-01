@@ -17,6 +17,9 @@ public sealed class ItineraryService(
     {
         if (request.DestinationId.HasValue && !await destinations.ExistsAsync(request.DestinationId.Value, cancellationToken))
             throw new BusinessRuleException("Destination not found.");
+        // Same answer for someone else's conversation as for a missing one, so ids cannot be probed.
+        if (request.ConversationId.HasValue && !await itineraries.ConversationBelongsToAsync(request.ConversationId.Value, caller.UserId, cancellationToken))
+            throw new BusinessRuleException("Conversation not found.");
 
         var itinerary = new Itinerary
         {
@@ -26,16 +29,24 @@ public sealed class ItineraryService(
             EndDate = DateTime.SpecifyKind(request.EndDate, DateTimeKind.Utc),
             Status = ItineraryStatus.Draft,
             EstimatedCost = request.EstimatedCost,
+            Budget = request.Budget,
+            Travelers = request.Travelers ?? 1,
             DestinationId = request.DestinationId,
+            ConversationId = request.ConversationId,
             Summary = Ownership.Clean(request.Summary),
-            Items = request.Items.Select((item, index) => new ItineraryItem
-            {
-                DayNumber = item.DayNumber,
-                Title = item.Title.Trim(),
-                Description = Ownership.Clean(item.Description),
-                StartTime = item.StartTime,
-                SortOrder = item.SortOrder != 0 ? item.SortOrder : index
-            }).ToList()
+            // Clients number items per day (or not at all), so normalise to one sequence:
+            // day, then the given sort order, then request order for ties.
+            Items = request.Items
+                .Select((item, index) => (item, index))
+                .OrderBy(x => x.item.DayNumber).ThenBy(x => x.item.SortOrder).ThenBy(x => x.index)
+                .Select((x, position) => new ItineraryItem
+                {
+                    DayNumber = x.item.DayNumber,
+                    Title = x.item.Title.Trim(),
+                    Description = Ownership.Clean(x.item.Description),
+                    StartTime = x.item.StartTime,
+                    SortOrder = position
+                }).ToList()
         };
 
         itineraries.Add(itinerary);

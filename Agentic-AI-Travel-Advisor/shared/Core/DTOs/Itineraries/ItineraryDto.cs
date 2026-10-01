@@ -8,8 +8,11 @@ public class ItineraryDto
     public DateTime EndDate { get; set; }
     public int Status { get; set; }
     public decimal? EstimatedCost { get; set; }
+    public decimal? Budget { get; set; }
+    public int Travelers { get; set; }
     public int? DestinationId { get; set; }
     public string? DestinationName { get; set; }
+    public int? ConversationId { get; set; }
     public string? Summary { get; set; }
     public int ItemCount { get; set; }
 }
@@ -36,6 +39,11 @@ public class CreateItineraryRequest
     public DateTime EndDate { get; set; }
     public int? DestinationId { get; set; }
     public decimal? EstimatedCost { get; set; }
+    public decimal? Budget { get; set; }
+    /// <summary>Defaults to 1 when omitted.</summary>
+    public int? Travelers { get; set; }
+    /// <summary>The AI conversation the plan came from; must belong to the caller.</summary>
+    public int? ConversationId { get; set; }
     public string? Summary { get; set; }
     public List<CreateItineraryItemRequest> Items { get; set; } = [];
 }
