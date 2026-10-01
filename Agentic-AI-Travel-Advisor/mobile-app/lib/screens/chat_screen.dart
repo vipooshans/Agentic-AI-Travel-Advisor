@@ -67,6 +67,9 @@ class _ChatScreenState extends State<ChatScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Itinerary saved'),
+        // Snack bars with an action persist by default, which would leave this
+        // one covering the message box and Send button.
+        persist: false,
         action: SnackBarAction(
           label: 'View',
           onPressed: () => context.push('/itineraries/${saved.id}'),

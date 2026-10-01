@@ -321,3 +321,32 @@ Defects below were found while implementing and executing tests.
 - **Status:** Retested (Closed)
 - **Fix:** `LoginPage` uses the same target in both places through `postLoginPath(role, from)`, which returns `from` only if that role may open it and otherwise the role's home page. `AuthProvider` records an explicit Sign out (`signedOut`), and `RequireRole` then redirects to `/login` without a `from`. Reordering `logout()` and `navigate()` in the Sign out handler was tried first and did not work, because React Router runs navigation in a transition.
 - **Retest result:** 2026-10-01. The three regression tests in `LoginPage.test.tsx` and `App.test.tsx` pass, as do 76 `postLoginPath` checks generated from the App route table. Playwright: 16 of 16 passed, twice in a row.
+
+## DEF-022 Flutter cards overflow when text is wider than the space
+- **Severity / Priority:** Low / P3
+- **Description:** Four widgets laid text out in fixed `Row`s or fixed-height `Column`s with no way to wrap or shorten:
+  - `HotelCard`: rooms, rating, `Spacer` and price in one Row.
+  - `PackageCard`: duration and rating in one Row.
+  - `DestinationCard`: a fixed 120 px image above the name and country, inside a 200 px tall slot.
+  - `ReviewsSection`: the header, with the title, stars and "4.6 / 5 (1280 reviews)" in one Row.
+  When the text needs more room than the card has, Flutter reports a RenderFlex overflow and draws the yellow-and-black stripe over the clipped content.
+- **Found by:** The new mocktail widget tests. The `flutter_test` font draws every glyph 1 em wide, about twice as wide as Roboto, so the hotel and reviews rows overflowed on the default test screen. Narrow screens, long names and a larger system font size would produce the same overflow in the real app; that conclusion comes from the layout code and was not observed on a device.
+- **Steps to reproduce:** `test/layout_test.dart`: a 320 x 640 screen with a 1.3 text scale, rendering a hotel with 124 rooms, rating 4.7 (1280 reviews) and LKR 125,000; a package with a long duration; the Home destination card for "Nuwara Eliya Highlands", "United Arab Emirates"; and a reviews header for 1280 reviews.
+- **Expected:** The cards lay out without overflow.
+- **Actual:** "A RenderFlex overflowed by" 176 px (destination card, bottom), 444 px (hotel card, right), 112 px (package card, right) and 206 px (reviews header, right).
+- **Evidence:** `testing/execution-results/phase8-tests/def022-before-fix.log` (4 failed); `flutter-test.log` after the fix.
+- **Status:** Retested (Closed)
+- **Fix:** The hotel card and reviews header use a `Wrap`, so the price or the rating summary moves to the next line when needed. The hotel and package details are a single `Text.rich` (shared `iconLabel` helper in `lib/widgets/icon_label.dart`), so they wrap like ordinary text. The destination image is `Expanded` and gives up height to the text, and the name and country are one line with an ellipsis.
+- **Retest result:** 2026-10-01. The four layout tests pass, and the full suite passes (94 tests, `flutter-test.log`). `flutter analyze`: no issues.
+
+## DEF-023 Flutter "Itinerary saved" notice never closes and covers the chat's Send button
+- **Severity / Priority:** Medium / P2
+- **Description:** After a traveler saves an AI plan, the chat shows a snack bar "Itinerary saved" with a View action. In the Flutter SDK in use (3.47.5), a snack bar with an action defaults to `persist: true` (`snack_bar.dart`: `persist = persist ?? action != null`) and stays until the action is used or it is swiped away. The snack bar sits over the message box and Send button, so the traveler cannot send the next message. Tapping where Send is shown hits View instead and opens the saved itinerary, leaving the chat.
+- **Found by:** The Flutter integration test against the real API (`integration_test/traveler_journey_test.dart`). After saving, its tap on Send opened the itinerary page ("On screen: Ella trip | … Status: Draft"). Waiting for the notice to close then timed out after 15 seconds.
+- **Steps to reproduce:** Sign in as a traveler, ask the assistant to plan a trip, tap Save itinerary, then wait.
+- **Expected:** The notice closes after a few seconds and the next message can be sent.
+- **Actual:** The notice is still on screen after 10 seconds (widget test) and 15 seconds (browser), covering the message box.
+- **Evidence:** `testing/execution-results/phase8-tests/def023-before-fix.log` (regression test failed: `Found 1 widget with text "Itinerary saved"`, expected none), `def023-after-fix.log` (passed); integration runs 7 (failed) and 8 (passed): `flutter-integration-run7-profile.log`, `flutter-integration.log`, `flutter-integration-console.log`.
+- **Status:** Retested (Closed)
+- **Fix:** The snack bar sets `persist: false`, so it closes after the default 4 seconds. The View action is still available while it is shown.
+- **Retest result:** 2026-10-01. The regression test "the "Itinerary saved" notice closes by itself and does not block the message box (DEF-023)" passes, and so does the integration journey (3 of 3).

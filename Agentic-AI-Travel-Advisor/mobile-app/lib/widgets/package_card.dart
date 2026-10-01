@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/travel_package.dart';
 import '../utils/format.dart';
 import 'catalog_image.dart';
+import 'icon_label.dart';
 
 class PackageCard extends StatelessWidget {
   final TravelPackage package;
@@ -52,19 +53,18 @@ class PackageCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text('${package.destinationName}, ${package.destinationCountry}', style: TextStyle(color: Colors.grey.shade600)),
                   const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Icon(Icons.schedule, size: 16, color: Colors.blue.shade700),
-                      const SizedBox(width: 6),
-                      Text('${package.durationDays} days', style: TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.w600)),
-                      if (package.reviewCount > 0 && package.averageRating != null) ...[
-                        const SizedBox(width: 16),
-                        Icon(Icons.star, size: 16, color: Colors.amber.shade700),
-                        const SizedBox(width: 4),
-                        Text('${package.averageRating!.toStringAsFixed(1)} (${package.reviewCount})'),
-                      ],
+                  Text.rich(TextSpan(children: [
+                    iconLabel(
+                      Icons.schedule,
+                      '${package.durationDays} days',
+                      iconColor: Colors.blue.shade700,
+                      style: TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.w600),
+                    ),
+                    if (package.reviewCount > 0 && package.averageRating != null) ...[
+                      iconLabelGap,
+                      iconLabel(Icons.star, '${package.averageRating!.toStringAsFixed(1)} (${package.reviewCount})', iconColor: Colors.amber.shade700),
                     ],
-                  ),
+                  ])),
                 ],
               ),
             ),

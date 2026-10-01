@@ -22,14 +22,19 @@ class DestinationCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CatalogImage(imageUrl: destination.imageUrl, height: 120, fallbackIcon: Icons.landscape),
+            Expanded(child: CatalogImage(imageUrl: destination.imageUrl, fallbackIcon: Icons.landscape)),
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(destination.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  Text(destination.country, style: TextStyle(color: Colors.grey.shade600)),
+                  Text(
+                    destination.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  Text(destination.country, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.grey.shade600)),
                 ],
               ),
             ),

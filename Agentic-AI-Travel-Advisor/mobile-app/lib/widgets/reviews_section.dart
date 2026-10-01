@@ -23,12 +23,21 @@ class _ReviewsSectionState extends State<ReviewsSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 12,
+          runSpacing: 4,
           children: [
-            Expanded(child: Text('Reviews', style: Theme.of(context).textTheme.titleMedium)),
-            StarRating(rating: widget.averageRating ?? 0, size: 18),
-            const SizedBox(width: 6),
-            Text(formatRating(widget.averageRating, widget.reviewCount), style: TextStyle(color: Colors.grey.shade700)),
+            Text('Reviews', style: Theme.of(context).textTheme.titleMedium),
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 6,
+              children: [
+                StarRating(rating: widget.averageRating ?? 0, size: 18),
+                Text(formatRating(widget.averageRating, widget.reviewCount), style: TextStyle(color: Colors.grey.shade700)),
+              ],
+            ),
           ],
         ),
         const SizedBox(height: 8),
