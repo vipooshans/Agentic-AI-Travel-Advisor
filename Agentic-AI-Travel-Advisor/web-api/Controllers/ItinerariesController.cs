@@ -1,139 +1,37 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using TravelAdvisor.Api.Infrastructure;
 using TravelAdvisor.Core.DTOs.Itineraries;
-using TravelAdvisor.Core.Entities;
-using TravelAdvisor.Core.Enums;
-using TravelAdvisor.Infrastructure.Data;
+using TravelAdvisor.Core.Interfaces.Services;
+using TravelAdvisor.Infrastructure;
 
 namespace TravelAdvisor.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class ItinerariesController : ControllerBase
+public class ItinerariesController(IItineraryService itineraryService) : ControllerBase
 {
-    private readonly AppDbContext _context;
-
-    public ItinerariesController(AppDbContext context)
-    {
-        _context = context;
-    }
-
-    [Authorize(Policy = "RequireUser")]
+    [Authorize(Policy = AuthPolicies.RequireUser)]
     [HttpPost]
-    public async Task<ActionResult<ItineraryDetailDto>> Create([FromBody] CreateItineraryRequest request)
+    public async Task<ActionResult<ItineraryDetailDto>> Create([FromBody] CreateItineraryRequest request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.Title))
-            return BadRequest(new { message = "Title is required." });
-        if (request.Items.Count == 0)
-            return BadRequest(new { message = "At least one itinerary item is required." });
-
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-
-        if (request.DestinationId.HasValue)
-        {
-            var exists = await _context.Destinations.AnyAsync(d => d.Id == request.DestinationId.Value);
-            if (!exists)
-                return BadRequest(new { message = "Destination not found." });
-        }
-
-        var itinerary = new Itinerary
-        {
-            UserId = userId,
-            Title = request.Title.Trim(),
-            StartDate = DateTime.SpecifyKind(request.StartDate, DateTimeKind.Utc),
-            EndDate = DateTime.SpecifyKind(request.EndDate, DateTimeKind.Utc),
-            Status = ItineraryStatus.Draft,
-            EstimatedCost = request.EstimatedCost,
-            DestinationId = request.DestinationId,
-            Summary = request.Summary,
-            Items = request.Items.Select((item, index) => new ItineraryItem
-            {
-                DayNumber = item.DayNumber,
-                Title = item.Title,
-                Description = item.Description,
-                StartTime = item.StartTime,
-                SortOrder = item.SortOrder != 0 ? item.SortOrder : index
-            }).ToList()
-        };
-
-        _context.Itineraries.Add(itinerary);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetById), new { id = itinerary.Id }, await MapDetailAsync(itinerary.Id, userId));
+        var itinerary = await itineraryService.CreateAsync(User.ToUserContext(), request, cancellationToken);
+        return CreatedAtAction(nameof(GetById), new { id = itinerary.Id }, itinerary);
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<ItineraryDto>>> GetAll()
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var items = await _context.Itineraries
-            .Include(i => i.Destination)
-            .Include(i => i.Items)
-            .Where(i => i.UserId == userId)
-            .OrderByDescending(i => i.StartDate)
-            .Select(i => new ItineraryDto
-            {
-                Id = i.Id,
-                Title = i.Title,
-                StartDate = i.StartDate,
-                EndDate = i.EndDate,
-                Status = (int)i.Status,
-                EstimatedCost = i.EstimatedCost,
-                DestinationId = i.DestinationId,
-                DestinationName = i.Destination != null ? i.Destination.Name : null,
-                Summary = i.Summary,
-                ItemCount = i.Items.Count
-            })
-            .ToListAsync();
-
-        return Ok(items);
-    }
+    public async Task<ActionResult<List<ItineraryDto>>> GetAll(CancellationToken cancellationToken) =>
+        Ok(await itineraryService.ListAsync(User.ToUserContext(), cancellationToken));
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<ItineraryDetailDto>> GetById(int id)
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var dto = await MapDetailAsync(id, userId);
-        if (dto is null)
-            return NotFound(new { message = "Itinerary not found." });
-        return Ok(dto);
-    }
+    public async Task<ActionResult<ItineraryDetailDto>> GetById(int id, CancellationToken cancellationToken) =>
+        Ok(await itineraryService.GetAsync(User.ToUserContext(), id, cancellationToken));
 
-    private async Task<ItineraryDetailDto?> MapDetailAsync(int id, string userId)
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        return await _context.Itineraries
-            .Include(i => i.Destination)
-            .Include(i => i.Items)
-            .Where(i => i.Id == id && i.UserId == userId)
-            .Select(i => new ItineraryDetailDto
-            {
-                Id = i.Id,
-                Title = i.Title,
-                StartDate = i.StartDate,
-                EndDate = i.EndDate,
-                Status = (int)i.Status,
-                EstimatedCost = i.EstimatedCost,
-                DestinationId = i.DestinationId,
-                DestinationName = i.Destination != null ? i.Destination.Name : null,
-                Summary = i.Summary,
-                ItemCount = i.Items.Count,
-                Items = i.Items
-                    .OrderBy(item => item.DayNumber)
-                    .ThenBy(item => item.SortOrder)
-                    .Select(item => new ItineraryItemDto
-                    {
-                        Id = item.Id,
-                        DayNumber = item.DayNumber,
-                        Title = item.Title,
-                        Description = item.Description,
-                        StartTime = item.StartTime,
-                        SortOrder = item.SortOrder
-                    })
-                    .ToList()
-            })
-            .FirstOrDefaultAsync();
+        await itineraryService.DeleteAsync(User.ToUserContext(), id, cancellationToken);
+        return NoContent();
     }
 }

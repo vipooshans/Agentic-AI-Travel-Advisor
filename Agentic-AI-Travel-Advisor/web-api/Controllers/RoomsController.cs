@@ -1,152 +1,43 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using TravelAdvisor.Api.Infrastructure;
 using TravelAdvisor.Core.DTOs.Hotels;
-using TravelAdvisor.Core.Entities;
-using TravelAdvisor.Infrastructure.Data;
+using TravelAdvisor.Core.Interfaces.Services;
+using TravelAdvisor.Infrastructure;
 
 namespace TravelAdvisor.Api.Controllers;
 
 [ApiController]
-[Route("api/hotels/{hotelId}/rooms")]
-public class RoomsController : ControllerBase
+[Route("api/hotels/{hotelId:int}/rooms")]
+public class RoomsController(IRoomService roomService) : ControllerBase
 {
-    private readonly AppDbContext _context;
-
-    public RoomsController(AppDbContext context)
-    {
-        _context = context;
-    }
-
     [HttpGet]
-    public async Task<ActionResult<List<RoomDto>>> GetAll(int hotelId)
-    {
-        var hotel = await _context.Hotels.FirstOrDefaultAsync(h => h.Id == hotelId);
-        if (hotel is null)
-            return NotFound(new { message = "Hotel not found." });
+    public async Task<ActionResult<List<RoomDto>>> GetAll(int hotelId, CancellationToken cancellationToken) =>
+        Ok(await roomService.ListAsync(User.ToOptionalUserContext(), hotelId, cancellationToken));
 
-        var isOwnerOrAdmin = User.Identity?.IsAuthenticated == true &&
-            (User.IsInRole("ADMIN") || User.FindFirstValue(ClaimTypes.NameIdentifier) == hotel.OwnerId);
-        if (hotel.ApprovalStatus != TravelAdvisor.Core.Enums.ApprovalStatus.Approved && !isOwnerOrAdmin)
-            return NotFound(new { message = "Hotel not found." });
-
-        var rooms = await _context.Rooms
-            .Where(r => r.HotelId == hotelId)
-            .OrderBy(r => r.Name)
-            .Select(r => new RoomDto
-            {
-                Id = r.Id,
-                HotelId = r.HotelId,
-                Name = r.Name,
-                RoomType = r.RoomType,
-                PricePerNight = r.PricePerNight,
-                Capacity = r.Capacity,
-                IsAvailable = r.IsAvailable
-            })
-            .ToListAsync();
-
-        return Ok(rooms);
-    }
-
-    [Authorize(Policy = "RequireHotelOwner")]
+    [Authorize(Policy = AuthPolicies.HotelOwnerOrAdmin)]
     [HttpPost]
-    public async Task<ActionResult<RoomDto>> Create(int hotelId, [FromBody] CreateRoomRequest request)
+    public async Task<ActionResult<RoomDto>> Create(int hotelId, [FromBody] CreateRoomRequest request, CancellationToken cancellationToken)
     {
-        var hotel = await _context.Hotels.FirstOrDefaultAsync(h => h.Id == hotelId);
-        if (hotel is null)
-            return NotFound(new { message = "Hotel not found." });
-
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        if (hotel.OwnerId != userId && !User.IsInRole("ADMIN"))
-            return Forbid();
-
-        var room = new Room
-        {
-            HotelId = hotelId,
-            Name = request.Name,
-            RoomType = request.RoomType,
-            PricePerNight = request.PricePerNight,
-            Capacity = request.Capacity,
-            IsAvailable = true
-        };
-
-        _context.Rooms.Add(room);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetAll), new { hotelId }, new RoomDto
-        {
-            Id = room.Id,
-            HotelId = room.HotelId,
-            Name = room.Name,
-            RoomType = room.RoomType,
-            PricePerNight = room.PricePerNight,
-            Capacity = room.Capacity,
-            IsAvailable = room.IsAvailable
-        });
+        var room = await roomService.CreateAsync(User.ToUserContext(), hotelId, request, cancellationToken);
+        return CreatedAtAction(nameof(GetAll), new { hotelId }, room);
     }
 
-    [Authorize(Policy = "RequireHotelOwner")]
-    [HttpPut("{roomId}")]
-    public async Task<ActionResult<RoomDto>> Update(int hotelId, int roomId, [FromBody] UpdateRoomRequest request)
+    [Authorize(Policy = AuthPolicies.HotelOwnerOrAdmin)]
+    [HttpPut("{roomId:int}")]
+    public async Task<ActionResult<RoomDto>> Update(int hotelId, int roomId, [FromBody] UpdateRoomRequest request, CancellationToken cancellationToken) =>
+        Ok(await roomService.UpdateAsync(User.ToUserContext(), hotelId, roomId, request, cancellationToken));
+
+    [Authorize(Policy = AuthPolicies.HotelOwnerOrAdmin)]
+    [HttpPatch("{roomId:int}/availability")]
+    public async Task<ActionResult<RoomDto>> UpdateAvailability(int hotelId, int roomId, [FromBody] UpdateRoomAvailabilityRequest request, CancellationToken cancellationToken) =>
+        Ok(await roomService.SetAvailabilityAsync(User.ToUserContext(), hotelId, roomId, request.IsAvailable, cancellationToken));
+
+    [Authorize(Policy = AuthPolicies.HotelOwnerOrAdmin)]
+    [HttpDelete("{roomId:int}")]
+    public async Task<IActionResult> Delete(int hotelId, int roomId, CancellationToken cancellationToken)
     {
-        var room = await _context.Rooms
-            .Include(r => r.Hotel)
-            .FirstOrDefaultAsync(r => r.Id == roomId && r.HotelId == hotelId);
-
-        if (room is null)
-            return NotFound(new { message = "Room not found." });
-
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        if (room.Hotel.OwnerId != userId && !User.IsInRole("ADMIN"))
-            return Forbid();
-
-        room.Name = request.Name;
-        room.RoomType = request.RoomType;
-        room.PricePerNight = request.PricePerNight;
-        room.Capacity = request.Capacity;
-
-        await _context.SaveChangesAsync();
-
-        return Ok(new RoomDto
-        {
-            Id = room.Id,
-            HotelId = room.HotelId,
-            Name = room.Name,
-            RoomType = room.RoomType,
-            PricePerNight = room.PricePerNight,
-            Capacity = room.Capacity,
-            IsAvailable = room.IsAvailable
-        });
-    }
-
-    [Authorize(Policy = "RequireHotelOwner")]
-    [HttpPatch("{roomId}/availability")]
-    public async Task<ActionResult<RoomDto>> UpdateAvailability(int hotelId, int roomId, [FromBody] UpdateRoomAvailabilityRequest request)
-    {
-        var room = await _context.Rooms
-            .Include(r => r.Hotel)
-            .FirstOrDefaultAsync(r => r.Id == roomId && r.HotelId == hotelId);
-
-        if (room is null)
-            return NotFound(new { message = "Room not found." });
-
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        if (room.Hotel.OwnerId != userId && !User.IsInRole("ADMIN"))
-            return Forbid();
-
-        room.IsAvailable = request.IsAvailable;
-        await _context.SaveChangesAsync();
-
-        return Ok(new RoomDto
-        {
-            Id = room.Id,
-            HotelId = room.HotelId,
-            Name = room.Name,
-            RoomType = room.RoomType,
-            PricePerNight = room.PricePerNight,
-            Capacity = room.Capacity,
-            IsAvailable = room.IsAvailable
-        });
+        await roomService.DeleteAsync(User.ToUserContext(), hotelId, roomId, cancellationToken);
+        return NoContent();
     }
 }

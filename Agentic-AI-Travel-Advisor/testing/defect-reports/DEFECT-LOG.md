@@ -16,7 +16,7 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Evidence:** `web-api/appsettings.json@4833828`.
 - **Status:** Retested (Closed)
 - **Fix:** Removed secrets from all tracked files. `docker-compose.yml` now requires `POSTGRES_PASSWORD` and `JWT_KEY` from `.env` (git-ignored); `.env.example` holds placeholders. Local development reads `Jwt:Key` and the connection string from .NET user-secrets. A new random JWT key was generated (rotation). The API now refuses to start if `Jwt:Key` is shorter than 32 characters or the connection string is empty. The test fixture generates a random JWT key per run. The old values remain in git history; the history was not rewritten (Decision 3), so the old database password must be changed on any server that used it.
-- **Retest result:** 2026-10-01 - `git grep -e vipoo -e SuperSecretKeyForJwt` over tracked files returns no matches; `dotnet test` passes (19 unit, 8 API).
+- **Retest result:** 2026-10-01 - `git grep` for the old database password and the old JWT key prefix over tracked files returns no matches; `dotnet test` passes (19 unit, 8 API). (The search terms themselves are deliberately not written here; an earlier version of this entry quoted them and was redacted on 2026-10-01.)
 
 ## DEF-002 Concurrent room bookings can double-book the same dates
 - **Severity / Priority:** High / P1
@@ -36,9 +36,9 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Expected:** 401 Unauthorized.
 - **Actual:** 200 OK.
 - **Evidence:** `shared/Infrastructure/DependencyInjection.cs` JWT setup has no `OnTokenValidated` hook.
-- **Status:** Open
-- **Fix:**
-- **Retest result:**
+- **Status:** Retested (Closed)
+- **Fix:** JwtBearer `OnTokenValidated` now checks the user's `IsActive` flag and current role through `IUserStatusCache` (30 s memory cache). `UserService.SetActiveAsync` invalidates the cache entry and rotates the security stamp, so the old token stops working on the next request. Tokens whose role claim no longer matches the database are also rejected.
+- **Retest result:** 2026-10-01 - `SecurityHardeningTests.Deactivated_user_token_is_rejected_immediately` and `Invalid_expired_and_unsigned_tokens_are_rejected` pass (`testing/execution-results/phase1-backend-arch/api-tests.trx`).
 
 ## DEF-004 Login brute force is possible
 - **Severity / Priority:** High / P2
@@ -47,9 +47,9 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Expected:** Account locks or requests are throttled.
 - **Actual:** Unlimited attempts accepted.
 - **Evidence:** `web-api/Controllers/AuthController.cs` line 81 at `4833828`.
-- **Status:** Open
-- **Fix:**
-- **Retest result:**
+- **Status:** Retested (Closed)
+- **Fix:** Identity lockout enabled (5 failed attempts, 5-minute lockout) and `AuthService.LoginAsync` calls `CheckPasswordSignInAsync(..., lockoutOnFailure: true)`. Login and register are also limited to 10 requests per minute per IP (`RateLimiting:*` settings, 429 with `Retry-After`).
+- **Retest result:** 2026-10-01 - `SecurityHardeningTests.Account_locks_after_five_failed_logins` and `Login_endpoint_is_rate_limited_when_enabled` pass (`testing/execution-results/phase1-backend-arch/api-tests.trx`).
 
 ## DEF-005 Login email comparison is case-sensitive
 - **Severity / Priority:** Medium / P2
@@ -58,9 +58,9 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Expected:** 200 OK with JWT.
 - **Actual:** 401 Unauthorized.
 - **Evidence:** `web-api/Controllers/AuthController.cs` line 74 at `4833828`.
-- **Status:** Open
-- **Fix:**
-- **Retest result:**
+- **Status:** Retested (Closed)
+- **Fix:** `AuthService.LoginAsync` looks the user up with `UserManager.FindByEmailAsync`, which compares the normalized (upper-case) email.
+- **Retest result:** 2026-10-01 - `SecurityHardeningTests.Login_email_is_case_insensitive` passes (`testing/execution-results/phase1-backend-arch/api-tests.trx`).
 
 ## DEF-006 Booking dates and duplicates are not validated
 - **Severity / Priority:** Medium / P2
@@ -124,9 +124,9 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Expected:** Admin moderation allowed (or the dead code removed).
 - **Actual:** 403 Forbidden.
 - **Evidence:** `HotelsController.cs` line 137 at `4833828`.
-- **Status:** Open
-- **Fix:**
-- **Retest result:**
+- **Status:** Retested (Closed)
+- **Fix:** New `HotelOwnerOrAdmin` and `TravelAgentOrAdmin` policies on update/delete/room/activity endpoints; ownership is enforced in the service layer (`Ownership.EnsureOwnerOrAdmin`), so other providers still get 403.
+- **Retest result:** 2026-10-01 - `SecurityHardeningTests.Provider_cannot_edit_another_providers_hotel_but_admin_can` passes (`testing/execution-results/phase1-backend-arch/api-tests.trx`).
 
 ## DEF-012 Swagger, migrations and demo seeding run in Production
 - **Severity / Priority:** Low / P2
@@ -135,9 +135,9 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Expected:** Configurable; disabled by default in Production.
 - **Actual:** Always on.
 - **Evidence:** `web-api/Program.cs` lines 25-38 at `4833828`.
-- **Status:** Open
-- **Fix:**
-- **Retest result:**
+- **Status:** Retested (Closed)
+- **Fix:** `Swagger:Enabled` and `Seed:DemoUsers` settings, both defaulting to on only in the Development environment. Docker Compose reads them from `SWAGGER_ENABLED` / `SEED_DEMO_USERS`. A real admin can be bootstrapped with `Seed:AdminEmail` / `Seed:AdminPassword` instead of the demo accounts.
+- **Retest result:** 2026-10-01 - `SecurityHardeningTests.Swagger_is_disabled_outside_development_by_default` passes (the test host runs in the `Testing` environment). Demo seeding remains on in tests because the fixture sets `Seed:DemoUsers=true` explicitly.
 
 ## DEF-013 AI errors are silently swallowed
 - **Severity / Priority:** Low / P3
@@ -169,8 +169,8 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Actual:** 269 generated files tracked.
 - **Evidence:** `git ls-files` at `4833828`.
 - **Status:** Retested (Closed)
-- **Fix:** `git rm --cached` on 269 generated files; added a repository-root `.gitignore` and extended the project `.gitignore` (Flutter `.dart_tool` anywhere, logs, React build output).
-- **Retest result:** 2026-10-01 - `git ls-files | Select-String "/(bin|obj)/"` returns 0 entries.
+- **Fix:** Added a repository-root `.gitignore` and extended the project `.gitignore` (Flutter `.dart_tool` anywhere, logs, React build output) in `f07fcb1`. That commit did **not** actually remove the `bin/`/`obj/` files from the index (it committed modified copies of 43 of them). The 265 remaining build files were untracked with `git rm --cached` in `5fe2b9e`.
+- **Retest result:** 2026-10-01 (first retest, after `f07fcb1`) - recorded as passing, but this was wrong: `git status` still listed tracked `bin/`/`obj/` files. 2026-10-01 (second retest, after `5fe2b9e`) - `git ls-files | Select-String "/(bin|obj)/"` returns 0 entries. Pass.
 
 ## DEF-016 API tests share a persistent database
 - **Severity / Priority:** Low / P2
@@ -182,3 +182,18 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Status:** Retested (Closed)
 - **Fix:** `ApiFixture` now starts a fresh `postgres:16-alpine` Testcontainer per run (random password). Fallback: a uniquely named database on a local server (password from `TEST_PG_PASSWORD`), dropped on dispose.
 - **Retest result:** 2026-10-01 - consecutive `dotnet test` runs pass (8/8 API tests) against fresh containers.
+
+---
+
+Defects below were found while implementing and executing tests.
+
+## DEF-017 Domain-model migration fails on databases that already contain itineraries or bookings
+- **Severity / Priority:** High / P1
+- **Description:** The generated `AddDomainModelV2` migration added the NOT NULL columns `Itineraries.Travelers` and `Bookings.Guests` with a default of 0. Existing rows were filled with 0, which violates the new check constraints `CK_Itineraries_Travelers` / `CK_Bookings_Guests` (`> 0`). Empty databases (the API test containers) were not affected, so the test suite passed.
+- **Steps to reproduce:** On a database migrated to `AddHotelAndPackageImages` that has at least one itinerary, run `dotnet ef database update`.
+- **Expected:** Migration applies.
+- **Actual:** `23514: check constraint "CK_Itineraries_Travelers" of relation "Itineraries" is violated by some row`; the transaction rolls back.
+- **Evidence:** `dotnet ef database update` output against the local development database, 2026-10-01.
+- **Status:** Retested (Closed)
+- **Fix:** The migration now backfills both columns with 1. New audit timestamp columns were also changed from `0001-01-01` to `DEFAULT now()`.
+- **Retest result:** 2026-10-01 - `dotnet ef database update` on the same development database completes ("Done."); API tests pass on a fresh container.

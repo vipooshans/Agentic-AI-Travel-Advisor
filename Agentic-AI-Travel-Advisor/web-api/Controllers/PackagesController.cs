@@ -1,328 +1,67 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using TravelAdvisor.Api.Infrastructure;
 using TravelAdvisor.Core.DTOs.Hotels;
 using TravelAdvisor.Core.DTOs.Packages;
-using TravelAdvisor.Core.Entities;
-using TravelAdvisor.Core.Enums;
-using TravelAdvisor.Infrastructure.Data;
+using TravelAdvisor.Core.Interfaces.Services;
+using TravelAdvisor.Infrastructure;
 
 namespace TravelAdvisor.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PackagesController : ControllerBase
+public class PackagesController(IPackageService packageService) : ControllerBase
 {
-    private readonly AppDbContext _context;
-
-    public PackagesController(AppDbContext context)
-    {
-        _context = context;
-    }
-
+    /// <summary>Search approved packages. Admins see every approval state and may filter by it.</summary>
     [HttpGet]
-    public async Task<ActionResult<List<TravelPackageDto>>> GetAll(
-        [FromQuery] int? destinationId,
-        [FromQuery] ApprovalStatus? approvalStatus)
-    {
-        var query = _context.TravelPackages
-            .Include(p => p.Destination)
-            .Include(p => p.Activities)
-            .AsQueryable();
+    public async Task<ActionResult<List<TravelPackageDto>>> GetAll([FromQuery] PackageSearchQuery query, CancellationToken cancellationToken) =>
+        Ok(await packageService.SearchAsync(User.ToOptionalUserContext(), query, cancellationToken));
 
-        if (User.Identity?.IsAuthenticated == true && User.IsInRole(RoleNames.Admin))
-        {
-            if (approvalStatus.HasValue)
-                query = query.Where(p => p.ApprovalStatus == approvalStatus.Value);
-        }
-        else
-        {
-            query = query.Where(p => p.ApprovalStatus == ApprovalStatus.Approved);
-        }
-
-        if (destinationId.HasValue)
-            query = query.Where(p => p.DestinationId == destinationId.Value);
-
-        var packages = await query
-            .OrderBy(p => p.Title)
-            .Select(p => new TravelPackageDto
-            {
-                Id = p.Id,
-                Title = p.Title,
-                Description = p.Description,
-                Price = p.Price,
-                DurationDays = p.DurationDays,
-                DestinationId = p.DestinationId,
-                DestinationName = p.Destination.Name,
-                DestinationCountry = p.Destination.Country,
-                ImageUrl = p.ImageUrl ?? p.Destination.ImageUrl,
-                ActivityCount = p.Activities.Count,
-                ApprovalStatus = p.ApprovalStatus
-            })
-            .ToListAsync();
-
-        return Ok(packages);
-    }
-
-    [Authorize(Policy = "RequireTravelAgent")]
+    [Authorize(Policy = AuthPolicies.RequireTravelAgent)]
     [HttpGet("mine")]
-    public async Task<ActionResult<List<TravelPackageDto>>> GetMine()
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var packages = await _context.TravelPackages
-            .Include(p => p.Destination)
-            .Include(p => p.Activities)
-            .Where(p => p.AgentId == userId)
-            .OrderBy(p => p.Title)
-            .Select(p => new TravelPackageDto
-            {
-                Id = p.Id,
-                Title = p.Title,
-                Description = p.Description,
-                Price = p.Price,
-                DurationDays = p.DurationDays,
-                DestinationId = p.DestinationId,
-                DestinationName = p.Destination.Name,
-                DestinationCountry = p.Destination.Country,
-                ImageUrl = p.ImageUrl ?? p.Destination.ImageUrl,
-                ActivityCount = p.Activities.Count,
-                ApprovalStatus = p.ApprovalStatus
-            })
-            .ToListAsync();
+    public async Task<ActionResult<List<TravelPackageDto>>> GetMine(CancellationToken cancellationToken) =>
+        Ok(await packageService.ListMineAsync(User.ToUserContext(), cancellationToken));
 
-        return Ok(packages);
-    }
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<TravelPackageDetailDto>> GetById(int id, CancellationToken cancellationToken) =>
+        Ok(await packageService.GetAsync(User.ToOptionalUserContext(), id, cancellationToken));
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<TravelPackageDetailDto>> GetById(int id)
-    {
-        var package = await _context.TravelPackages
-            .Include(p => p.Destination)
-            .Include(p => p.Activities)
-            .FirstOrDefaultAsync(p => p.Id == id);
-
-        if (package is null || !CanViewPackage(package))
-            return NotFound(new { message = "Package not found." });
-
-        return Ok(MapToDetail(package));
-    }
-
-    [Authorize(Policy = "RequireTravelAgent")]
+    [Authorize(Policy = AuthPolicies.RequireTravelAgent)]
     [HttpPost]
-    public async Task<ActionResult<TravelPackageDto>> Create([FromBody] CreatePackageRequest request)
+    public async Task<ActionResult<TravelPackageDto>> Create([FromBody] CreatePackageRequest request, CancellationToken cancellationToken)
     {
-        var destinationExists = await _context.Destinations.AnyAsync(d => d.Id == request.DestinationId);
-        if (!destinationExists)
-            return BadRequest(new { message = "Destination not found." });
-
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var package = new TravelPackage
-        {
-            AgentId = userId,
-            DestinationId = request.DestinationId,
-            Title = request.Title,
-            Description = request.Description,
-            Price = request.Price,
-            DurationDays = request.DurationDays,
-            ApprovalStatus = ApprovalStatus.Pending
-        };
-
-        _context.TravelPackages.Add(package);
-        await _context.SaveChangesAsync();
-
-        var destination = await _context.Destinations.FindAsync(request.DestinationId);
-
-        return CreatedAtAction(nameof(GetById), new { id = package.Id }, new TravelPackageDto
-        {
-            Id = package.Id,
-            Title = package.Title,
-            Description = package.Description,
-            Price = package.Price,
-            DurationDays = package.DurationDays,
-            DestinationId = package.DestinationId,
-            DestinationName = destination!.Name,
-            DestinationCountry = destination.Country,
-            ImageUrl = package.ImageUrl ?? destination.ImageUrl,
-            ActivityCount = 0,
-            ApprovalStatus = package.ApprovalStatus
-        });
+        var package = await packageService.CreateAsync(User.ToUserContext(), request, cancellationToken);
+        return CreatedAtAction(nameof(GetById), new { id = package.Id }, package);
     }
 
-    [Authorize(Policy = "RequireTravelAgent")]
-    [HttpPut("{id}")]
-    public async Task<ActionResult<TravelPackageDto>> Update(int id, [FromBody] UpdatePackageRequest request)
+    [Authorize(Policy = AuthPolicies.TravelAgentOrAdmin)]
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<TravelPackageDto>> Update(int id, [FromBody] UpdatePackageRequest request, CancellationToken cancellationToken) =>
+        Ok(await packageService.UpdateAsync(User.ToUserContext(), id, request, cancellationToken));
+
+    [Authorize(Policy = AuthPolicies.TravelAgentOrAdmin)]
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        var package = await _context.TravelPackages
-            .Include(p => p.Destination)
-            .Include(p => p.Activities)
-            .FirstOrDefaultAsync(p => p.Id == id);
-
-        if (package is null)
-            return NotFound(new { message = "Package not found." });
-
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        if (package.AgentId != userId && !User.IsInRole("ADMIN"))
-            return Forbid();
-
-        var destinationExists = await _context.Destinations.AnyAsync(d => d.Id == request.DestinationId);
-        if (!destinationExists)
-            return BadRequest(new { message = "Destination not found." });
-
-        package.DestinationId = request.DestinationId;
-        package.Title = request.Title;
-        package.Description = request.Description;
-        package.Price = request.Price;
-        package.DurationDays = request.DurationDays;
-        if (package.ApprovalStatus == ApprovalStatus.Rejected)
-            package.ApprovalStatus = ApprovalStatus.Pending;
-
-        await _context.SaveChangesAsync();
-
-        var destination = await _context.Destinations.FindAsync(request.DestinationId);
-
-        return Ok(new TravelPackageDto
-        {
-            Id = package.Id,
-            Title = package.Title,
-            Description = package.Description,
-            Price = package.Price,
-            DurationDays = package.DurationDays,
-            DestinationId = package.DestinationId,
-            DestinationName = destination!.Name,
-            DestinationCountry = destination.Country,
-            ImageUrl = package.ImageUrl ?? destination.ImageUrl,
-            ActivityCount = package.Activities.Count,
-            ApprovalStatus = package.ApprovalStatus
-        });
-    }
-
-    [Authorize(Policy = "RequireTravelAgent")]
-    [HttpPost("{id}/activities")]
-    public async Task<ActionResult<PackageActivityDto>> AddActivity(int id, [FromBody] CreateActivityRequest request)
-    {
-        var package = await _context.TravelPackages.FirstOrDefaultAsync(p => p.Id == id);
-        if (package is null)
-            return NotFound(new { message = "Package not found." });
-
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        if (package.AgentId != userId && !User.IsInRole("ADMIN"))
-            return Forbid();
-
-        var activity = new PackageActivity
-        {
-            TravelPackageId = id,
-            Title = request.Title,
-            Description = request.Description,
-            DayNumber = request.DayNumber,
-            Price = request.Price,
-            SortOrder = request.SortOrder
-        };
-
-        _context.PackageActivities.Add(activity);
-        await _context.SaveChangesAsync();
-
-        return Ok(new PackageActivityDto
-        {
-            Id = activity.Id,
-            TravelPackageId = activity.TravelPackageId,
-            Title = activity.Title,
-            Description = activity.Description,
-            DayNumber = activity.DayNumber,
-            Price = activity.Price,
-            SortOrder = activity.SortOrder
-        });
-    }
-
-    [Authorize(Policy = "RequireTravelAgent")]
-    [HttpDelete("{packageId}/activities/{activityId}")]
-    public async Task<IActionResult> DeleteActivity(int packageId, int activityId)
-    {
-        var activity = await _context.PackageActivities
-            .Include(a => a.TravelPackage)
-            .FirstOrDefaultAsync(a => a.Id == activityId && a.TravelPackageId == packageId);
-
-        if (activity is null)
-            return NotFound(new { message = "Activity not found." });
-
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        if (activity.TravelPackage.AgentId != userId && !User.IsInRole("ADMIN"))
-            return Forbid();
-
-        _context.PackageActivities.Remove(activity);
-        await _context.SaveChangesAsync();
-
+        await packageService.DeleteAsync(User.ToUserContext(), id, cancellationToken);
         return NoContent();
     }
 
-    [Authorize(Policy = "RequireAdmin")]
-    [HttpPatch("{id}/approval")]
-    public async Task<ActionResult<TravelPackageDto>> SetApproval(int id, [FromBody] UpdateApprovalRequest request)
+    [Authorize(Policy = AuthPolicies.TravelAgentOrAdmin)]
+    [HttpPost("{id:int}/activities")]
+    public async Task<ActionResult<PackageActivityDto>> AddActivity(int id, [FromBody] CreateActivityRequest request, CancellationToken cancellationToken) =>
+        Ok(await packageService.AddActivityAsync(User.ToUserContext(), id, request, cancellationToken));
+
+    [Authorize(Policy = AuthPolicies.TravelAgentOrAdmin)]
+    [HttpDelete("{packageId:int}/activities/{activityId:int}")]
+    public async Task<IActionResult> DeleteActivity(int packageId, int activityId, CancellationToken cancellationToken)
     {
-        if (request.Status is not ApprovalStatus.Approved and not ApprovalStatus.Rejected)
-            return BadRequest(new { message = "Status must be Approved or Rejected." });
-
-        var package = await _context.TravelPackages
-            .Include(p => p.Destination)
-            .Include(p => p.Activities)
-            .FirstOrDefaultAsync(p => p.Id == id);
-        if (package is null)
-            return NotFound(new { message = "Package not found." });
-
-        package.ApprovalStatus = request.Status;
-        await _context.SaveChangesAsync();
-        return Ok(new TravelPackageDto
-        {
-            Id = package.Id,
-            Title = package.Title,
-            Description = package.Description,
-            Price = package.Price,
-            DurationDays = package.DurationDays,
-            DestinationId = package.DestinationId,
-            DestinationName = package.Destination.Name,
-            DestinationCountry = package.Destination.Country,
-            ImageUrl = package.ImageUrl ?? package.Destination.ImageUrl,
-            ActivityCount = package.Activities.Count,
-            ApprovalStatus = package.ApprovalStatus
-        });
+        await packageService.DeleteActivityAsync(User.ToUserContext(), packageId, activityId, cancellationToken);
+        return NoContent();
     }
 
-    private bool CanViewPackage(TravelPackage package)
-    {
-        if (package.ApprovalStatus == ApprovalStatus.Approved)
-            return true;
-        if (User.Identity?.IsAuthenticated != true)
-            return false;
-        if (User.IsInRole(RoleNames.Admin))
-            return true;
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return package.AgentId == userId;
-    }
-
-    private static TravelPackageDetailDto MapToDetail(TravelPackage package) => new()
-    {
-        Id = package.Id,
-        Title = package.Title,
-        Description = package.Description,
-        Price = package.Price,
-        DurationDays = package.DurationDays,
-        DestinationId = package.DestinationId,
-        DestinationName = package.Destination.Name,
-        DestinationCountry = package.Destination.Country,
-        ImageUrl = string.IsNullOrWhiteSpace(package.ImageUrl) ? package.Destination.ImageUrl : package.ImageUrl,
-        ActivityCount = package.Activities.Count,
-        ApprovalStatus = package.ApprovalStatus,
-        Activities = package.Activities
-            .OrderBy(a => a.DayNumber).ThenBy(a => a.SortOrder)
-            .Select(a => new PackageActivityDto
-            {
-                Id = a.Id,
-                TravelPackageId = a.TravelPackageId,
-                Title = a.Title,
-                Description = a.Description,
-                DayNumber = a.DayNumber,
-                Price = a.Price,
-                SortOrder = a.SortOrder
-            }).ToList()
-    };
+    [Authorize(Policy = AuthPolicies.RequireAdmin)]
+    [HttpPatch("{id:int}/approval")]
+    public async Task<ActionResult<TravelPackageDto>> SetApproval(int id, [FromBody] UpdateApprovalRequest request, CancellationToken cancellationToken) =>
+        Ok(await packageService.SetApprovalAsync(id, request, cancellationToken));
 }
