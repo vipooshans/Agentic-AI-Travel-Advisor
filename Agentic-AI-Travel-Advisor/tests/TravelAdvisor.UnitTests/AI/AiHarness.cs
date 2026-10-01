@@ -193,12 +193,12 @@ internal sealed class AiHarness
         return new ToolRegistry(tools, NullLogger<ToolRegistry>.Instance);
     }
 
-    public AgentOrchestrator BuildOrchestrator()
+    public AgentOrchestrator BuildOrchestrator(ILlmClient? llm = null)
     {
         var options = Microsoft.Extensions.Options.Options.Create(Options);
         return new AgentOrchestrator(
             BuildRegistry(),
-            Llm,
+            llm ?? Llm,
             new TravelPlanningAgent(options),
             new BookingAgent(),
             new OutputSanitizer(Configuration),
