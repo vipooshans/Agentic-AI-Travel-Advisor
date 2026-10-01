@@ -13,11 +13,24 @@ public class HotelDto
     public string? ImageUrl { get; set; }
     public int RoomCount { get; set; }
     public ApprovalStatus ApprovalStatus { get; set; }
+    public decimal? MinPricePerNight { get; set; }
+    public double? AverageRating { get; set; }
+    public int ReviewCount { get; set; }
 }
 
 public class HotelDetailDto : HotelDto
 {
     public List<RoomDto> Rooms { get; set; } = [];
+}
+
+public class HotelSearchQuery
+{
+    public string? Q { get; set; }
+    public string? City { get; set; }
+    public string? Country { get; set; }
+    public ApprovalStatus? ApprovalStatus { get; set; }
+    public decimal? MaxPrice { get; set; }
+    public int? Guests { get; set; }
 }
 
 public class CreateHotelRequest
@@ -27,6 +40,7 @@ public class CreateHotelRequest
     public string City { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
     public string? Description { get; set; }
+    public string? ImageUrl { get; set; }
 }
 
 public class UpdateHotelRequest
@@ -36,6 +50,7 @@ public class UpdateHotelRequest
     public string City { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
     public string? Description { get; set; }
+    public string? ImageUrl { get; set; }
 }
 
 public class RoomDto

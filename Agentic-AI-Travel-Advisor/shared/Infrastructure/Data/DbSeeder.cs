@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TravelAdvisor.Core.Entities;
 using TravelAdvisor.Core.Enums;
@@ -8,11 +9,17 @@ namespace TravelAdvisor.Infrastructure.Data;
 
 public static class DbSeeder
 {
-    public static async Task SeedAsync(IServiceProvider serviceProvider)
+    /// <summary>
+    /// Applies migrations and seeds reference data. Demo accounts (with well-known passwords) and the
+    /// demo catalog are only created when <paramref name="seedDemoUsers"/> is true; a real admin can be
+    /// bootstrapped through the <c>Seed:AdminEmail</c> / <c>Seed:AdminPassword</c> settings instead.
+    /// </summary>
+    public static async Task SeedAsync(IServiceProvider serviceProvider, bool seedDemoUsers)
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
         await context.Database.MigrateAsync();
 
@@ -26,6 +33,71 @@ public static class DbSeeder
             await context.SaveChangesAsync();
         }
 
+        await SeedSystemSettingsAsync(context);
+        await SeedBootstrapAdminAsync(context, userManager, configuration);
+
+        if (!seedDemoUsers)
+            return;
+
+        await SeedDemoAsync(context, userManager);
+    }
+
+    private static async Task SeedBootstrapAdminAsync(
+        AppDbContext context,
+        UserManager<ApplicationUser> userManager,
+        IConfiguration configuration)
+    {
+        var email = configuration["Seed:AdminEmail"];
+        var password = configuration["Seed:AdminPassword"];
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            return;
+        if (await userManager.FindByEmailAsync(email) is not null)
+            return;
+
+        var adminRole = await context.AppRoles.FirstAsync(r => r.Name == RoleNames.Admin);
+        var result = await userManager.CreateAsync(new ApplicationUser
+        {
+            UserName = email,
+            Email = email,
+            FirstName = "Platform",
+            LastName = "Admin",
+            RoleId = adminRole.Id,
+            EmailConfirmed = true,
+            IsActive = true
+        }, password);
+
+        if (!result.Succeeded)
+            throw new InvalidOperationException(
+                "Bootstrap admin could not be created: " + string.Join("; ", result.Errors.Select(e => e.Description)));
+    }
+
+    private static async Task SeedSystemSettingsAsync(AppDbContext context)
+    {
+        var defaults = new (string Key, string Value, string Description)[]
+        {
+            (SystemSettingKeys.DefaultCurrency, "LKR", "Currency shown when a listing does not specify one"),
+            (SystemSettingKeys.MaxAdvanceBookingDays, "365", "How far in the future a booking may start"),
+            (SystemSettingKeys.GuestCancellationCutoffHours, "24", "Guests may cancel confirmed bookings up to this many hours before check-in"),
+            (SystemSettingKeys.AiAssistantEnabled, "true", "Turns the AI travel assistant on or off"),
+            (SystemSettingKeys.MaintenanceMessage, "", "Optional banner shown to all clients")
+        };
+
+        var existing = await context.SystemSettings.Select(s => s.Key).ToListAsync();
+        var missing = defaults.Where(d => !existing.Contains(d.Key)).ToList();
+        if (missing.Count == 0)
+            return;
+
+        context.SystemSettings.AddRange(missing.Select(d => new SystemSetting
+        {
+            Key = d.Key,
+            Value = d.Value,
+            Description = d.Description
+        }));
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedDemoAsync(AppDbContext context, UserManager<ApplicationUser> userManager)
+    {
         if (await userManager.FindByEmailAsync("admin@traveladvisor.com") is null)
         {
             var adminRole = await context.AppRoles.FirstAsync(r => r.Name == RoleNames.Admin);
@@ -177,6 +249,78 @@ public static class DbSeeder
 
         await SeedSriLankaCatalogAsync(context, owner, agent);
         await BackfillCatalogImagesAsync(context);
+        await BackfillActivityCategoriesAsync(context);
+        await SeedTransportationAsync(context, agent);
+    }
+
+    private static async Task BackfillActivityCategoriesAsync(AppDbContext context)
+    {
+        var activities = await context.PackageActivities.Where(a => a.Category == null).ToListAsync();
+        var changed = false;
+        foreach (var activity in activities)
+        {
+            if (!ActivityCategories.TryGetValue(activity.Title, out var category))
+                continue;
+            activity.Category = category;
+            changed = true;
+        }
+
+        if (changed)
+            await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedTransportationAsync(AppDbContext context, ApplicationUser? agent)
+    {
+        if (agent is null || await context.Transportation.AnyAsync())
+            return;
+
+        var destinations = await context.Destinations
+            .Where(d => d.Country == "Sri Lanka")
+            .ToDictionaryAsync(d => d.Name, d => d.Id);
+        var packages = await context.TravelPackages
+            .Where(p => p.AgentId == agent.Id)
+            .ToDictionaryAsync(p => p.Title, p => p.Id);
+
+        int? Dest(string name) => destinations.TryGetValue(name, out var id) ? id : null;
+        int? Pkg(string title) => packages.TryGetValue(title, out var id) ? id : null;
+
+        context.Transportation.AddRange(
+            new Transportation
+            {
+                ProviderId = agent.Id, DestinationId = Dest("Ella"), TravelPackageId = Pkg("Ella Hills Escape"),
+                Mode = TransportMode.Train, FromLocation = "Kandy", ToLocation = "Ella",
+                DepartureTime = new TimeSpan(8, 47, 0), DurationMinutes = 420, PricePerPerson = 2000, Capacity = 40,
+                Description = "Scenic hill-country train, reserved second-class seats"
+            },
+            new Transportation
+            {
+                ProviderId = agent.Id, DestinationId = Dest("Ella"),
+                Mode = TransportMode.TukTuk, FromLocation = "Ella town", ToLocation = "Nine Arch Bridge",
+                DurationMinutes = 15, PricePerPerson = 800, Capacity = 3,
+                Description = "Local tuk-tuk transfer"
+            },
+            new Transportation
+            {
+                ProviderId = agent.Id, DestinationId = Dest("Kandy"), TravelPackageId = Pkg("Kandy Cultural Weekend"),
+                Mode = TransportMode.Van, FromLocation = "Colombo", ToLocation = "Kandy",
+                DepartureTime = new TimeSpan(7, 0, 0), DurationMinutes = 210, PricePerPerson = 4500, Capacity = 8,
+                Description = "Private air-conditioned van with driver"
+            },
+            new Transportation
+            {
+                ProviderId = agent.Id, DestinationId = Dest("Galle"), TravelPackageId = Pkg("Galle Fort Getaway"),
+                Mode = TransportMode.Train, FromLocation = "Colombo Fort", ToLocation = "Galle",
+                DepartureTime = new TimeSpan(6, 55, 0), DurationMinutes = 150, PricePerPerson = 600, Capacity = 60,
+                Description = "Coastal line express"
+            },
+            new Transportation
+            {
+                ProviderId = agent.Id, DestinationId = Dest("Galle"),
+                Mode = TransportMode.Bus, FromLocation = "Colombo", ToLocation = "Galle",
+                DepartureTime = new TimeSpan(9, 0, 0), DurationMinutes = 120, PricePerPerson = 1200, Capacity = 45,
+                Description = "Southern Expressway intercity bus"
+            });
+        await context.SaveChangesAsync();
     }
 
     private static async Task SeedSriLankaCatalogAsync(
@@ -365,6 +509,30 @@ public static class DbSeeder
         ["Ella Heights Lodge"] = "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=1200&q=80",
         ["Kandy Lake House"] = "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=1200&q=80",
         ["Galle Fort Stay"] = "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=80"
+    };
+
+    private static readonly Dictionary<string, string> ActivityCategories = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Eiffel Tower Visit"] = "culture",
+        ["Seine River Cruise"] = "food",
+        ["Louvre Museum Tour"] = "culture",
+        ["Ubud Rice Terrace Trek"] = "nature",
+        ["Temple Sunset Tour"] = "culture",
+        ["Shibuya Food Tour"] = "food",
+        ["Mt. Fuji Day Trip"] = "adventure",
+        ["Nine Arch Bridge"] = "sightseeing",
+        ["Little Adam's Peak"] = "hiking",
+        ["Ravana Falls"] = "nature",
+        ["Tea Estate Walk"] = "nature",
+        ["Ella Rock Viewpoint"] = "hiking",
+        ["Temple of the Tooth"] = "culture",
+        ["Kandy Lake Walk"] = "nature",
+        ["Peradeniya Botanical Gardens"] = "nature",
+        ["Cultural Dance Show"] = "culture",
+        ["Galle Fort Ramparts"] = "culture",
+        ["Unawatuna Beach"] = "beach",
+        ["Maritime Museum"] = "culture",
+        ["Jungle Beach Walk"] = "beach"
     };
 
     private static readonly Dictionary<string, string> PackageImages = new(StringComparer.OrdinalIgnoreCase)

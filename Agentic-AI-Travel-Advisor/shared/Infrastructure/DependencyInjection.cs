@@ -24,7 +24,9 @@ public static class DependencyInjection
             throw new InvalidOperationException(
                 "ConnectionStrings:DefaultConnection is not configured. Set it with user-secrets or the ConnectionStrings__DefaultConnection environment variable.");
 
-        services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
+        services.AddDbContext<AppDbContext>(options => options
+            .UseNpgsql(connectionString)
+            .AddInterceptors(new AuditInterceptor()));
 
         services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {

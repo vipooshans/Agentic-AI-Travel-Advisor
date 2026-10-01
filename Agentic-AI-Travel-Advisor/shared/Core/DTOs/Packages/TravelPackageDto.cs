@@ -15,11 +15,26 @@ public class TravelPackageDto
     public string? ImageUrl { get; set; }
     public int ActivityCount { get; set; }
     public ApprovalStatus ApprovalStatus { get; set; }
+
+    /// <summary>Package price plus all included activity prices, per person.</summary>
+    public decimal TotalPrice { get; set; }
+    public int MaxTravelers { get; set; }
+    public double? AverageRating { get; set; }
+    public int ReviewCount { get; set; }
 }
 
 public class TravelPackageDetailDto : TravelPackageDto
 {
     public List<PackageActivityDto> Activities { get; set; } = [];
+}
+
+public class PackageSearchQuery
+{
+    public string? Q { get; set; }
+    public int? DestinationId { get; set; }
+    public ApprovalStatus? ApprovalStatus { get; set; }
+    public decimal? MaxPrice { get; set; }
+    public int? MaxDurationDays { get; set; }
 }
 
 public class CreatePackageRequest
@@ -29,6 +44,8 @@ public class CreatePackageRequest
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public int DurationDays { get; set; }
+    public string? ImageUrl { get; set; }
+    public int MaxTravelers { get; set; } = 10;
 }
 
 public class UpdatePackageRequest
@@ -38,6 +55,8 @@ public class UpdatePackageRequest
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public int DurationDays { get; set; }
+    public string? ImageUrl { get; set; }
+    public int MaxTravelers { get; set; } = 10;
 }
 
 public class PackageActivityDto

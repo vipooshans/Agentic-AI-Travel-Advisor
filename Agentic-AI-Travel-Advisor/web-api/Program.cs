@@ -35,7 +35,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-await DbSeeder.SeedAsync(app.Services);
+var seedDemoUsers = app.Configuration.GetValue<bool?>("Seed:DemoUsers") ?? app.Environment.IsDevelopment();
+await DbSeeder.SeedAsync(app.Services, seedDemoUsers);
 
 app.Run();
 
