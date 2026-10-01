@@ -39,3 +39,43 @@ Result of the mutated run: 5 failed, 109 passed. This run was not kept as a file
 - Two test mistakes were corrected rather than the API:
   - `POST /api/packages/{id}/activities` returns `200 OK`, not `201`. That is the existing contract.
   - After an agent adds an activity the package goes back to Pending, so an anonymous read returns 404. That is the re-approval rule (DEF-010) working as designed.
+
+## 8b. Database: constraints, transactions, migrations, booking consistency
+
+### What was added
+
+`tests/TravelAdvisor.Api.Tests/DatabaseIntegrityTests.cs` runs against the same Testcontainers PostgreSQL as the API tests. Constraint checks are plain SQL inside a transaction that is always rolled back, so they prove what PostgreSQL itself enforces, not EF validation, and they leave no rows behind. Each rejection is asserted by SQLSTATE and by the exact constraint name.
+
+| Area | Cases |
+|---|---|
+| Foreign keys (23503) | room to missing hotel; booking to missing user or room; payment to missing booking; restrict on deleting a destination with packages, a role held by users, a room with bookings, a booking with a payment |
+| Unique (23505) | normalised email, destination name+country, room name per hotel, role name, setting key, payment reference, one calendar override per room night, one review per booking |
+| NOT NULL (23502) | hotel name, destination country, booking user, payment currency |
+| Check (23514) | booking room-xor-package, check-out after check-in, guests > 0, total >= 0; room capacity and price; package duration and travelers; activity day; review rating 1-5 and single target; payment amount > 0; price override >= 0; budget min <= max; itinerary dates |
+| Exclusion (23P01) | overlapping or identical stays in the same room (`EX_Bookings_Room_NoOverlap`) |
+| Accepted edge cases | back-to-back stays, overlap with a cancelled stay, overlap in different rooms, package booking without a room, one review per booking, budget min = max, same-day itinerary |
+| Schema | all 19 domain tables exist; all 22 named check/exclusion constraints exist; 33 foreign keys |
+| Delete behaviour | itinerary keeps living with `DestinationId` set to NULL; itinerary items and room calendar rows cascade |
+| Transactions | `UnitOfWork.ExecuteInTransactionAsync` rolls back an already-saved write when the action throws and clears the change tracker |
+| Concurrency | two contexts editing one booking: the second save throws `DbUpdateConcurrencyException` (xmin row version) and the first edit is kept |
+| Audit | `CreatedAt` is stamped by the interceptor (client value ignored), never changes on update, `UpdatedAt` moves, values are UTC |
+| Seeding | running `DbSeeder` a second time leaves roles/destinations/settings/demo users at 4/9/5/3 |
+| Migrations | on a separate freshly created database: all 6 migrations apply in order, the model snapshot has no drift from the current model, every `Down()` runs back to an empty schema, and `Up()` rebuilds it including the exclusion constraint |
+| Booking consistency | a booking made through the API is stored with the right user, room, dates, guests, Pending status and total (3 nights x 9,000 = 27,000); cancelling sets status 2 and `CancelledAt`; the same dates can then be booked again |
+
+### Results
+
+| Suite | Command | Result | Evidence |
+|---|---|---|---|
+| API integration incl. database | `dotnet test tests/TravelAdvisor.Api.Tests` | **127 passed, 0 failed, 0 skipped** (73 from 8a + 54 database tests) | `backend-api-tests.trx`, `backend-api-tests-verbose.log` (this run replaces the 8a files) |
+| Database tests only | extracted from the TRX above | 54 passed, 0 failed; the actual PostgreSQL error for every rejected case | `database-tests.txt` |
+
+### Checking that the database tests can fail
+
+Two expectations were broken on purpose and the database tests rerun: one expected constraint name was changed to a wrong name, and the "same-day itinerary" accepted case was changed to end before it starts. Three tests failed: the wrong name (`Expected: "CK_Reviews_Wrong"`, `Actual: "CK_Reviews_Target"`), the itinerary case (`rejected: 23514 CK_Itineraries_Dates`), and the schema test, which takes its expected names from the same list. The file was then restored.
+
+The first full run after restoring still showed those 3 failures (124 passed). The restored file had kept the backup's older timestamp, so the incremental build reused the mutated assembly. After touching the file and rerunning, the result was 127 passed. That run is the one stored here.
+
+### Findings
+
+No database defects were found. All constraint names and delete behaviours matched the EF configuration, and the migration history round-trips without model drift.

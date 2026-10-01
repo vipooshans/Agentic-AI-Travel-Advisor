@@ -1,0 +1,101 @@
+﻿Database tests (DatabaseIntegrityTests) - extracted from backend-api-tests.trx
+Extracted: 2026-10-01 19:09 local; database: Testcontainers postgres:16-alpine
+Results: 54 passed, 0 failed
+
+[Passed] Database_rejects_invalid_data(case: "payment of zero", sqlState: "23514", constraint: "CK_Payments_Amount")
+    payment of zero: 23514 CK_Payments_Amount - new row for relation "Payments" violates check constraint "CK_Payments_Amount"
+[Passed] Database_accepts_valid_edge_cases(case: "budget minimum equal to maximum")
+[Passed] Database_rejects_invalid_data(case: "budget minimum above maximum", sqlState: "23514", constraint: "CK_TravelPreferences_Budget")
+    budget minimum above maximum: 23514 CK_TravelPreferences_Budget - new row for relation "TravelPreferences" violates check constraint "CK_TravelPreferences_Budget"
+[Passed] Database_rejects_invalid_data(case: "room capacity of zero", sqlState: "23514", constraint: "CK_Rooms_Capacity")
+    room capacity of zero: 23514 CK_Rooms_Capacity - new row for relation "Rooms" violates check constraint "CK_Rooms_Capacity"
+[Passed] Unit_of_work_rolls_back_everything_when_the_action_fails
+[Passed] Migrations_build_the_schema_match_the_model_and_roll_back_cleanly
+    applied 6 migrations: 20260914142854_InitialCreate, 20260917131635_AddPackageActivity, 20260919134738_AddItineraryPlanFields, 20260919142435_AddApprovalStatus, 20260929064500_AddHotelAndPackageImages, 20261001105903_AddDomainModelV2
+[Passed] Database_rejects_invalid_data(case: "second review for the same booking", sqlState: "23505", constraint: "IX_Reviews_BookingId")
+    second review for the same booking: 23505 IX_Reviews_BookingId - duplicate key value violates unique constraint "IX_Reviews_BookingId"
+[Passed] Database_rejects_invalid_data(case: "negative room price", sqlState: "23514", constraint: "CK_Rooms_Price")
+    negative room price: 23514 CK_Rooms_Price - new row for relation "Rooms" violates check constraint "CK_Rooms_Price"
+[Passed] Database_rejects_invalid_data(case: "delete a destination that has packages (restrict)", sqlState: "23503", constraint: "FK_TravelPackages_Destinations_DestinationId")
+    delete a destination that has packages (restrict): 23503 FK_TravelPackages_Destinations_DestinationId - update or delete on table "Destinations" violates foreign key constraint "FK_TravelPackages_Destinations_DestinationId" on table "TravelPackages"
+[Passed] Audit_timestamps_are_set_on_insert_and_only_updated_at_moves_on_update
+[Passed] Database_rejects_invalid_data(case: "duplicate role name", sqlState: "23505", constraint: "IX_Roles_Name")
+    duplicate role name: 23505 IX_Roles_Name - duplicate key value violates unique constraint "IX_Roles_Name"
+[Passed] Database_rejects_invalid_data(case: "review targeting a hotel and a package", sqlState: "23514", constraint: "CK_Reviews_Target")
+    review targeting a hotel and a package: 23514 CK_Reviews_Target - new row for relation "Reviews" violates check constraint "CK_Reviews_Target"
+[Passed] Database_rejects_invalid_data(case: "payment without a currency", sqlState: "23502", constraint: "")
+    payment without a currency: 23502  - null value in column "Currency" of relation "Payments" violates not-null constraint
+[Passed] Database_rejects_invalid_data(case: "payment for a missing booking", sqlState: "23503", constraint: "FK_Payments_Bookings_BookingId")
+    payment for a missing booking: 23503 FK_Payments_Bookings_BookingId - insert or update on table "Payments" violates foreign key constraint "FK_Payments_Bookings_BookingId"
+[Passed] Database_rejects_invalid_data(case: "duplicate payment reference", sqlState: "23505", constraint: "IX_Payments_TransactionReference")
+    duplicate payment reference: 23505 IX_Payments_TransactionReference - duplicate key value violates unique constraint "IX_Payments_TransactionReference"
+[Passed] Database_rejects_invalid_data(case: "rating of six", sqlState: "23514", constraint: "CK_Reviews_Rating")
+    rating of six: 23514 CK_Reviews_Rating - new row for relation "Reviews" violates check constraint "CK_Reviews_Rating"
+[Passed] Database_rejects_invalid_data(case: "delete a booking that has a payment (restrict)", sqlState: "23503", constraint: "FK_Payments_Bookings_BookingId")
+    delete a booking that has a payment (restrict): 23503 FK_Payments_Bookings_BookingId - update or delete on table "Bookings" violates foreign key constraint "FK_Payments_Bookings_BookingId" on table "Payments"
+[Passed] Booking_written_through_the_api_is_stored_consistently
+[Passed] Seeding_twice_does_not_duplicate_reference_data
+    roles/destinations/settings/demo users: 4/9/5/3
+[Passed] Database_rejects_invalid_data(case: "negative booking total", sqlState: "23514", constraint: "CK_Bookings_TotalPrice")
+    negative booking total: 23514 CK_Bookings_TotalPrice - new row for relation "Bookings" violates check constraint "CK_Bookings_TotalPrice"
+[Passed] Database_accepts_valid_edge_cases(case: "package booking without a room")
+[Passed] Database_rejects_invalid_data(case: "check-out equal to check-in", sqlState: "23514", constraint: "CK_Bookings_Dates")
+    check-out equal to check-in: 23514 CK_Bookings_Dates - new row for relation "Bookings" violates check constraint "CK_Bookings_Dates"
+[Passed] Delete_behaviours_cascade_or_set_null_as_configured
+[Passed] Database_rejects_invalid_data(case: "activity on day zero", sqlState: "23514", constraint: "CK_PackageActivities_Day")
+    activity on day zero: 23514 CK_PackageActivities_Day - new row for relation "PackageActivities" violates check constraint "CK_PackageActivities_Day"
+[Passed] Database_accepts_valid_edge_cases(case: "overlap with a cancelled stay")
+[Passed] Database_rejects_invalid_data(case: "rating of zero", sqlState: "23514", constraint: "CK_Reviews_Rating")
+    rating of zero: 23514 CK_Reviews_Rating - new row for relation "Reviews" violates check constraint "CK_Reviews_Rating"
+[Passed] Database_rejects_invalid_data(case: "booking for a missing user", sqlState: "23503", constraint: "FK_Bookings_AspNetUsers_UserId")
+    booking for a missing user: 23503 FK_Bookings_AspNetUsers_UserId - insert or update on table "Bookings" violates foreign key constraint "FK_Bookings_AspNetUsers_UserId"
+[Passed] Database_rejects_invalid_data(case: "hotel without a name", sqlState: "23502", constraint: "")
+    hotel without a name: 23502  - null value in column "Name" of relation "Hotels" violates not-null constraint
+[Passed] Database_rejects_invalid_data(case: "itinerary ending before it starts", sqlState: "23514", constraint: "CK_Itineraries_Dates")
+    itinerary ending before it starts: 23514 CK_Itineraries_Dates - new row for relation "Itineraries" violates check constraint "CK_Itineraries_Dates"
+[Passed] Every_domain_table_and_named_constraint_exists
+    22 check/exclusion constraints in the schema: CK_Bookings_Dates, CK_Bookings_Guests, CK_Bookings_RoomOrPackage, CK_Bookings_TotalPrice, CK_Itineraries_Dates, CK_Itineraries_Travelers, CK_PackageActivities_Day, CK_PackageActivities_Price, CK_Payments_Amount, CK_Reviews_Rating, CK_Reviews_Target, CK_RoomAvailability_Price, CK_Rooms_Capacity, CK_Rooms_Price, CK_Transportation_Capacity, CK_Transportation_Duration, CK_Transportation_Price, CK_TravelPackages_Duration, CK_TravelPackages_MaxTravelers, CK_TravelPackages_Price, CK_TravelPreferences_Budget, EX_Bookings_Room_NoOverlap
+    33 foreign keys
+[Passed] Database_accepts_valid_edge_cases(case: "back-to-back stays in the same room")
+[Passed] Database_rejects_invalid_data(case: "delete a role that users hold (restrict)", sqlState: "23503", constraint: "FK_AspNetUsers_Roles_RoleId")
+    delete a role that users hold (restrict): 23503 FK_AspNetUsers_Roles_RoleId - update or delete on table "Roles" violates foreign key constraint "FK_AspNetUsers_Roles_RoleId" on table "AspNetUsers"
+[Passed] Database_rejects_invalid_data(case: "zero guests", sqlState: "23514", constraint: "CK_Bookings_Guests")
+    zero guests: 23514 CK_Bookings_Guests - new row for relation "Bookings" violates check constraint "CK_Bookings_Guests"
+[Passed] Concurrent_edits_of_a_booking_are_detected_by_the_row_version
+[Passed] Database_rejects_invalid_data(case: "two calendar overrides for one room night", sqlState: "23505", constraint: "IX_RoomAvailability_RoomId_Date")
+    two calendar overrides for one room night: 23505 IX_RoomAvailability_RoomId_Date - duplicate key value violates unique constraint "IX_RoomAvailability_RoomId_Date"
+[Passed] Database_rejects_invalid_data(case: "two accounts with the same normalised email", sqlState: "23505", constraint: "UX_AspNetUsers_NormalizedEmail")
+    two accounts with the same normalised email: 23505 UX_AspNetUsers_NormalizedEmail - duplicate key value violates unique constraint "UX_AspNetUsers_NormalizedEmail"
+[Passed] Database_rejects_invalid_data(case: "duplicate destination name in a country", sqlState: "23505", constraint: "IX_Destinations_Name_Country")
+    duplicate destination name in a country: 23505 IX_Destinations_Name_Country - duplicate key value violates unique constraint "IX_Destinations_Name_Country"
+[Passed] Database_rejects_invalid_data(case: "booking for a room and a package", sqlState: "23514", constraint: "CK_Bookings_RoomOrPackage")
+    booking for a room and a package: 23514 CK_Bookings_RoomOrPackage - new row for relation "Bookings" violates check constraint "CK_Bookings_RoomOrPackage"
+[Passed] Database_rejects_invalid_data(case: "duplicate system setting key", sqlState: "23505", constraint: "IX_SystemSettings_Key")
+    duplicate system setting key: 23505 IX_SystemSettings_Key - duplicate key value violates unique constraint "IX_SystemSettings_Key"
+[Passed] Database_rejects_invalid_data(case: "package for zero travelers", sqlState: "23514", constraint: "CK_TravelPackages_MaxTravelers")
+    package for zero travelers: 23514 CK_TravelPackages_MaxTravelers - new row for relation "TravelPackages" violates check constraint "CK_TravelPackages_MaxTravelers"
+[Passed] Database_rejects_invalid_data(case: "room pointing at a missing hotel", sqlState: "23503", constraint: "FK_Rooms_Hotels_HotelId")
+    room pointing at a missing hotel: 23503 FK_Rooms_Hotels_HotelId - insert or update on table "Rooms" violates foreign key constraint "FK_Rooms_Hotels_HotelId"
+[Passed] Database_accepts_valid_edge_cases(case: "overlapping stays in different rooms")
+[Passed] Database_rejects_invalid_data(case: "package lasting zero days", sqlState: "23514", constraint: "CK_TravelPackages_Duration")
+    package lasting zero days: 23514 CK_TravelPackages_Duration - new row for relation "TravelPackages" violates check constraint "CK_TravelPackages_Duration"
+[Passed] Database_rejects_invalid_data(case: "booking without a user", sqlState: "23502", constraint: "")
+    booking without a user: 23502  - null value in column "UserId" of relation "Bookings" violates not-null constraint
+[Passed] Database_rejects_invalid_data(case: "booking for a missing room", sqlState: "23503", constraint: "FK_Bookings_Rooms_RoomId")
+    booking for a missing room: 23503 FK_Bookings_Rooms_RoomId - insert or update on table "Bookings" violates foreign key constraint "FK_Bookings_Rooms_RoomId"
+[Passed] Database_rejects_invalid_data(case: "overlapping stays in the same room", sqlState: "23P01", constraint: "EX_Bookings_Room_NoOverlap")
+    overlapping stays in the same room: 23P01 EX_Bookings_Room_NoOverlap - conflicting key value violates exclusion constraint "EX_Bookings_Room_NoOverlap"
+[Passed] Database_rejects_invalid_data(case: "same stay booked twice", sqlState: "23P01", constraint: "EX_Bookings_Room_NoOverlap")
+    same stay booked twice: 23P01 EX_Bookings_Room_NoOverlap - conflicting key value violates exclusion constraint "EX_Bookings_Room_NoOverlap"
+[Passed] Database_rejects_invalid_data(case: "destination without a country", sqlState: "23502", constraint: "")
+    destination without a country: 23502  - null value in column "Country" of relation "Destinations" violates not-null constraint
+[Passed] Database_accepts_valid_edge_cases(case: "one review per booking")
+[Passed] Database_rejects_invalid_data(case: "booking for neither room nor package", sqlState: "23514", constraint: "CK_Bookings_RoomOrPackage")
+    booking for neither room nor package: 23514 CK_Bookings_RoomOrPackage - new row for relation "Bookings" violates check constraint "CK_Bookings_RoomOrPackage"
+[Passed] Database_rejects_invalid_data(case: "delete a room that has a booking (restrict)", sqlState: "23503", constraint: "FK_Bookings_Rooms_RoomId")
+    delete a room that has a booking (restrict): 23503 FK_Bookings_Rooms_RoomId - update or delete on table "Rooms" violates foreign key constraint "FK_Bookings_Rooms_RoomId" on table "Bookings"
+[Passed] Database_rejects_invalid_data(case: "duplicate room name in a hotel", sqlState: "23505", constraint: "IX_Rooms_HotelId_Name")
+    duplicate room name in a hotel: 23505 IX_Rooms_HotelId_Name - duplicate key value violates unique constraint "IX_Rooms_HotelId_Name"
+[Passed] Database_rejects_invalid_data(case: "negative price override", sqlState: "23514", constraint: "CK_RoomAvailability_Price")
+    negative price override: 23514 CK_RoomAvailability_Price - new row for relation "RoomAvailability" violates check constraint "CK_RoomAvailability_Price"
+[Passed] Database_accepts_valid_edge_cases(case: "same-day itinerary")
