@@ -1,7 +1,9 @@
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TravelAdvisor.Core.Interfaces;
 
@@ -12,15 +14,20 @@ public class OpenAiCompatClient : ILlmClient
 {
     private readonly HttpClient _http;
     private readonly AiOptions _options;
+    private readonly LlmAvailability _availability;
+    private readonly ILogger<OpenAiCompatClient> _logger;
 
-    public OpenAiCompatClient(HttpClient http, IOptions<AiOptions> options)
+    public OpenAiCompatClient(HttpClient http, IOptions<AiOptions> options, LlmAvailability availability, ILogger<OpenAiCompatClient> logger)
     {
         _http = http;
         _options = options.Value;
+        _availability = availability;
+        _logger = logger;
         _http.Timeout = TimeSpan.FromSeconds(Math.Clamp(_options.TimeoutSeconds, 5, 300));
     }
 
-    public bool IsConfigured => !string.IsNullOrWhiteSpace(_options.ApiKey);
+    /// <summary>False without a key, and for a while after the provider rejects the key.</summary>
+    public bool IsConfigured => !string.IsNullOrWhiteSpace(_options.ApiKey) && !_availability.IsSuspended;
 
     public async Task<string> CompleteAsync(
         string systemPrompt,
@@ -141,6 +148,15 @@ public class OpenAiCompatClient : ILlmClient
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
+            // A rejected key will not start working on the next request; timeouts and 5xx might, so only these suspend.
+            if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
+            {
+                _availability.Suspend();
+                _logger.LogError(
+                    "The AI provider rejected the API key ({Status}). Using the deterministic planner until {Until:u}; check Ai:ApiKey.",
+                    (int)response.StatusCode, _availability.SuspendedUntil);
+            }
+
             var snippet = body.Length > 300 ? body[..300] + "..." : body;
             throw new HttpRequestException($"LLM request failed ({(int)response.StatusCode}): {snippet}", null, response.StatusCode);
         }

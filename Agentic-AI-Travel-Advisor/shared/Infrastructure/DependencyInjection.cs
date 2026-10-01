@@ -71,6 +71,7 @@ public static class DependencyInjection
         services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 
         services.Configure<AI.AiOptions>(configuration.GetSection(AI.AiOptions.SectionName));
+        services.AddSingleton<AI.LlmAvailability>();
         services.AddHttpClient<ILlmClient, AI.OpenAiCompatClient>();
         services.AddScoped<ICatalogTools, AI.CatalogTools>();
         services.AddSingleton<AI.Safety.OutputSanitizer>();

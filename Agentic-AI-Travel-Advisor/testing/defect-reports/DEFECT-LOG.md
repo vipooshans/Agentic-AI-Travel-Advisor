@@ -385,3 +385,22 @@ Defects below were found while implementing and executing tests.
   - `Def025_saved_itinerary_keeps_the_order_of_items_within_each_day` passes: per-day numbering, no sort orders, and explicit reordering.
   - Full suites: unit 397 passed / 35 skipped, API 130 passed.
   - The E2E journey now compares the saved items, ordered by day and sort order, with the plan stored in the conversation, and passes (`e2e-full-suite.log`).
+
+## DEF-026 A rejected AI API key adds a failed provider call to every chat request
+- **Severity / Priority:** Medium / P2
+- **Description:** When `Ai:ApiKey` is set but the provider rejects it (wrong, placeholder or revoked key), `AgentOrchestrator` tried the model on every chat request. Each try waited for the provider's 401, logged a warning and then fell back to the deterministic planner. Users still got a correct deterministic answer, but every non-refused request paid about 0.4 s for the failed round trip, and the log filled with one warning per request. There was no back-off.
+- **Found by:** The k6 AI chat load test (Phase 9). Requests answered by the deterministic planner took about 420 ms, while refused requests (which skip the model) took about 10 ms. The tools took about 36 ms in total. The API log of that run held 481 `LLM orchestration failed` warnings, each caused by `LLM request failed (401) ... invalid_api_key`. The local user-secrets `Ai:ApiKey` was a placeholder.
+- **Steps to reproduce:** Set `Ai:ApiKey` to an invalid key and start the API. Send several `POST /api/ai/chat` requests (for example "Hello there", or a 3-day trip to Ella) and time them, then count the fallback warnings in the API log (`testing/scripts/def026-ai-latency-probe.ps1`).
+- **Expected:** At most one provider call fails. The client then stops calling the provider for a cool-down period, and later requests take only the deterministic planner's time.
+- **Actual:** Six requests made six failing provider calls, and each took 419–961 ms.
+- **Evidence:** `testing/execution-results/phase9-nfr/def026-before-fix.log`, `k6-ai-chat-rejected-key.log`, `def026-after-fix.log`, `def026-live-retest.log`.
+- **Status:** Retested (Closed)
+- **Fix:**
+  - A new singleton, `LlmAvailability`, records a 10-minute suspension when the provider answers 401 or 403. `OpenAiCompatClient.IsConfigured` is false while the suspension lasts, so the orchestrator goes straight to the deterministic planner.
+  - One error is logged per suspension, naming `Ai:ApiKey` and the time it ends.
+  - Timeouts, 429, 400 and 5xx do not suspend, because they can be transient or specific to one request.
+  - After the cool-down the key is tried again, so a corrected or restored key starts working without a restart.
+- **Retest result:** 2026-10-01.
+  - `OpenAiCompatClientTests` (7 tests) pass. They cover 401 and 403 suspending until the cool-down ends with no HTTP call in between, then working again; 500, 429 and 400 not suspending; the suspension being shared across client instances; and a missing key.
+  - Full suites: unit 411 passed / 35 skipped (live LLM), API 130 passed (`backend-unit-tests-def026.log`, `backend-api-tests-def026.log`).
+  - Live probe against the rebuilt API, with the same rejected key: one failed provider call and one "rejected the API key" error in total. Warm requests then took 15–23 ms (clarification) and 55–56 ms (plan), instead of 419–449 ms. The first requests after the restart were slower (342–1395 ms) because of start-up warm-up.

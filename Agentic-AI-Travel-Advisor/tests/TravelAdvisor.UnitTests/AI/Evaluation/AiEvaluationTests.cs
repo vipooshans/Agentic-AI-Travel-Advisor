@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using TravelAdvisor.Infrastructure.AI;
 using Xunit;
@@ -64,7 +65,7 @@ public class AiLiveEvaluationTests(LiveAiEvalReport report, ITestOutputHelper ou
             options.Model = model;
 
         using var http = new HttpClient();
-        var llm = new OpenAiCompatClient(http, Options.Create(options));
+        var llm = new OpenAiCompatClient(http, Options.Create(options), new LlmAvailability(TimeProvider.System), NullLogger<OpenAiCompatClient>.Instance);
         var evalCase = AiEvalCases.Get(id);
         var result = await EvalRunner.RunAsync(evalCase, llm);
         report.Record(result);
