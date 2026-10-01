@@ -1,4 +1,6 @@
 -- Travel Advisor — Initial Schema Reference
+-- HISTORICAL: this hand-written sketch predates later migrations and is out of date.
+-- The current schema is database/schemas/full_schema.sql (generated from the migrations).
 -- Source of truth: EF Core migration in shared/Infrastructure/Migrations/
 
 -- Application roles (custom RBAC)

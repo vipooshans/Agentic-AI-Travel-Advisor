@@ -31,3 +31,6 @@ testing/**/node_modules/
 
 # Test output (raw); curated evidence lives under testing/
 TestResults/
+
+# Automation plan that the ZAP baseline script regenerates in its work folder on every run
+testing/security/zap/zap.yaml
