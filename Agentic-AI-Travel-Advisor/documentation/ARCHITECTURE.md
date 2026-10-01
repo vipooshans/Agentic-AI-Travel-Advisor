@@ -123,11 +123,11 @@ recommendations, and returns a `ChatResponse`.
 ```
 message
   → PromptInjectionGuard ── blocked ──► status "refused"
-  → confirmation of a pending proposal? ──► BookingAgent.ConfirmAsync → CreateBooking tool → BookingService
+  → confirmation of a pending proposal? ──► BookingAgent.ConfirmAsync → createBooking tool → BookingService
   → LLM configured and not suspended?
         yes → LLM tool loop (max Ai:MaxToolIterations rounds, max 6 tool calls per round)
               any failure → fall back ▼
-        no  → deterministic agents (TravelPlanningAgent → GenerateItinerary tool → RecommendationAgent + ItineraryAgent)
+        no  → deterministic agents (TravelPlanningAgent → generateItinerary tool → RecommendationAgent + ItineraryAgent)
   → output checks: system-prompt leak, unverified booking claim, redaction
   → ChatResponse { status, message, plan, pendingBooking, booking, mode, agents, toolCalls }
 ```
@@ -149,15 +149,18 @@ may not use are not even offered to the LLM.
 
 | Tool | Allowed roles | Backend source |
 |------|---------------|----------------|
-| `SearchDestinations` | any | catalog queries |
-| `SearchHotels` | any | approved hotels and rooms |
-| `SearchTravelPackages` | any | approved packages with activities |
-| `SearchActivities` | any | activities of approved packages |
-| `SearchTransportation` | any | active transport routes |
-| `CheckAvailability` | any | `BookingService` availability quote |
-| `GetTravelPreferences` | `USER` | the caller's saved preferences |
-| `GenerateItinerary` | any | Recommendation + Itinerary agents |
-| `CreateBooking` | `USER` | creates a proposal; books only for a confirmed proposal |
+| `searchDestinations` | any | catalog queries |
+| `searchHotels` | any | approved hotels and rooms |
+| `searchTravelPackages` | any | approved packages with activities |
+| `searchActivities` | any | activities of approved packages |
+| `searchTransportation` | any | active transport routes |
+| `checkAvailability` | any | `BookingService` availability quote |
+| `getTravelPreferences` | `USER` | the caller's saved preferences |
+| `generateItinerary` | any | Recommendation + Itinerary agents |
+| `createBooking` | `USER` | creates a proposal; books only for a proposal the server saw the user confirm |
+
+Catalog text written by providers (descriptions, notes) is filtered by `PromptInjectionGuard.SanitizeUntrusted`
+and truncated before it is passed to the model, so a listing cannot smuggle instructions into the prompt.
 
 ### Safety measures
 
@@ -203,7 +206,9 @@ may not use are not even offered to the LLM.
 
 ### MVC portal (`web-app`)
 
-Server-rendered portal for hotel owners, travel agents and admins. It signs in through the API, keeps the JWT
+Server-rendered portal for hotel owners, travel agents and admins (travelers are turned away). It covers
+listings, rooms, packages, activities, approvals, users and bookings; transport, room calendars, reviews,
+settings and statistics are only in the React app. It signs in through the API, keeps the JWT
 in an authentication cookie and forwards it with `JwtCookieHandler` on every `TravelApiClient` call
 (`ApiSettings:BaseUrl`). It has no database access of its own.
 
@@ -227,7 +232,8 @@ indexes, check constraints and the booking exclusion constraint. See [DATABASE.m
 
 `docker-compose.yml` runs PostgreSQL (host port 5433), the API (host port 5000, Production) and the MVC portal
 (host port 7000). Secrets come from `.env` (`POSTGRES_PASSWORD`, `JWT_KEY`, optional `AI_API_KEY`). Demo
-accounts are seeded only with `SEED_DEMO_USERS=true`.
+accounts are seeded only with `SEED_DEMO_USERS=true`: Compose defaults it to false, but `.env.example` sets it
+to true for classroom demos. The React app is not part of the Compose file.
 
 ## Testing
 

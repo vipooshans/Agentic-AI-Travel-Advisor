@@ -88,7 +88,8 @@ Configured with `RateLimiting:Enabled`, `RateLimiting:AuthPermitsPerMinute` and 
 
 ## Enumerations
 
-Enums are sent and returned as integers.
+Enums are sent and returned as integers. Two exceptions: inside the AI `plan`, `transportation[].mode` is the
+mode name (e.g. `"Train"`), and the `bookingsByStatus` dictionary in statistics is keyed by status name.
 
 | Enum | Values |
 |------|--------|
@@ -204,7 +205,7 @@ Booking rules enforced by the backend:
 - The hotel or package must be approved (400) and the room must be on sale (409).
 - Check-in cannot be in the past or more than `Booking.MaxAdvanceDays` (default 365) days ahead. Room
   bookings need a check-out after check-in and at most 30 nights. Guests must fit the room capacity or the
-  package's maximum travelers.
+  package's maximum travelers (400), and the package places still free on that start date (409).
 - Bookings run in a transaction that locks the room or package row, and a PostgreSQL exclusion constraint
   blocks overlapping stays on the same room. Overlaps and blocked calendar nights return 409; when 8
   identical requests race, exactly one succeeds. A traveler cannot book the same package twice on one date (409).
@@ -248,7 +249,7 @@ never stored. The test card `4000 0000 0000 0002` is always declined, which reco
 | GET | `/api/hotels/{hotelId}/reviews` | Public | Visible reviews; author shown as first name and last initial |
 | GET | `/api/packages/{packageId}/reviews` | Public | |
 | GET | `/api/reviews?status&hotelId&travelPackageId` | Authenticated | Travelers see their own reviews, owners and agents the visible reviews of their listings, admins all (with filters) |
-| POST | `/api/reviews` | `RequireUser` | `{ bookingId, rating (1–5), comment }` — booking must be yours and Completed (400 otherwise); one review per booking (409) |
+| POST | `/api/reviews` | `RequireUser` | `{ bookingId, rating (1–5), comment (max 2000) }` — someone else's booking is 404, an uncompleted one 400; one review per booking (409) |
 | PUT | `/api/reviews/{id}` | `RequireUser` (own review) | |
 | DELETE | `/api/reviews/{id}` | Authenticated (author or admin) | |
 | PATCH | `/api/reviews/{id}/status` | `RequireAdmin` | Moderation: `{ status }` 0 Visible / 1 Hidden |
@@ -282,9 +283,9 @@ Known keys: `Platform.DefaultCurrency`, `Platform.MaintenanceMessage`, `Booking.
 
 ### Health — `/api/health`
 
-| Method | Route | Access |
-|--------|-------|--------|
-| GET | `/` | Public |
+| Method | Route | Access | Notes |
+|--------|-------|--------|-------|
+| GET | `/` | Public | `{ status: "healthy" \| "unhealthy", database: "connected" \| "disconnected", timestamp }` |
 
 ## AI assistant — `/api/ai`
 
@@ -301,7 +302,8 @@ Known keys: `Platform.DefaultCurrency`, `Platform.MaintenanceMessage`, `Booking.
 { "conversationId": null, "message": "Plan a 3 day trip to Ella for 2 people, budget 60000 LKR", "confirmBookingId": null }
 ```
 
-Omit `conversationId` to start a new conversation; send the returned id to continue it.
+Omit `conversationId` to start a new conversation; send the returned id to continue it. `message` is required
+and limited to 2000 characters. Two requests racing on the same conversation get 409 for the second one.
 
 ### Chat response
 

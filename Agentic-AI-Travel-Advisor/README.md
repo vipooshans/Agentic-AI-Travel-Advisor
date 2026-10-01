@@ -41,7 +41,8 @@ docker compose up --build
 | PostgreSQL (from the host) | `localhost:5433` |
 
 The API container runs in Production and applies migrations on startup. Demo accounts and the demo catalog are
-only seeded with `SEED_DEMO_USERS=true` in `.env`. Optional: `AI_API_KEY`, `AI_BASE_URL`, `AI_MODEL`.
+only seeded when `SEED_DEMO_USERS=true`. `.env.example` sets it to true for demos; set it to false (the Compose
+default) for anything else. Optional: `AI_API_KEY`, `AI_BASE_URL`, `AI_MODEL`.
 
 ## Local development
 
