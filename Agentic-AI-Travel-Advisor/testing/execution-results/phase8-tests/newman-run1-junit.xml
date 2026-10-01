@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Travel Advisor API" tests="79" time="2.923">
+  <testsuite name="01 Health and public catalog / Health check" id="b3b5ebed-fa15-401d-929b-d993dee61683" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.098">
+    <testcase name="no secrets or stack traces in the response" time="0.098" classname="01HealthAndPublicCatalogHealthCheck"/>
+    <testcase name="responds within 5 s" time="0.098" classname="01HealthAndPublicCatalogHealthCheck"/>
+    <testcase name="status is 200" time="0.098" classname="01HealthAndPublicCatalogHealthCheck"/>
+    <testcase name="API and database are healthy" time="0.098" classname="01HealthAndPublicCatalogHealthCheck"/>
+  </testsuite>
+  <testsuite name="01 Health and public catalog / Public settings" id="c83086b4-f455-4aeb-9614-7e18593126b6" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.098">
+    <testcase name="no secrets or stack traces in the response" time="0.098" classname="01HealthAndPublicCatalogPublicSettings"/>
+    <testcase name="responds within 5 s" time="0.098" classname="01HealthAndPublicCatalogPublicSettings"/>
+    <testcase name="status is 200" time="0.098" classname="01HealthAndPublicCatalogPublicSettings"/>
+    <testcase name="exposes only public settings" time="0.098" classname="01HealthAndPublicCatalogPublicSettings"/>
+  </testsuite>
+  <testsuite name="01 Health and public catalog / List destinations" id="2f587d39-c037-4ed3-a7e6-84d2237dc1d0" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.011">
+    <testcase name="no secrets or stack traces in the response" time="0.011" classname="01HealthAndPublicCatalogListDestinations"/>
+    <testcase name="responds within 5 s" time="0.011" classname="01HealthAndPublicCatalogListDestinations"/>
+    <testcase name="status is 200" time="0.011" classname="01HealthAndPublicCatalogListDestinations"/>
+    <testcase name="includes Ella" time="0.011" classname="01HealthAndPublicCatalogListDestinations"/>
+  </testsuite>
+  <testsuite name="01 Health and public catalog / Get destination" id="4d7e79bf-f4dc-4c76-8c86-0ce9541bcc36" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.031">
+    <testcase name="no secrets or stack traces in the response" time="0.031" classname="01HealthAndPublicCatalogGetDestination"/>
+    <testcase name="responds within 5 s" time="0.031" classname="01HealthAndPublicCatalogGetDestination"/>
+    <testcase name="status is 200" time="0.031" classname="01HealthAndPublicCatalogGetDestination"/>
+    <testcase name="returns the requested destination" time="0.031" classname="01HealthAndPublicCatalogGetDestination"/>
+  </testsuite>
+  <testsuite name="01 Health and public catalog / Unknown destination is 404" id="653c0723-a6e0-49bd-b2f4-d7a69debfc0d" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="no secrets or stack traces in the response" time="0.008" classname="01HealthAndPublicCatalogUnknownDestinationIs404"/>
+    <testcase name="error body is ProblemDetails" time="0.008" classname="01HealthAndPublicCatalogUnknownDestinationIs404"/>
+    <testcase name="responds within 5 s" time="0.008" classname="01HealthAndPublicCatalogUnknownDestinationIs404"/>
+    <testcase name="status is 404" time="0.008" classname="01HealthAndPublicCatalogUnknownDestinationIs404"/>
+  </testsuite>
+  <testsuite name="01 Health and public catalog / Search hotels lists approved hotels only" id="b4cf74ca-4bb2-4913-a19b-df0483fea302" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.026">
+    <testcase name="no secrets or stack traces in the response" time="0.026" classname="01HealthAndPublicCatalogSearchHotelsListsApprovedHotelsOnly"/>
+    <testcase name="responds within 5 s" time="0.026" classname="01HealthAndPublicCatalogSearchHotelsListsApprovedHotelsOnly"/>
+    <testcase name="status is 200" time="0.026" classname="01HealthAndPublicCatalogSearchHotelsListsApprovedHotelsOnly"/>
+    <testcase name="every hotel is approved" time="0.026" classname="01HealthAndPublicCatalogSearchHotelsListsApprovedHotelsOnly"/>
+  </testsuite>
+  <testsuite name="01 Health and public catalog / List packages" id="2e13e601-1797-4908-8edd-b63ac7d44fd2" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="no secrets or stack traces in the response" time="0.008" classname="01HealthAndPublicCatalogListPackages"/>
+    <testcase name="responds within 5 s" time="0.008" classname="01HealthAndPublicCatalogListPackages"/>
+    <testcase name="status is 200" time="0.008" classname="01HealthAndPublicCatalogListPackages"/>
+    <testcase name="returns an array of packages with prices" time="0.008" classname="01HealthAndPublicCatalogListPackages"/>
+  </testsuite>
+  <testsuite name="01 Health and public catalog / List transportation" id="8144eed2-e75a-4db9-b89d-dabf4a5cc8cf" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.044">
+    <testcase name="no secrets or stack traces in the response" time="0.044" classname="01HealthAndPublicCatalogListTransportation"/>
+    <testcase name="responds within 5 s" time="0.044" classname="01HealthAndPublicCatalogListTransportation"/>
+    <testcase name="status is 200" time="0.044" classname="01HealthAndPublicCatalogListTransportation"/>
+    <testcase name="returns an array" time="0.044" classname="01HealthAndPublicCatalogListTransportation"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Register traveler" id="d46dfa69-c800-49e0-8eaf-106a1062c239" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.072">
+    <testcase name="no secrets or stack traces in the response" time="0.072" classname="02AuthenticationRegisterTraveler"/>
+    <testcase name="responds within 5 s" time="0.072" classname="02AuthenticationRegisterTraveler"/>
+    <testcase name="status is 200" time="0.072" classname="02AuthenticationRegisterTraveler"/>
+    <testcase name="new account is a USER with a token" time="0.072" classname="02AuthenticationRegisterTraveler"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Register second traveler" id="51e05716-30f2-4c07-99c3-174db21ff08a" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.056">
+    <testcase name="no secrets or stack traces in the response" time="0.056" classname="02AuthenticationRegisterSecondTraveler"/>
+    <testcase name="responds within 5 s" time="0.056" classname="02AuthenticationRegisterSecondTraveler"/>
+    <testcase name="status is 200" time="0.056" classname="02AuthenticationRegisterSecondTraveler"/>
+    <testcase name="stores the second token" time="0.056" classname="02AuthenticationRegisterSecondTraveler"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Duplicate email is 409" id="5cb473a9-bde4-4e3c-9564-a33edcaf9fdf" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="no secrets or stack traces in the response" time="0.008" classname="02AuthenticationDuplicateEmailIs409"/>
+    <testcase name="error body is ProblemDetails" time="0.008" classname="02AuthenticationDuplicateEmailIs409"/>
+    <testcase name="responds within 5 s" time="0.008" classname="02AuthenticationDuplicateEmailIs409"/>
+    <testcase name="status is 409" time="0.008" classname="02AuthenticationDuplicateEmailIs409"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Weak password is 400" id="74d7c89d-2255-42ed-b395-d018b92f57a5" timestamp="2026-10-01T15:32:22.462Z" tests="5" failures="0" errors="0" time="0.014">
+    <testcase name="no secrets or stack traces in the response" time="0.014" classname="02AuthenticationWeakPasswordIs400"/>
+    <testcase name="error body is ProblemDetails" time="0.014" classname="02AuthenticationWeakPasswordIs400"/>
+    <testcase name="responds within 5 s" time="0.014" classname="02AuthenticationWeakPasswordIs400"/>
+    <testcase name="status is 400" time="0.014" classname="02AuthenticationWeakPasswordIs400"/>
+    <testcase name="names the password field" time="0.014" classname="02AuthenticationWeakPasswordIs400"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Registration cannot pick a role" id="72d8c469-7045-4880-8fcd-b9cad3e06909" timestamp="2026-10-01T15:32:22.462Z" tests="3" failures="0" errors="0" time="0.065">
+    <testcase name="no secrets or stack traces in the response" time="0.065" classname="02AuthenticationRegistrationCannotPickARole"/>
+    <testcase name="responds within 5 s" time="0.065" classname="02AuthenticationRegistrationCannotPickARole"/>
+    <testcase name="role is ignored or rejected" time="0.065" classname="02AuthenticationRegistrationCannotPickARole"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Wrong password is 401" id="9a572cd2-f3f3-469b-918b-0150659d7a49" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.088">
+    <testcase name="no secrets or stack traces in the response" time="0.088" classname="02AuthenticationWrongPasswordIs401"/>
+    <testcase name="responds within 5 s" time="0.088" classname="02AuthenticationWrongPasswordIs401"/>
+    <testcase name="status is 401" time="0.088" classname="02AuthenticationWrongPasswordIs401"/>
+    <testcase name="does not return a token" time="0.088" classname="02AuthenticationWrongPasswordIs401"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Log in as owner" id="34fbc705-3e3e-43c5-946f-8d0e0328b908" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.055">
+    <testcase name="no secrets or stack traces in the response" time="0.055" classname="02AuthenticationLogInAsOwner"/>
+    <testcase name="responds within 5 s" time="0.055" classname="02AuthenticationLogInAsOwner"/>
+    <testcase name="status is 200" time="0.055" classname="02AuthenticationLogInAsOwner"/>
+    <testcase name="returns a token for the owner" time="0.055" classname="02AuthenticationLogInAsOwner"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Log in as agent" id="fe582923-8a24-4cc2-bf02-2c60f0d931f7" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.052">
+    <testcase name="no secrets or stack traces in the response" time="0.052" classname="02AuthenticationLogInAsAgent"/>
+    <testcase name="responds within 5 s" time="0.052" classname="02AuthenticationLogInAsAgent"/>
+    <testcase name="status is 200" time="0.052" classname="02AuthenticationLogInAsAgent"/>
+    <testcase name="returns a token for the agent" time="0.052" classname="02AuthenticationLogInAsAgent"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Log in as admin" id="4c543ca2-f73d-454a-8fa0-ee2bca80ded4" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.062">
+    <testcase name="no secrets or stack traces in the response" time="0.062" classname="02AuthenticationLogInAsAdmin"/>
+    <testcase name="responds within 5 s" time="0.062" classname="02AuthenticationLogInAsAdmin"/>
+    <testcase name="status is 200" time="0.062" classname="02AuthenticationLogInAsAdmin"/>
+    <testcase name="returns a token for the admin" time="0.062" classname="02AuthenticationLogInAsAdmin"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Current user" id="88c2a4c3-6e81-4547-b780-e372124db2b8" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.007">
+    <testcase name="no secrets or stack traces in the response" time="0.007" classname="02AuthenticationCurrentUser"/>
+    <testcase name="responds within 5 s" time="0.007" classname="02AuthenticationCurrentUser"/>
+    <testcase name="status is 200" time="0.007" classname="02AuthenticationCurrentUser"/>
+    <testcase name="returns the signed-in traveler" time="0.007" classname="02AuthenticationCurrentUser"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Tampered token is 401" id="e97c413a-d2bf-4eeb-bd82-098c87fe7db5" timestamp="2026-10-01T15:32:22.462Z" tests="3" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="02AuthenticationTamperedTokenIs401"/>
+    <testcase name="responds within 5 s" time="0.002" classname="02AuthenticationTamperedTokenIs401"/>
+    <testcase name="status is 401" time="0.002" classname="02AuthenticationTamperedTokenIs401"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Missing token is 401" id="86672813-86af-4e05-90df-b4e220da5c49" timestamp="2026-10-01T15:32:22.462Z" tests="3" failures="0" errors="0" time="0.005">
+    <testcase name="no secrets or stack traces in the response" time="0.005" classname="02AuthenticationMissingTokenIs401"/>
+    <testcase name="responds within 5 s" time="0.005" classname="02AuthenticationMissingTokenIs401"/>
+    <testcase name="status is 401" time="0.005" classname="02AuthenticationMissingTokenIs401"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / USER cannot list users" id="670203e1-d7cf-4c08-9a2e-239c4d98ad82" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="03RoleBasedAccessUserCannotListUsers"/>
+    <testcase name="error body is ProblemDetails" time="0.002" classname="03RoleBasedAccessUserCannotListUsers"/>
+    <testcase name="responds within 5 s" time="0.002" classname="03RoleBasedAccessUserCannotListUsers"/>
+    <testcase name="status is 403" time="0.002" classname="03RoleBasedAccessUserCannotListUsers"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / USER cannot read settings" id="4f17d90c-5025-491e-8a5e-74cf46a032b7" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="03RoleBasedAccessUserCannotReadSettings"/>
+    <testcase name="error body is ProblemDetails" time="0.002" classname="03RoleBasedAccessUserCannotReadSettings"/>
+    <testcase name="responds within 5 s" time="0.002" classname="03RoleBasedAccessUserCannotReadSettings"/>
+    <testcase name="status is 403" time="0.002" classname="03RoleBasedAccessUserCannotReadSettings"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / USER cannot create hotels" id="f2bb0a17-778b-4964-882d-809898c76291" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="03RoleBasedAccessUserCannotCreateHotels"/>
+    <testcase name="error body is ProblemDetails" time="0.002" classname="03RoleBasedAccessUserCannotCreateHotels"/>
+    <testcase name="responds within 5 s" time="0.002" classname="03RoleBasedAccessUserCannotCreateHotels"/>
+    <testcase name="status is 403" time="0.002" classname="03RoleBasedAccessUserCannotCreateHotels"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / HOTEL_OWNER cannot list users" id="c81a754b-c720-4e1a-a487-bb875ca39630" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.004">
+    <testcase name="no secrets or stack traces in the response" time="0.004" classname="03RoleBasedAccessHotelOwnerCannotListUsers"/>
+    <testcase name="error body is ProblemDetails" time="0.004" classname="03RoleBasedAccessHotelOwnerCannotListUsers"/>
+    <testcase name="responds within 5 s" time="0.004" classname="03RoleBasedAccessHotelOwnerCannotListUsers"/>
+    <testcase name="status is 403" time="0.004" classname="03RoleBasedAccessHotelOwnerCannotListUsers"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / HOTEL_OWNER cannot create packages" id="8d3e4673-27d4-456d-8b20-32dae111e582" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="03RoleBasedAccessHotelOwnerCannotCreatePackages"/>
+    <testcase name="error body is ProblemDetails" time="0.002" classname="03RoleBasedAccessHotelOwnerCannotCreatePackages"/>
+    <testcase name="responds within 5 s" time="0.002" classname="03RoleBasedAccessHotelOwnerCannotCreatePackages"/>
+    <testcase name="status is 403" time="0.002" classname="03RoleBasedAccessHotelOwnerCannotCreatePackages"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / TRAVEL_AGENT cannot approve hotels" id="e1894af3-2ffe-498a-8e8e-b271f3348501" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.004">
+    <testcase name="no secrets or stack traces in the response" time="0.004" classname="03RoleBasedAccessTravelAgentCannotApproveHotels"/>
+    <testcase name="error body is ProblemDetails" time="0.004" classname="03RoleBasedAccessTravelAgentCannotApproveHotels"/>
+    <testcase name="responds within 5 s" time="0.004" classname="03RoleBasedAccessTravelAgentCannotApproveHotels"/>
+    <testcase name="status is 403" time="0.004" classname="03RoleBasedAccessTravelAgentCannotApproveHotels"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / TRAVEL_AGENT cannot use the AI booking assistant" id="e93f2bee-7535-456c-a7fc-ff837ab93d38" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="03RoleBasedAccessTravelAgentCannotUseTheAiBookingAssistant"/>
+    <testcase name="error body is ProblemDetails" time="0.002" classname="03RoleBasedAccessTravelAgentCannotUseTheAiBookingAssistant"/>
+    <testcase name="responds within 5 s" time="0.002" classname="03RoleBasedAccessTravelAgentCannotUseTheAiBookingAssistant"/>
+    <testcase name="status is 403" time="0.002" classname="03RoleBasedAccessTravelAgentCannotUseTheAiBookingAssistant"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / Anonymous cannot list bookings" id="09ab2a16-6aca-40c3-bc32-87686334eeb3" timestamp="2026-10-01T15:32:22.462Z" tests="3" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="03RoleBasedAccessAnonymousCannotListBookings"/>
+    <testcase name="responds within 5 s" time="0.002" classname="03RoleBasedAccessAnonymousCannotListBookings"/>
+    <testcase name="status is 401" time="0.002" classname="03RoleBasedAccessAnonymousCannotListBookings"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / ADMIN can list users" id="58975fec-6f85-40ad-ac2a-0afc64306c03" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.005">
+    <testcase name="no secrets or stack traces in the response" time="0.005" classname="03RoleBasedAccessAdminCanListUsers"/>
+    <testcase name="responds within 5 s" time="0.005" classname="03RoleBasedAccessAdminCanListUsers"/>
+    <testcase name="status is 200" time="0.005" classname="03RoleBasedAccessAdminCanListUsers"/>
+    <testcase name="no password hashes in the user list" time="0.005" classname="03RoleBasedAccessAdminCanListUsers"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / ADMIN can read platform statistics" id="0dd16269-eead-4ff5-9cb8-755a33300698" timestamp="2026-10-01T15:32:22.462Z" tests="3" failures="0" errors="0" time="0.010">
+    <testcase name="no secrets or stack traces in the response" time="0.010" classname="03RoleBasedAccessAdminCanReadPlatformStatistics"/>
+    <testcase name="responds within 5 s" time="0.010" classname="03RoleBasedAccessAdminCanReadPlatformStatistics"/>
+    <testcase name="status is 200" time="0.010" classname="03RoleBasedAccessAdminCanReadPlatformStatistics"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Owner creates a hotel (pending)" id="2b605415-77db-4b9d-b8d0-e06cd81443ad" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.010">
+    <testcase name="no secrets or stack traces in the response" time="0.010" classname="04ProviderListingsAndApprovalOwnerCreatesAHotelPending"/>
+    <testcase name="responds within 5 s" time="0.010" classname="04ProviderListingsAndApprovalOwnerCreatesAHotelPending"/>
+    <testcase name="status is 201" time="0.010" classname="04ProviderListingsAndApprovalOwnerCreatesAHotelPending"/>
+    <testcase name="new hotel waits for approval" time="0.010" classname="04ProviderListingsAndApprovalOwnerCreatesAHotelPending"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Owner adds a room" id="be7f39f9-2101-4343-8dd1-bf4f7f772f7e" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.012">
+    <testcase name="no secrets or stack traces in the response" time="0.012" classname="04ProviderListingsAndApprovalOwnerAddsARoom"/>
+    <testcase name="responds within 5 s" time="0.012" classname="04ProviderListingsAndApprovalOwnerAddsARoom"/>
+    <testcase name="status is 201" time="0.012" classname="04ProviderListingsAndApprovalOwnerAddsARoom"/>
+    <testcase name="room is stored with its price" time="0.012" classname="04ProviderListingsAndApprovalOwnerAddsARoom"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Room with zero price is 400" id="ef0c90f2-3162-4efc-8907-89d2aab815e3" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.018">
+    <testcase name="no secrets or stack traces in the response" time="0.018" classname="04ProviderListingsAndApprovalRoomWithZeroPriceIs400"/>
+    <testcase name="error body is ProblemDetails" time="0.018" classname="04ProviderListingsAndApprovalRoomWithZeroPriceIs400"/>
+    <testcase name="responds within 5 s" time="0.018" classname="04ProviderListingsAndApprovalRoomWithZeroPriceIs400"/>
+    <testcase name="status is 400" time="0.018" classname="04ProviderListingsAndApprovalRoomWithZeroPriceIs400"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Pending hotel is hidden from the public" id="2ddd6be6-ecdb-4bff-86d5-91c358301474" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="no secrets or stack traces in the response" time="0.008" classname="04ProviderListingsAndApprovalPendingHotelIsHiddenFromThePublic"/>
+    <testcase name="error body is ProblemDetails" time="0.008" classname="04ProviderListingsAndApprovalPendingHotelIsHiddenFromThePublic"/>
+    <testcase name="responds within 5 s" time="0.008" classname="04ProviderListingsAndApprovalPendingHotelIsHiddenFromThePublic"/>
+    <testcase name="status is 404" time="0.008" classname="04ProviderListingsAndApprovalPendingHotelIsHiddenFromThePublic"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Another provider cannot edit the hotel" id="24d0eec1-4a89-4537-abe7-72be917789d0" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.003">
+    <testcase name="no secrets or stack traces in the response" time="0.003" classname="04ProviderListingsAndApprovalAnotherProviderCannotEditTheHotel"/>
+    <testcase name="error body is ProblemDetails" time="0.003" classname="04ProviderListingsAndApprovalAnotherProviderCannotEditTheHotel"/>
+    <testcase name="responds within 5 s" time="0.003" classname="04ProviderListingsAndApprovalAnotherProviderCannotEditTheHotel"/>
+    <testcase name="status is 403" time="0.003" classname="04ProviderListingsAndApprovalAnotherProviderCannotEditTheHotel"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Owner cannot approve their own hotel" id="2c139cc1-6986-4028-879c-c9281a275ddd" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="04ProviderListingsAndApprovalOwnerCannotApproveTheirOwnHotel"/>
+    <testcase name="error body is ProblemDetails" time="0.002" classname="04ProviderListingsAndApprovalOwnerCannotApproveTheirOwnHotel"/>
+    <testcase name="responds within 5 s" time="0.002" classname="04ProviderListingsAndApprovalOwnerCannotApproveTheirOwnHotel"/>
+    <testcase name="status is 403" time="0.002" classname="04ProviderListingsAndApprovalOwnerCannotApproveTheirOwnHotel"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Booking a pending hotel is refused" id="767cd7ce-48d4-4af8-adcd-3aef95414212" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.018">
+    <testcase name="no secrets or stack traces in the response" time="0.018" classname="04ProviderListingsAndApprovalBookingAPendingHotelIsRefused"/>
+    <testcase name="error body is ProblemDetails" time="0.018" classname="04ProviderListingsAndApprovalBookingAPendingHotelIsRefused"/>
+    <testcase name="responds within 5 s" time="0.018" classname="04ProviderListingsAndApprovalBookingAPendingHotelIsRefused"/>
+    <testcase name="status is 400" time="0.018" classname="04ProviderListingsAndApprovalBookingAPendingHotelIsRefused"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Admin approves the hotel" id="78fe9d66-f049-4541-8bad-094948991921" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.009">
+    <testcase name="no secrets or stack traces in the response" time="0.009" classname="04ProviderListingsAndApprovalAdminApprovesTheHotel"/>
+    <testcase name="responds within 5 s" time="0.009" classname="04ProviderListingsAndApprovalAdminApprovesTheHotel"/>
+    <testcase name="status is 200" time="0.009" classname="04ProviderListingsAndApprovalAdminApprovesTheHotel"/>
+    <testcase name="hotel is approved" time="0.009" classname="04ProviderListingsAndApprovalAdminApprovesTheHotel"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Approved hotel is public" id="a14f939e-dba9-47cf-8bfe-2f9f7be61888" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.006">
+    <testcase name="no secrets or stack traces in the response" time="0.006" classname="04ProviderListingsAndApprovalApprovedHotelIsPublic"/>
+    <testcase name="responds within 5 s" time="0.006" classname="04ProviderListingsAndApprovalApprovedHotelIsPublic"/>
+    <testcase name="status is 200" time="0.006" classname="04ProviderListingsAndApprovalApprovedHotelIsPublic"/>
+    <testcase name="shows the new room" time="0.006" classname="04ProviderListingsAndApprovalApprovedHotelIsPublic"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Agent creates a package (pending)" id="558521b1-0e5f-4ac7-abdb-7c9e48aee1f3" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="no secrets or stack traces in the response" time="0.008" classname="04ProviderListingsAndApprovalAgentCreatesAPackagePending"/>
+    <testcase name="responds within 5 s" time="0.008" classname="04ProviderListingsAndApprovalAgentCreatesAPackagePending"/>
+    <testcase name="status is 201" time="0.008" classname="04ProviderListingsAndApprovalAgentCreatesAPackagePending"/>
+    <testcase name="new package waits for approval" time="0.008" classname="04ProviderListingsAndApprovalAgentCreatesAPackagePending"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Owner cannot edit the agent's package" id="39299501-ce70-4aad-a6fa-e6255e5717f0" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.003">
+    <testcase name="no secrets or stack traces in the response" time="0.003" classname="04ProviderListingsAndApprovalOwnerCannotEditTheAgentsPackage"/>
+    <testcase name="error body is ProblemDetails" time="0.003" classname="04ProviderListingsAndApprovalOwnerCannotEditTheAgentsPackage"/>
+    <testcase name="responds within 5 s" time="0.003" classname="04ProviderListingsAndApprovalOwnerCannotEditTheAgentsPackage"/>
+    <testcase name="status is 403" time="0.003" classname="04ProviderListingsAndApprovalOwnerCannotEditTheAgentsPackage"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Admin rejects the package" id="12ef31ed-320b-40d4-8c94-c3d9a30c4972" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.013">
+    <testcase name="no secrets or stack traces in the response" time="0.013" classname="04ProviderListingsAndApprovalAdminRejectsThePackage"/>
+    <testcase name="responds within 5 s" time="0.013" classname="04ProviderListingsAndApprovalAdminRejectsThePackage"/>
+    <testcase name="status is 200" time="0.013" classname="04ProviderListingsAndApprovalAdminRejectsThePackage"/>
+    <testcase name="package is rejected" time="0.013" classname="04ProviderListingsAndApprovalAdminRejectsThePackage"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Availability quote" id="3eb6fb17-f14b-4406-843c-5136f1f29456" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.011">
+    <testcase name="no secrets or stack traces in the response" time="0.011" classname="05BookingWorkflowAvailabilityQuote"/>
+    <testcase name="responds within 5 s" time="0.011" classname="05BookingWorkflowAvailabilityQuote"/>
+    <testcase name="status is 200" time="0.011" classname="05BookingWorkflowAvailabilityQuote"/>
+    <testcase name="room is free and priced by the server" time="0.011" classname="05BookingWorkflowAvailabilityQuote"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Too many guests is 400" id="80c10b3a-eca3-45d8-80ec-888bd8a46514" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.007">
+    <testcase name="no secrets or stack traces in the response" time="0.007" classname="05BookingWorkflowTooManyGuestsIs400"/>
+    <testcase name="error body is ProblemDetails" time="0.007" classname="05BookingWorkflowTooManyGuestsIs400"/>
+    <testcase name="responds within 5 s" time="0.007" classname="05BookingWorkflowTooManyGuestsIs400"/>
+    <testcase name="status is 400" time="0.007" classname="05BookingWorkflowTooManyGuestsIs400"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Check-out before check-in is 400" id="505c6843-bb08-4597-9fa6-7a6a93c496f7" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.005">
+    <testcase name="no secrets or stack traces in the response" time="0.005" classname="05BookingWorkflowCheckOutBeforeCheckInIs400"/>
+    <testcase name="error body is ProblemDetails" time="0.005" classname="05BookingWorkflowCheckOutBeforeCheckInIs400"/>
+    <testcase name="responds within 5 s" time="0.005" classname="05BookingWorkflowCheckOutBeforeCheckInIs400"/>
+    <testcase name="status is 400" time="0.005" classname="05BookingWorkflowCheckOutBeforeCheckInIs400"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Check-in in the past is 400" id="e613c26e-227d-4494-aaa1-d984a1bb2061" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.009">
+    <testcase name="no secrets or stack traces in the response" time="0.009" classname="05BookingWorkflowCheckInInThePastIs400"/>
+    <testcase name="error body is ProblemDetails" time="0.009" classname="05BookingWorkflowCheckInInThePastIs400"/>
+    <testcase name="responds within 5 s" time="0.009" classname="05BookingWorkflowCheckInInThePastIs400"/>
+    <testcase name="status is 400" time="0.009" classname="05BookingWorkflowCheckInInThePastIs400"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Traveler books the room" id="c23877d9-bbd9-4f12-af47-023bf6893969" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.030">
+    <testcase name="no secrets or stack traces in the response" time="0.030" classname="05BookingWorkflowTravelerBooksTheRoom"/>
+    <testcase name="responds within 5 s" time="0.030" classname="05BookingWorkflowTravelerBooksTheRoom"/>
+    <testcase name="status is 201" time="0.030" classname="05BookingWorkflowTravelerBooksTheRoom"/>
+    <testcase name="booking starts Pending at the server price" time="0.030" classname="05BookingWorkflowTravelerBooksTheRoom"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Overlapping booking is 409" id="9c4ee34d-960b-4bd2-b7be-8d404e5d0d5f" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.011">
+    <testcase name="no secrets or stack traces in the response" time="0.011" classname="05BookingWorkflowOverlappingBookingIs409"/>
+    <testcase name="error body is ProblemDetails" time="0.011" classname="05BookingWorkflowOverlappingBookingIs409"/>
+    <testcase name="responds within 5 s" time="0.011" classname="05BookingWorkflowOverlappingBookingIs409"/>
+    <testcase name="status is 409" time="0.011" classname="05BookingWorkflowOverlappingBookingIs409"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Another traveler cannot read the booking" id="71acd8b3-c737-4a2a-b37a-2c76cfd832ec" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.006">
+    <testcase name="no secrets or stack traces in the response" time="0.006" classname="05BookingWorkflowAnotherTravelerCannotReadTheBooking"/>
+    <testcase name="error body is ProblemDetails" time="0.006" classname="05BookingWorkflowAnotherTravelerCannotReadTheBooking"/>
+    <testcase name="responds within 5 s" time="0.006" classname="05BookingWorkflowAnotherTravelerCannotReadTheBooking"/>
+    <testcase name="status is 403" time="0.006" classname="05BookingWorkflowAnotherTravelerCannotReadTheBooking"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Another provider cannot confirm the booking" id="89976d65-fd36-4f65-af60-15c1e6c85839" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.010">
+    <testcase name="no secrets or stack traces in the response" time="0.010" classname="05BookingWorkflowAnotherProviderCannotConfirmTheBooking"/>
+    <testcase name="error body is ProblemDetails" time="0.010" classname="05BookingWorkflowAnotherProviderCannotConfirmTheBooking"/>
+    <testcase name="responds within 5 s" time="0.010" classname="05BookingWorkflowAnotherProviderCannotConfirmTheBooking"/>
+    <testcase name="status is 403" time="0.010" classname="05BookingWorkflowAnotherProviderCannotConfirmTheBooking"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Traveler cannot confirm their own booking" id="351a34de-1e7b-49db-8610-136035bbfd81" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="no secrets or stack traces in the response" time="0.008" classname="05BookingWorkflowTravelerCannotConfirmTheirOwnBooking"/>
+    <testcase name="error body is ProblemDetails" time="0.008" classname="05BookingWorkflowTravelerCannotConfirmTheirOwnBooking"/>
+    <testcase name="responds within 5 s" time="0.008" classname="05BookingWorkflowTravelerCannotConfirmTheirOwnBooking"/>
+    <testcase name="refused" time="0.008" classname="05BookingWorkflowTravelerCannotConfirmTheirOwnBooking"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Owner sees the booking" id="583891bf-3434-481f-a9f8-9db45957d0b5" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="no secrets or stack traces in the response" time="0.008" classname="05BookingWorkflowOwnerSeesTheBooking"/>
+    <testcase name="responds within 5 s" time="0.008" classname="05BookingWorkflowOwnerSeesTheBooking"/>
+    <testcase name="status is 200" time="0.008" classname="05BookingWorkflowOwnerSeesTheBooking"/>
+    <testcase name="booking for the owner's room is listed" time="0.008" classname="05BookingWorkflowOwnerSeesTheBooking"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Owner confirms the booking" id="d26d5d47-cab3-479d-a636-362cba31246a" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.011">
+    <testcase name="no secrets or stack traces in the response" time="0.011" classname="05BookingWorkflowOwnerConfirmsTheBooking"/>
+    <testcase name="responds within 5 s" time="0.011" classname="05BookingWorkflowOwnerConfirmsTheBooking"/>
+    <testcase name="status is 200" time="0.011" classname="05BookingWorkflowOwnerConfirmsTheBooking"/>
+    <testcase name="booking is Confirmed" time="0.011" classname="05BookingWorkflowOwnerConfirmsTheBooking"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Confirmed booking cannot go back to Pending" id="022c66aa-7d6d-4050-b951-53e898f2464a" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.010">
+    <testcase name="no secrets or stack traces in the response" time="0.010" classname="05BookingWorkflowConfirmedBookingCannotGoBackToPending"/>
+    <testcase name="error body is ProblemDetails" time="0.010" classname="05BookingWorkflowConfirmedBookingCannotGoBackToPending"/>
+    <testcase name="responds within 5 s" time="0.010" classname="05BookingWorkflowConfirmedBookingCannotGoBackToPending"/>
+    <testcase name="status is 400" time="0.010" classname="05BookingWorkflowConfirmedBookingCannotGoBackToPending"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Completing before check-in is 400" id="b99aa251-c51a-4976-8d86-219e9a2b49d6" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.009">
+    <testcase name="no secrets or stack traces in the response" time="0.009" classname="05BookingWorkflowCompletingBeforeCheckInIs400"/>
+    <testcase name="error body is ProblemDetails" time="0.009" classname="05BookingWorkflowCompletingBeforeCheckInIs400"/>
+    <testcase name="responds within 5 s" time="0.009" classname="05BookingWorkflowCompletingBeforeCheckInIs400"/>
+    <testcase name="status is 400" time="0.009" classname="05BookingWorkflowCompletingBeforeCheckInIs400"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Traveler sees the confirmation" id="278997b7-97e5-40de-9c04-0467a220ca91" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.007">
+    <testcase name="no secrets or stack traces in the response" time="0.007" classname="05BookingWorkflowTravelerSeesTheConfirmation"/>
+    <testcase name="responds within 5 s" time="0.007" classname="05BookingWorkflowTravelerSeesTheConfirmation"/>
+    <testcase name="status is 200" time="0.007" classname="05BookingWorkflowTravelerSeesTheConfirmation"/>
+    <testcase name="booking is Confirmed for the traveler" time="0.007" classname="05BookingWorkflowTravelerSeesTheConfirmation"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Room is no longer available for those dates" id="e9cb8f3d-2541-420b-8600-05b374eb80f8" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="no secrets or stack traces in the response" time="0.008" classname="05BookingWorkflowRoomIsNoLongerAvailableForThoseDates"/>
+    <testcase name="responds within 5 s" time="0.008" classname="05BookingWorkflowRoomIsNoLongerAvailableForThoseDates"/>
+    <testcase name="status is 200" time="0.008" classname="05BookingWorkflowRoomIsNoLongerAvailableForThoseDates"/>
+    <testcase name="quote reports the room as taken" time="0.008" classname="05BookingWorkflowRoomIsNoLongerAvailableForThoseDates"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Plan a trip" id="f8ba4b01-665f-4fa7-94fc-f0267f73cd00" timestamp="2026-10-01T15:32:22.462Z" tests="6" failures="0" errors="0" time="0.838">
+    <testcase name="no secrets or stack traces in the response" time="0.838" classname="06AgenticAiPlanATrip"/>
+    <testcase name="responds within 5 s" time="0.838" classname="06AgenticAiPlanATrip"/>
+    <testcase name="status is 200" time="0.838" classname="06AgenticAiPlanATrip"/>
+    <testcase name="returns a structured plan within budget" time="0.838" classname="06AgenticAiPlanATrip"/>
+    <testcase name="the selected hotel came from an availability check" time="0.838" classname="06AgenticAiPlanATrip"/>
+    <testcase name="the plan was built with backend tools" time="0.838" classname="06AgenticAiPlanATrip"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Ask to book: proposal only" id="ff358e11-e698-4fc0-bda6-4668da049284" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.379">
+    <testcase name="no secrets or stack traces in the response" time="0.379" classname="06AgenticAiAskToBookProposalOnly"/>
+    <testcase name="responds within 5 s" time="0.379" classname="06AgenticAiAskToBookProposalOnly"/>
+    <testcase name="status is 200" time="0.379" classname="06AgenticAiAskToBookProposalOnly"/>
+    <testcase name="returns a proposal, not a booking" time="0.379" classname="06AgenticAiAskToBookProposalOnly"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Proposal created no booking" id="f5b97611-8d33-42ca-b60e-49b1e76a8386" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.005">
+    <testcase name="no secrets or stack traces in the response" time="0.005" classname="06AgenticAiProposalCreatedNoBooking"/>
+    <testcase name="responds within 5 s" time="0.005" classname="06AgenticAiProposalCreatedNoBooking"/>
+    <testcase name="status is 200" time="0.005" classname="06AgenticAiProposalCreatedNoBooking"/>
+    <testcase name="no booking exists for the proposed room and dates yet" time="0.005" classname="06AgenticAiProposalCreatedNoBooking"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Confirm the proposal" id="008a7e3e-b0f8-4485-960b-c9c7e3693d11" timestamp="2026-10-01T15:32:22.462Z" tests="5" failures="0" errors="0" time="0.016">
+    <testcase name="no secrets or stack traces in the response" time="0.016" classname="06AgenticAiConfirmTheProposal"/>
+    <testcase name="responds within 5 s" time="0.016" classname="06AgenticAiConfirmTheProposal"/>
+    <testcase name="status is 200" time="0.016" classname="06AgenticAiConfirmTheProposal"/>
+    <testcase name="backend created a Pending booking at the quoted price" time="0.016" classname="06AgenticAiConfirmTheProposal"/>
+    <testcase name="reply does not claim the booking is confirmed" time="0.016" classname="06AgenticAiConfirmTheProposal"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Confirming the same proposal again books nothing" id="0dfb05cd-1ea0-4c24-bbf6-5172078a0523" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.007">
+    <testcase name="no secrets or stack traces in the response" time="0.007" classname="06AgenticAiConfirmingTheSameProposalAgainBooksNothing"/>
+    <testcase name="responds within 5 s" time="0.007" classname="06AgenticAiConfirmingTheSameProposalAgainBooksNothing"/>
+    <testcase name="status is 200" time="0.007" classname="06AgenticAiConfirmingTheSameProposalAgainBooksNothing"/>
+    <testcase name="no second booking" time="0.007" classname="06AgenticAiConfirmingTheSameProposalAgainBooksNothing"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / AI booking is stored as Pending" id="29d238b8-2726-42e8-85c9-6faeeeca805f" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.006">
+    <testcase name="no secrets or stack traces in the response" time="0.006" classname="06AgenticAiAiBookingIsStoredAsPending"/>
+    <testcase name="responds within 5 s" time="0.006" classname="06AgenticAiAiBookingIsStoredAsPending"/>
+    <testcase name="status is 200" time="0.006" classname="06AgenticAiAiBookingIsStoredAsPending"/>
+    <testcase name="status is Pending until the provider confirms" time="0.006" classname="06AgenticAiAiBookingIsStoredAsPending"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Prompt injection is refused" id="6e223c6d-fc14-4446-8b44-2d15ebbc574d" timestamp="2026-10-01T15:32:22.462Z" tests="5" failures="0" errors="0" time="0.011">
+    <testcase name="no secrets or stack traces in the response" time="0.011" classname="06AgenticAiPromptInjectionIsRefused"/>
+    <testcase name="responds within 5 s" time="0.011" classname="06AgenticAiPromptInjectionIsRefused"/>
+    <testcase name="status is 200" time="0.011" classname="06AgenticAiPromptInjectionIsRefused"/>
+    <testcase name="assistant refuses" time="0.011" classname="06AgenticAiPromptInjectionIsRefused"/>
+    <testcase name="no internal details in the reply" time="0.011" classname="06AgenticAiPromptInjectionIsRefused"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Booking for another user is refused" id="ead24b0d-6bc0-415b-b64e-cc6c0d930e35" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.413">
+    <testcase name="no secrets or stack traces in the response" time="0.413" classname="06AgenticAiBookingForAnotherUserIsRefused"/>
+    <testcase name="responds within 5 s" time="0.413" classname="06AgenticAiBookingForAnotherUserIsRefused"/>
+    <testcase name="status is 200" time="0.413" classname="06AgenticAiBookingForAnotherUserIsRefused"/>
+    <testcase name="no booking and no other user's data" time="0.413" classname="06AgenticAiBookingForAnotherUserIsRefused"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Anonymous cannot chat" id="5bd6546c-0407-48f8-ba6c-ff655f69c880" timestamp="2026-10-01T15:32:22.462Z" tests="3" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="06AgenticAiAnonymousCannotChat"/>
+    <testcase name="responds within 5 s" time="0.002" classname="06AgenticAiAnonymousCannotChat"/>
+    <testcase name="status is 401" time="0.002" classname="06AgenticAiAnonymousCannotChat"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Conversation list includes the chat" id="433f76eb-9cff-4dc6-b904-d71683eb4b3d" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.005">
+    <testcase name="no secrets or stack traces in the response" time="0.005" classname="06AgenticAiConversationListIncludesTheChat"/>
+    <testcase name="responds within 5 s" time="0.005" classname="06AgenticAiConversationListIncludesTheChat"/>
+    <testcase name="status is 200" time="0.005" classname="06AgenticAiConversationListIncludesTheChat"/>
+    <testcase name="conversation is listed" time="0.005" classname="06AgenticAiConversationListIncludesTheChat"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Another traveler cannot read the conversation" id="436e3f7a-83af-423d-a0e4-7bea95ec725b" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.014">
+    <testcase name="no secrets or stack traces in the response" time="0.014" classname="06AgenticAiAnotherTravelerCannotReadTheConversation"/>
+    <testcase name="error body is ProblemDetails" time="0.014" classname="06AgenticAiAnotherTravelerCannotReadTheConversation"/>
+    <testcase name="responds within 5 s" time="0.014" classname="06AgenticAiAnotherTravelerCannotReadTheConversation"/>
+    <testcase name="status is 404" time="0.014" classname="06AgenticAiAnotherTravelerCannotReadTheConversation"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Recommendations come from the plan" id="54207519-340c-4353-9f8b-ef51a0301c1e" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.011">
+    <testcase name="no secrets or stack traces in the response" time="0.011" classname="06AgenticAiRecommendationsComeFromThePlan"/>
+    <testcase name="responds within 5 s" time="0.011" classname="06AgenticAiRecommendationsComeFromThePlan"/>
+    <testcase name="status is 200" time="0.011" classname="06AgenticAiRecommendationsComeFromThePlan"/>
+    <testcase name="recommendations belong to this conversation" time="0.011" classname="06AgenticAiRecommendationsComeFromThePlan"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Traveler cancels the AI booking" id="03b504f4-4d20-41be-8a85-f83e97abe1cf" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="no secrets or stack traces in the response" time="0.008" classname="06AgenticAiTravelerCancelsTheAiBooking"/>
+    <testcase name="responds within 5 s" time="0.008" classname="06AgenticAiTravelerCancelsTheAiBooking"/>
+    <testcase name="status is 200" time="0.008" classname="06AgenticAiTravelerCancelsTheAiBooking"/>
+    <testcase name="booking is Cancelled" time="0.008" classname="06AgenticAiTravelerCancelsTheAiBooking"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Cancelling twice is 400" id="97ad92d2-adf6-46e0-8896-d2fd04a179d4" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.007">
+    <testcase name="no secrets or stack traces in the response" time="0.007" classname="06AgenticAiCancellingTwiceIs400"/>
+    <testcase name="error body is ProblemDetails" time="0.007" classname="06AgenticAiCancellingTwiceIs400"/>
+    <testcase name="responds within 5 s" time="0.007" classname="06AgenticAiCancellingTwiceIs400"/>
+    <testcase name="status is 400" time="0.007" classname="06AgenticAiCancellingTwiceIs400"/>
+  </testsuite>
+  <testsuite name="07 Itineraries / Save the plan as an itinerary" id="ff7fb0fa-5663-4dbf-b2d7-82de9e904116" timestamp="2026-10-01T15:32:22.462Z" tests="5" failures="0" errors="0" time="0.023">
+    <testcase name="no secrets or stack traces in the response" time="0.023" classname="07ItinerariesSaveThePlanAsAnItinerary"/>
+    <testcase name="responds within 5 s" time="0.023" classname="07ItinerariesSaveThePlanAsAnItinerary"/>
+    <testcase name="status is 201" time="0.023" classname="07ItinerariesSaveThePlanAsAnItinerary"/>
+    <testcase name="keeps travelers, budget and conversation" time="0.023" classname="07ItinerariesSaveThePlanAsAnItinerary"/>
+    <testcase name="items are ordered by day, then by the given order" time="0.023" classname="07ItinerariesSaveThePlanAsAnItinerary"/>
+  </testsuite>
+  <testsuite name="07 Itineraries / Zero travelers is 400" id="7209fc36-03e3-4ba2-a3f8-dca5f40effc6" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.004">
+    <testcase name="no secrets or stack traces in the response" time="0.004" classname="07ItinerariesZeroTravelersIs400"/>
+    <testcase name="error body is ProblemDetails" time="0.004" classname="07ItinerariesZeroTravelersIs400"/>
+    <testcase name="responds within 5 s" time="0.004" classname="07ItinerariesZeroTravelersIs400"/>
+    <testcase name="status is 400" time="0.004" classname="07ItinerariesZeroTravelersIs400"/>
+  </testsuite>
+  <testsuite name="07 Itineraries / Another traveler cannot attach this conversation" id="fc772260-767f-43d1-8b54-ef7c543d4d04" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.006">
+    <testcase name="no secrets or stack traces in the response" time="0.006" classname="07ItinerariesAnotherTravelerCannotAttachThisConversation"/>
+    <testcase name="error body is ProblemDetails" time="0.006" classname="07ItinerariesAnotherTravelerCannotAttachThisConversation"/>
+    <testcase name="responds within 5 s" time="0.006" classname="07ItinerariesAnotherTravelerCannotAttachThisConversation"/>
+    <testcase name="status is 400" time="0.006" classname="07ItinerariesAnotherTravelerCannotAttachThisConversation"/>
+  </testsuite>
+  <testsuite name="07 Itineraries / Another traveler cannot read the itinerary" id="e20aa649-81d7-4ab1-8d6d-b5d668db5782" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.013">
+    <testcase name="no secrets or stack traces in the response" time="0.013" classname="07ItinerariesAnotherTravelerCannotReadTheItinerary"/>
+    <testcase name="error body is ProblemDetails" time="0.013" classname="07ItinerariesAnotherTravelerCannotReadTheItinerary"/>
+    <testcase name="responds within 5 s" time="0.013" classname="07ItinerariesAnotherTravelerCannotReadTheItinerary"/>
+    <testcase name="hidden from other users" time="0.013" classname="07ItinerariesAnotherTravelerCannotReadTheItinerary"/>
+  </testsuite>
+  <testsuite name="07 Itineraries / Owner of the itinerary deletes it" id="d0634629-3ec8-451b-999a-a94e8a7880e6" timestamp="2026-10-01T15:32:22.462Z" tests="3" failures="0" errors="0" time="0.028">
+    <testcase name="no secrets or stack traces in the response" time="0.028" classname="07ItinerariesOwnerOfTheItineraryDeletesIt"/>
+    <testcase name="responds within 5 s" time="0.028" classname="07ItinerariesOwnerOfTheItineraryDeletesIt"/>
+    <testcase name="status is 204" time="0.028" classname="07ItinerariesOwnerOfTheItineraryDeletesIt"/>
+  </testsuite>
+  <testsuite name="07 Itineraries / Deleted itinerary is 404" id="355933e7-e445-48c8-bb90-2ba47fe06f33" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.005">
+    <testcase name="no secrets or stack traces in the response" time="0.005" classname="07ItinerariesDeletedItineraryIs404"/>
+    <testcase name="error body is ProblemDetails" time="0.005" classname="07ItinerariesDeletedItineraryIs404"/>
+    <testcase name="responds within 5 s" time="0.005" classname="07ItinerariesDeletedItineraryIs404"/>
+    <testcase name="status is 404" time="0.005" classname="07ItinerariesDeletedItineraryIs404"/>
+  </testsuite>
+  <testsuite name="08 Cleanup / Hotel with bookings cannot be deleted" id="a5b3781e-22c5-4b74-af22-b04b8da3021f" timestamp="2026-10-01T15:32:22.462Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="no secrets or stack traces in the response" time="0.008" classname="08CleanupHotelWithBookingsCannotBeDeleted"/>
+    <testcase name="error body is ProblemDetails" time="0.008" classname="08CleanupHotelWithBookingsCannotBeDeleted"/>
+    <testcase name="responds within 5 s" time="0.008" classname="08CleanupHotelWithBookingsCannotBeDeleted"/>
+    <testcase name="status is 409" time="0.008" classname="08CleanupHotelWithBookingsCannotBeDeleted"/>
+  </testsuite>
+  <testsuite name="08 Cleanup / Agent deletes the rejected package" id="389d61d1-af5f-444f-973f-471e139516ff" timestamp="2026-10-01T15:32:22.462Z" tests="3" failures="0" errors="0" time="0.009">
+    <testcase name="no secrets or stack traces in the response" time="0.009" classname="08CleanupAgentDeletesTheRejectedPackage"/>
+    <testcase name="responds within 5 s" time="0.009" classname="08CleanupAgentDeletesTheRejectedPackage"/>
+    <testcase name="status is 204" time="0.009" classname="08CleanupAgentDeletesTheRejectedPackage"/>
+  </testsuite>
+</testsuites>
