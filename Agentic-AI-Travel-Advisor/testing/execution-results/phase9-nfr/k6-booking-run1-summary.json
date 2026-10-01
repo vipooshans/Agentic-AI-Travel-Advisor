@@ -1,0 +1,258 @@
+{
+    "metrics":  {
+                    "http_req_receiving":  {
+                                               "min":  0.012163,
+                                               "med":  0.081128,
+                                               "p(90)":  0.20131600000000002,
+                                               "p(95)":  0.2816914,
+                                               "p(99)":  0.7256169600000006,
+                                               "max":  5.411167,
+                                               "avg":  0.11605475302355238
+                                           },
+                    "data_received":  {
+                                          "count":  3434725,
+                                          "rate":  25998.620932639962
+                                      },
+                    "iteration_duration":  {
+                                               "avg":  1012.8522655483611,
+                                               "min":  13.593142,
+                                               "med":  1032.225323,
+                                               "p(90)":  1040.5957284,
+                                               "p(95)":  1044.2523704,
+                                               "p(99)":  1061.8800562399997,
+                                               "max":  1381.195952
+                                           },
+                    "http_req_connecting":  {
+                                                "p(99)":  0,
+                                                "max":  15.796679,
+                                                "avg":  0.05523278060683216,
+                                                "min":  0,
+                                                "med":  0,
+                                                "p(90)":  0,
+                                                "p(95)":  0
+                                            },
+                    "http_req_waiting":  {
+                                             "max":  317.979828,
+                                             "avg":  9.170969148100975,
+                                             "min":  2.905027,
+                                             "med":  7.221444,
+                                             "p(90)":  12.156169400000001,
+                                             "p(95)":  13.611584199999992,
+                                             "p(99)":  56.06961396
+                                         },
+                    "vus_max":  {
+                                    "min":  30,
+                                    "max":  30,
+                                    "value":  30
+                                },
+                    "http_req_duration{name:quote}":  {
+                                                          "min":  3.468125,
+                                                          "med":  6.478219,
+                                                          "p(90)":  8.763877,
+                                                          "p(95)":  10.016432599999991,
+                                                          "p(99)":  17.970343279999927,
+                                                          "max":  318.08432,
+                                                          "avg":  8.026779096663821,
+                                                          "thresholds":  {
+                                                                             "p(95)<1000":  false
+                                                                         }
+                                                      },
+                    "http_req_failed":  {
+                                            "passes":  9,
+                                            "fails":  4704,
+                                            "value":  0.0019096117122851686
+                                        },
+                    "checks":  {
+                                   "passes":  6966,
+                                   "fails":  41,
+                                   "value":  0.9941487084344227
+                               },
+                    "checks{scenario:booking_flow}":  {
+                                                          "passes":  6946,
+                                                          "fails":  41,
+                                                          "thresholds":  {
+                                                                             "rate>0.99":  false
+                                                                         },
+                                                          "value":  0.9941319593530843
+                                                      },
+                    "vus":  {
+                                "value":  10,
+                                "min":  0,
+                                "max":  10
+                            },
+                    "data_sent":  {
+                                      "count":  3410298,
+                                      "rate":  25813.724525061018
+                                  },
+                    "http_req_tls_handshaking":  {
+                                                     "p(99)":  0,
+                                                     "max":  0,
+                                                     "avg":  0,
+                                                     "min":  0,
+                                                     "med":  0,
+                                                     "p(90)":  0,
+                                                     "p(95)":  0
+                                                 },
+                    "http_req_duration{name:get booking}":  {
+                                                                "p(90)":  7.0822068,
+                                                                "p(95)":  7.7911458499999995,
+                                                                "p(99)":  12.495102420000002,
+                                                                "max":  14.485004,
+                                                                "avg":  5.530407283620697,
+                                                                "min":  2.997476,
+                                                                "med":  5.180645999999999,
+                                                                "thresholds":  {
+                                                                                   "p(95)<1000":  false
+                                                                               }
+                                                            },
+                    "http_req_blocked":  {
+                                             "p(95)":  0.012369999999999985,
+                                             "p(99)":  0.06110320000000006,
+                                             "max":  16.646663,
+                                             "avg":  0.06569347379588379,
+                                             "min":  0.001052,
+                                             "med":  0.004208,
+                                             "p(90)":  0.008767
+                                         },
+                    "iterations":  {
+                                       "count":  1189,
+                                       "rate":  8.999952045333735
+                                   },
+                    "http_req_duration":  {
+                                              "p(90)":  12.3168596,
+                                              "p(95)":  13.772146199999998,
+                                              "p(99)":  56.38099076000002,
+                                              "max":  318.08432,
+                                              "avg":  9.313789704646709,
+                                              "min":  2.997476,
+                                              "med":  7.376023
+                                          },
+                    "http_reqs":  {
+                                      "count":  4713,
+                                      "rate":  35.674326315944406
+                                  },
+                    "http_req_failed{scenario:booking_flow}":  {
+                                                                   "passes":  9,
+                                                                   "fails":  4649,
+                                                                   "thresholds":  {
+                                                                                      "rate<0.01":  false
+                                                                                  },
+                                                                   "value":  0.0019321597252039502
+                                                               },
+                    "http_req_sending":  {
+                                             "p(95)":  0.0693109999999999,
+                                             "p(99)":  0.14584944000000036,
+                                             "max":  1.596121,
+                                             "avg":  0.026765803522172733,
+                                             "min":  0.004028,
+                                             "med":  0.016592,
+                                             "p(90)":  0.053321
+                                         },
+                    "race_conflicts":  {
+                                           "count":  19,
+                                           "rate":  0.14381756842837762,
+                                           "thresholds":  {
+                                                              "count==19":  false
+                                                          }
+                                       },
+                    "http_req_duration{name:cancel booking}":  {
+                                                                   "avg":  8.354218023275859,
+                                                                   "min":  4.717892,
+                                                                   "med":  7.9090165,
+                                                                   "p(90)":  10.054965800000002,
+                                                                   "p(95)":  11.360313699999997,
+                                                                   "p(99)":  16.021771530000056,
+                                                                   "max":  56.400953,
+                                                                   "thresholds":  {
+                                                                                      "p(95)<1000":  false
+                                                                                  }
+                                                               },
+                    "race_bookings_created":  {
+                                                  "count":  1,
+                                                  "rate":  0.007569345706756716,
+                                                  "thresholds":  {
+                                                                     "count==1":  false
+                                                                 }
+                                              },
+                    "http_req_duration{name:create booking}":  {
+                                                                   "max":  235.531052,
+                                                                   "avg":  12.53854900427716,
+                                                                   "min":  7.524797,
+                                                                   "med":  11.203155,
+                                                                   "p(90)":  14.396823600000003,
+                                                                   "p(95)":  16.274637199999994,
+                                                                   "p(99)":  26.410627239999986,
+                                                                   "thresholds":  {
+                                                                                      "p(95)<1000":  false
+                                                                                  }
+                                                               },
+                    "http_req_duration{expected_response:true}":  {
+                                                                      "p(90)":  12.2894747,
+                                                                      "p(95)":  13.738517949999999,
+                                                                      "p(99)":  56.15167276000027,
+                                                                      "max":  318.08432,
+                                                                      "avg":  9.264194957695567,
+                                                                      "min":  2.997476,
+                                                                      "med":  7.3686644999999995
+                                                                  }
+                },
+    "root_group":  {
+                       "name":  "",
+                       "path":  "",
+                       "id":  "d41d8cd98f00b204e9800998ecf8427e",
+                       "groups":  {
+
+                                  },
+                       "checks":  {
+                                      "quote: status 200":  {
+                                                                "id":  "7bc52402df3a35bacd8fcb4d2510f8e4",
+                                                                "passes":  1169,
+                                                                "fails":  0,
+                                                                "name":  "quote: status 200",
+                                                                "path":  "::quote: status 200"
+                                                            },
+                                      "quote: available at 16,000":  {
+                                                                         "name":  "quote: available at 16,000",
+                                                                         "path":  "::quote: available at 16,000",
+                                                                         "id":  "13f1cee8239ad02e7f659a2649e84b35",
+                                                                         "passes":  1137,
+                                                                         "fails":  32
+                                                                     },
+                                      "create booking: status 201":  {
+                                                                         "name":  "create booking: status 201",
+                                                                         "path":  "::create booking: status 201",
+                                                                         "id":  "1d5a030d3f8c7c15f658aa29ce90cd91",
+                                                                         "passes":  1160,
+                                                                         "fails":  9
+                                                                     },
+                                      "create booking: Pending at server price":  {
+                                                                                      "name":  "create booking: Pending at server price",
+                                                                                      "path":  "::create booking: Pending at server price",
+                                                                                      "id":  "8af2f49d4b6fffc5c6d838b06bbdbc58",
+                                                                                      "passes":  1160,
+                                                                                      "fails":  0
+                                                                                  },
+                                      "get booking: status 200":  {
+                                                                      "id":  "d272a9d07083d22e45821b54ce60385e",
+                                                                      "passes":  1160,
+                                                                      "fails":  0,
+                                                                      "name":  "get booking: status 200",
+                                                                      "path":  "::get booking: status 200"
+                                                                  },
+                                      "cancel booking: status 200":  {
+                                                                         "fails":  0,
+                                                                         "name":  "cancel booking: status 200",
+                                                                         "path":  "::cancel booking: status 200",
+                                                                         "id":  "222eee02c52d71c6d38bbe22ab63373a",
+                                                                         "passes":  1160
+                                                                     },
+                                      "race: 201 or 409 only":  {
+                                                                    "passes":  20,
+                                                                    "fails":  0,
+                                                                    "name":  "race: 201 or 409 only",
+                                                                    "path":  "::race: 201 or 409 only",
+                                                                    "id":  "1c88c76ca1b11bb85fb7ac5d8f541d63"
+                                                                }
+                                  }
+                   }
+}

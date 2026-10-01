@@ -1,0 +1,242 @@
+{
+    "root_group":  {
+                       "name":  "",
+                       "path":  "",
+                       "id":  "d41d8cd98f00b204e9800998ecf8427e",
+                       "groups":  {
+
+                                  },
+                       "checks":  {
+                                      "destinations: status 200":  {
+                                                                       "path":  "::destinations: status 200",
+                                                                       "id":  "f7579d1ea47f4504fa23679cb1360fb8",
+                                                                       "passes":  6775,
+                                                                       "fails":  0,
+                                                                       "name":  "destinations: status 200"
+                                                                   },
+                                      "hotel search: status 200":  {
+                                                                       "path":  "::hotel search: status 200",
+                                                                       "id":  "cc10bf68e2cd0caa9101153270679d4d",
+                                                                       "passes":  6775,
+                                                                       "fails":  0,
+                                                                       "name":  "hotel search: status 200"
+                                                                   },
+                                      "hotel search: only approved hotels":  {
+                                                                                 "id":  "efa9acab98a6881ac71abc0ce4ec1560",
+                                                                                 "passes":  6775,
+                                                                                 "fails":  0,
+                                                                                 "name":  "hotel search: only approved hotels",
+                                                                                 "path":  "::hotel search: only approved hotels"
+                                                                             },
+                                      "package search: status 200":  {
+                                                                         "name":  "package search: status 200",
+                                                                         "path":  "::package search: status 200",
+                                                                         "id":  "e093f174f77ad848a7d85776a41def83",
+                                                                         "passes":  6775,
+                                                                         "fails":  0
+                                                                     },
+                                      "hotel details: status 200":  {
+                                                                        "path":  "::hotel details: status 200",
+                                                                        "id":  "46ccad94b82d534d6a49a696e3b15661",
+                                                                        "passes":  6775,
+                                                                        "fails":  0,
+                                                                        "name":  "hotel details: status 200"
+                                                                    },
+                                      "availability quote: status 200":  {
+                                                                             "name":  "availability quote: status 200",
+                                                                             "path":  "::availability quote: status 200",
+                                                                             "id":  "69dd3f845e5b3bd5eb435b03eb893819",
+                                                                             "passes":  6775,
+                                                                             "fails":  0
+                                                                         }
+                                  }
+                   },
+    "metrics":  {
+                    "http_req_duration{expected_response:true}":  {
+                                                                      "min":  0.824151,
+                                                                      "med":  5.01737,
+                                                                      "p(90)":  7.294897,
+                                                                      "p(95)":  7.9806928,
+                                                                      "p(99)":  10.156073159999995,
+                                                                      "max":  174.505965,
+                                                                      "avg":  5.174598742775322
+                                                                  },
+                    "iterations":  {
+                                       "count":  6775,
+                                       "rate":  26.55411674114186
+                                   },
+                    "vus":  {
+                                "value":  2,
+                                "min":  0,
+                                "max":  50
+                            },
+                    "http_req_duration{name:hotel search}":  {
+                                                                 "avg":  4.823763135202943,
+                                                                 "min":  1.673124,
+                                                                 "med":  4.692675,
+                                                                 "p(90)":  6.9029184,
+                                                                 "p(95)":  7.466281099999997,
+                                                                 "p(99)":  9.284245860000004,
+                                                                 "max":  174.505965,
+                                                                 "thresholds":  {
+                                                                                    "p(95)<500":  false
+                                                                                }
+                                                             },
+                    "http_req_failed":  {
+                                            "passes":  0,
+                                            "fails":  33877,
+                                            "thresholds":  {
+                                                               "rate<0.01":  false
+                                                           },
+                                            "value":  0
+                                        },
+                    "http_req_receiving":  {
+                                               "p(99)":  0.47103599999999896,
+                                               "max":  4.1015,
+                                               "avg":  0.13268406960474807,
+                                               "min":  0.015931,
+                                               "med":  0.11403,
+                                               "p(90)":  0.22145779999999998,
+                                               "p(95)":  0.28249359999999996
+                                           },
+                    "iteration_duration":  {
+                                               "min":  1016.601538,
+                                               "med":  1027.192509,
+                                               "p(90)":  1032.6248916,
+                                               "p(95)":  1034.9042302999999,
+                                               "p(99)":  1043.60353992,
+                                               "max":  1219.83655,
+                                               "avg":  1027.7654642028047
+                                           },
+                    "http_req_sending":  {
+                                             "max":  1.582992,
+                                             "avg":  0.0275229830268323,
+                                             "min":  0.004138,
+                                             "med":  0.016923,
+                                             "p(90)":  0.056228400000000005,
+                                             "p(95)":  0.07224179999999997,
+                                             "p(99)":  0.1199360399999995
+                                         },
+                    "http_reqs":  {
+                                      "count":  33877,
+                                      "rate":  132.77842255935983
+                                  },
+                    "data_sent":  {
+                                      "count":  4837621,
+                                      "rate":  18960.701517844933
+                                  },
+                    "http_req_waiting":  {
+                                             "p(90)":  7.142270000000001,
+                                             "p(95)":  7.8114425999999995,
+                                             "p(99)":  9.910242839999968,
+                                             "max":  174.228971,
+                                             "avg":  5.0143916901437695,
+                                             "min":  0.76107,
+                                             "med":  4.857321
+                                         },
+                    "http_req_tls_handshaking":  {
+                                                     "p(95)":  0,
+                                                     "p(99)":  0,
+                                                     "max":  0,
+                                                     "avg":  0,
+                                                     "min":  0,
+                                                     "med":  0,
+                                                     "p(90)":  0
+                                                 },
+                    "http_req_duration{name:package search}":  {
+                                                                   "min":  1.774263,
+                                                                   "med":  5.433294,
+                                                                   "p(90)":  7.531188800000001,
+                                                                   "p(95)":  8.209664299999996,
+                                                                   "p(99)":  10.477666920000003,
+                                                                   "max":  48.916007,
+                                                                   "avg":  5.589349952029521,
+                                                                   "thresholds":  {
+                                                                                      "p(95)<500":  false
+                                                                                  }
+                                                               },
+                    "http_req_duration{name:availability quote}":  {
+                                                                       "p(90)":  8.186150400000002,
+                                                                       "p(95)":  8.901179399999997,
+                                                                       "p(99)":  11.313380940000004,
+                                                                       "max":  70.039984,
+                                                                       "avg":  6.536333162214035,
+                                                                       "min":  2.988643,
+                                                                       "med":  6.312415,
+                                                                       "thresholds":  {
+                                                                                          "p(95)<500":  false
+                                                                                      }
+                                                                   },
+                    "http_req_duration{name:destinations}":  {
+                                                                 "min":  0.824151,
+                                                                 "med":  3.581111,
+                                                                 "p(90)":  5.0574758,
+                                                                 "p(95)":  5.451438,
+                                                                 "p(99)":  6.652194720000002,
+                                                                 "max":  81.963692,
+                                                                 "avg":  3.7284236103321082,
+                                                                 "thresholds":  {
+                                                                                    "p(95)<500":  false
+                                                                                }
+                                                             },
+                    "data_received":  {
+                                          "count":  39208542,
+                                          "rate":  153675.0112941644
+                                      },
+                    "http_req_duration":  {
+                                              "min":  0.824151,
+                                              "med":  5.01737,
+                                              "p(90)":  7.294897,
+                                              "p(95)":  7.9806928,
+                                              "p(99)":  10.156073159999995,
+                                              "max":  174.505965,
+                                              "avg":  5.174598742775322,
+                                              "thresholds":  {
+                                                                 "p(95)<500":  false
+                                                             }
+                                          },
+                    "http_req_blocked":  {
+                                             "p(90)":  0.01015,
+                                             "p(95)":  0.01385039999999998,
+                                             "p(99)":  0.030347199999999838,
+                                             "max":  11.113339,
+                                             "avg":  0.012750548956519194,
+                                             "min":  0.001002,
+                                             "med":  0.00488
+                                         },
+                    "vus_max":  {
+                                    "min":  50,
+                                    "max":  50,
+                                    "value":  50
+                                },
+                    "checks":  {
+                                   "passes":  40650,
+                                   "fails":  0,
+                                   "thresholds":  {
+                                                      "rate>0.99":  false
+                                                  },
+                                   "value":  1
+                               },
+                    "http_req_connecting":  {
+                                                "max":  10.344524,
+                                                "avg":  0.005944748413377809,
+                                                "min":  0,
+                                                "med":  0,
+                                                "p(90)":  0,
+                                                "p(95)":  0,
+                                                "p(99)":  0
+                                            },
+                    "http_req_duration{name:hotel details}":  {
+                                                                  "p(99)":  9.334581620000003,
+                                                                  "max":  98.96396,
+                                                                  "avg":  5.179419631143923,
+                                                                  "min":  2.218868,
+                                                                  "med":  4.943858,
+                                                                  "p(90)":  6.751001400000001,
+                                                                  "p(95)":  7.259459399999997,
+                                                                  "thresholds":  {
+                                                                                     "p(95)<500":  false
+                                                                                 }
+                                                              }
+                }
+}
