@@ -1,0 +1,190 @@
+﻿00:00 +0: loading T:/mobile-app/test/app_flow_test.dart
+00:00 +0: (setUpAll)
+00:00 +0: Login and navigation a restored traveler session opens Home and the bottom bar reaches every tab
+00:02 +1: Login and navigation without a session every page redirects to sign-in and nothing is fetched
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: '/login'
+  Actual: '/home'
+   Which: is different.
+          Expected: /login
+            Actual: /home
+                     ^
+           Differ at offset 1
+/home
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///T:/mobile-app/test/app_flow_test.dart:75:9)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///T:/mobile-app/test/app_flow_test.dart line 75
+The test description was:
+  without a session every page redirects to sign-in and nothing is fetched
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:02 +1 -1: Login and navigation without a session every page redirects to sign-in and nothing is fetched [E]
+  Test failed. See exception logs above.
+  The test description was: without a session every page redirects to sign-in and nothing is fetched
+  
+00:02 +1 -1: Login and navigation signing in on the login screen lands on Home
+00:03 +2 -1: Login and navigation the login form validates before anything is sent
+00:03 +3 -1: Login and navigation a rejected sign-in shows the API message and stays on the login screen
+00:03 +4 -1: Login and navigation registration with a weak or mismatched password never reaches the API
+00:04 +5 -1: Login and navigation signing out from Profile clears the chat and returns to sign-in
+00:04 +6 -1: Destination and hotel search the Hotels quick link opens the Hotels tab with prices and ratings from the API
+00:04 +7 -1: Destination and hotel search a destination opens with its packages and transport options
+00:05 +8 -1: Destination and hotel search hotel search sends the keyword and price, and says when nothing matches
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: <10000>
+  Actual: <null>
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///T:/mobile-app/test/app_flow_test.dart:219:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///T:/mobile-app/test/app_flow_test.dart line 219
+The test description was:
+  hotel search sends the keyword and price, and says when nothing matches
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:06 +8 -2: Destination and hotel search hotel search sends the keyword and price, and says when nothing matches [E]
+  Test failed. See exception logs above.
+  The test description was: hotel search sends the keyword and price, and says when nothing matches
+  
+00:06 +8 -2: Destination and hotel search a failed destination load shows the server message and Retry recovers
+00:06 +9 -2: Hotel and package details, and booking hotel details show rooms, prices, availability and reviews
+00:06 +10 -2: Hotel and package details, and booking booking a room from the hotel page: validation, quote, request, then My Bookings shows Pending
+00:07 +11 -2: Hotel and package details, and booking a missing hotel shows a not-found message with Retry
+00:07 +12 -2: Hotel and package details, and booking package details show price per person, activities, transport and reviews
+00:07 +13 -2: AI assistant the starter prompt returns recommendations and a plan that can be saved and opened
+00:08 +14 -2: AI assistant a booking proposal is only booked after Confirm, and the result shows the backend status
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: {
+            'message': 'Confirm booking: Ella Gap View Inn – Deluxe Double',
+            'conversationId': 7,
+            'confirmBookingId': 'prop-123'
+          }
+  Actual: {
+            'message': 'Confirm booking: Ella Gap View Inn – Deluxe Double',
+            'conversationId': 7
+          }
+   Which: has different length and is missing map key 'confirmBookingId'
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///T:/mobile-app/test/app_flow_test.dart:390:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///T:/mobile-app/test/app_flow_test.dart line 390
+The test description was:
+  a booking proposal is only booked after Confirm, and the result shows the backend status
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:08 +14 -3: AI assistant a booking proposal is only booked after Confirm, and the result shows the backend status [E]
+  Test failed. See exception logs above.
+  The test description was: a booking proposal is only booked after Confirm, and the result shows the backend status
+  
+00:08 +14 -3: AI assistant a refused request is labelled and offers no plan or booking
+00:08 +15 -3: AI assistant a rate-limited assistant shows the error and claims nothing
+00:09 +16 -3: AI assistant a past conversation opens in the chat from Profile
+00:09 +17 -3: Itineraries with no saved itineraries the list points to the AI chat
+00:09 +18 -3: Itineraries a saved itinerary opens day by day in order
+00:09 +19 -3: My bookings every status is listed and only the allowed actions are offered
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 91 pixels on the right.
+
+The relevant error-causing widget was:
+  Row Row:file:///T:/mobile-app/lib/widgets/booking_card.dart:53:24
+
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#8766f relayoutBoundary=up15 OVERFLOWING:
+  creator: Row ← Padding ← Column ← Padding ← Semantics ← DefaultTextStyle ← AnimatedDefaultTextStyle
+    ← _InkFeatures-[GlobalKey#b9e7a ink renderer] ← NotificationListener<LayoutChangedNotification> ←
+    CustomPaint ← _ShapeBorderPaint ← PhysicalShape ← ⋯
+  parentData: offset=Offset(8.0, 0.0) (can use size)
+  constraints: BoxConstraints(0.0<=w<=352.0, 0.0<=h<=Infinity)
+  size: Size(352.0, 48.0)
+  direction: horizontal
+  mainAxisAlignment: end
+  mainAxisSize: max
+  crossAxisAlignment: center
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly 2 matching candidates
+  Actual: _TextWidgetFinder:<Found 3 widgets with text "Cancel booking": [
+            Text("Cancel booking", dependencies: [DefaultSelectionStyle, DefaultTextStyle,
+MediaQuery]),
+            Text("Cancel booking", dependencies: [DefaultSelectionStyle, DefaultTextStyle,
+MediaQuery]),
+            Text("Cancel booking", dependencies: [DefaultSelectionStyle, DefaultTextStyle,
+MediaQuery]),
+          ]>
+   Which: is too many
+Pending and Confirmed only
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///T:/mobile-app/test/app_flow_test.dart:509:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///T:/mobile-app/test/app_flow_test.dart line 509
+The test description was:
+  every status is listed and only the allowed actions are offered
+════════════════════════════════════════════════════════════════════════════════════════════════════
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following message was thrown:
+Multiple exceptions (2) were detected during the running of the current test, and at least one was
+unexpected.
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:10 +19 -4: My bookings every status is listed and only the allowed actions are offered [E]
+  Test failed. See exception logs above.
+  The test description was: every status is listed and only the allowed actions are offered
+  
+00:10 +19 -4: My bookings a failed bookings load can be retried
+00:10 +20 -4: (tearDownAll)
+00:10 +20 -4: Some tests failed.
+
+Failing tests:
+  T:/mobile-app/test/app_flow_test.dart: AI assistant a booking proposal is only booked after Confirm, and the result shows the backend status
+  T:/mobile-app/test/app_flow_test.dart: Destination and hotel search hotel search sends the keyword and price, and says when nothing matches
+  T:/mobile-app/test/app_flow_test.dart: Login and navigation without a session every page redirects to sign-in and nothing is fetched
+  T:/mobile-app/test/app_flow_test.dart: My bookings every status is listed and only the allowed actions are offered

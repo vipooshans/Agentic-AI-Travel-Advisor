@@ -176,3 +176,60 @@ Earlier Playwright attempts failed. Each failure is listed below, with whether t
 
 - **Test mistakes, fixed in the specs:** ambiguous locators (the label "Guests" also matched the room option "2 guests"; "Role" matched "Filter by role"; "Sign in" matched both the header link and the booking panel link). One expectation was also wrong: `/api/reports/summary` is open to every role by design and scoped to the caller. The test now checks that a traveler receives no platform figures, and it uses admin-only endpoints for the 403 check.
 - **DEF-021 (Low), product defect, fixed:** sign-in ignored the page the visitor asked for (deep link to `/owner/hotels` landed on `/owner`). After that fix, a second problem appeared: Sign out stored the page being left, so the next user was sent there (403 for another role, someone else's page for the same role). Before/after: `def021-before-fix.log`, `def021b-before-fix.log`, `def021c-before-fix.log`, `def021-after-fix.log`. Details: `testing/defect-reports/DEFECT-LOG.md`.
+
+## 8e. Flutter mobile app: mocktail widget tests and integration_test against the real API
+
+Flutter 3.47.5. Visual Studio is not installed, so there is no Windows desktop target, and the Android emulator was offline. The integration test therefore ran in Chrome. For that, `flutter create --platforms=web .` added the `web/` folder; no existing file was changed.
+
+### Widget tests with mocktail
+
+`test/mocks.dart` mocks `ApiService` and `AuthService` with mocktail. Everything else is the real app: `AuthProvider`, `ChatProvider`, the GoRouter route table with its sign-in redirect, every screen, and the app's own response parsing and error mapping (`ensureSuccess` and `parseErrorMessage` delegate to the real `ApiService`). Stubs return the API's JSON shapes. Requests are checked with `verify` and `captureAny`, and `verifyNever` confirms that invalid input sends nothing.
+
+| File | Tests | What it checks |
+|---|---|---|
+| `test/app_flow_test.dart` (new) | 25 | Login and navigation: bottom navigation; 7 protected routes redirect to sign-in with no API call; login trims the email; validation; rejected login; register validation; sign-out clears the chat. Destination and hotel search: query parameters sent, no match, invalid price, 503 then Retry. Hotel and package details and room booking: guest validation, availability query, POST body, Pending in My Bookings, 404. AI assistant: plan, follow-up with `conversationId`, save itinerary; proposal booked only after Confirm with `confirmBookingId`, status taken from the backend (never "Confirmed"); refused request; 429; conversation history; DEF-023 regression. Itineraries: empty state, day order. My bookings: allowed actions per status, retry after failure |
+| `test/layout_test.dart` (new) | 4 | DEF-022 regression: hotel, package and destination cards and the reviews header on a 320 x 640 screen at 1.3 text scale, asserting no overflow |
+| Existing files | 65 | unchanged |
+
+| Run | Result | Evidence |
+|---|---|---|
+| `flutter test` | **94 passed, 0 failed** (was 65) | `flutter-test.log` |
+| `flutter analyze` | No issues found | `flutter-analyze.log` |
+
+**Checking that the tests can fail.** Four rules were broken on purpose in product code, then restored:
+- `ChatProvider.confirm` no longer sends `confirmBookingId`.
+- The router no longer redirects signed-out users.
+- Cancelled bookings still offer Cancel.
+- Hotel search drops `maxPrice`.
+
+The run gave 4 failed and 20 passed, and each failure was the test written for that rule. Evidence: `flutter-mutation-check.log`.
+
+### Integration test against the real system
+
+`integration_test/traveler_journey_test.dart` starts the real app (`main()`), which talks to the ASP.NET Core API on PostgreSQL. Nothing is mocked. The test calls the API directly only for setup, for the owner's confirmation and to check what the app stored.
+
+| Test | Flow |
+|---|---|
+| 1 | Setup: the hotel owner creates a hotel and room, and the admin approves it. In the UI, a new traveler registers, searches for the hotel, opens it, checks availability (3 nights, 2 guests, LKR 28,500) and requests the booking. The API returns the booking as Pending, with the right room, guests, dates, total (3 x 9,500, computed by the server) and traveler email |
+| 2 | Session restored on restart. The AI assistant plans the Ella trip and the plan is saved; the API then lists one itinerary. "Book the hotel please" returns a proposal, and the API still shows only one booking. After Confirm, the app says the provider still has to confirm and never shows "Confirmed"; the API shows the new booking as Pending. The traveler cancels it from My Bookings, and the API returns Cancelled |
+| 3 | The owner confirms the first booking through the API. After restart, My Bookings shows Confirmed and Cancelled. Sign out returns to the login page, and the hotel owner's login is refused with "This app is for travelers" |
+
+Command: `flutter drive --driver=test_driver/integration_test.dart --target=integration_test/traveler_journey_test.dart -d web-server --browser-name=chrome --profile --web-port 4173 --dart-define=API_BASE_URL=http://localhost:5080`, with chromedriver 153 on port 4444. The API was started with `RateLimiting__AuthPermitsPerMinute=300`.
+
+| Run | Result | Evidence |
+|---|---|---|
+| Run 8 (final) | **3 passed, 0 failed** ("All tests passed.") | `flutter-integration.log`, `flutter-integration-console.log` (per-test output from the browser console) |
+
+Runs 1 to 7 failed. They are kept, and the cause of each is listed below:
+
+- **Run 1** (`-d chrome`, debug) hung at "Waiting for connection from debug service" for more than 15 minutes, with no `web/` folder; it was stopped. From run 2, the `web-server` device was used, where chromedriver drives Chrome.
+- **Runs 2 to 5:** all three tests failed with empty failure details, because release and profile builds strip Flutter's error text. chromedriver `--verbose` captured the browser console. The test failed at "First name is required": `IntegrationTestWidgetsFlutterBinding` does not register the simulated keyboard, so `enterText` typed nothing. The test now registers it when the app starts. Test 3 failed in every run only because the earlier tests had not created its booking.
+- **Run 6:** registration worked. `find.text(hotelName)` also matched the search box holding the same name, so the tap opened nothing; the finder is now limited to `HotelCard`.
+- **Run 7:** test 1 passed. In test 2, tapping Send after saving the plan opened the itinerary instead, and waiting for the "Itinerary saved" notice to close timed out. This is **DEF-023 (Medium), a product defect**: the notice never closed and covered the message box. It was fixed with a widget regression test that failed before the fix (`def023-before-fix.log`) and passes after (`def023-after-fix.log`).
+
+### Defects found
+
+- **DEF-022 (Low):** hotel, package and destination cards and the reviews header overflowed when text was wider than the space. The mocktail tests found it, because the test font is wider than Roboto. The four layout tests failed before the fix (`def022-before-fix.log`: overflows of 176, 444, 112 and 206 px) and pass after.
+- **DEF-023 (Medium):** found by the integration test, as described above.
+
+Details: `testing/defect-reports/DEFECT-LOG.md`.
