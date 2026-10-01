@@ -428,12 +428,18 @@ public static class RequirementParser
         found.Add((m.Index, date));
     }
 
+    private static readonly Regex OriginLead = new(@"\bfrom\s+(the\s+)?$", Ci);
+
+    /// <summary>A catalog name right after "from" is where the traveler starts, not where they are going.</summary>
     private static string? FindDestination(string message, IReadOnlyList<string> knownDestinations)
     {
         foreach (var name in knownDestinations.OrderByDescending(n => n.Length))
         {
-            if (Regex.IsMatch(message, $@"\b{Regex.Escape(name)}\b", Ci))
-                return name;
+            foreach (Match match in Regex.Matches(message, $@"\b{Regex.Escape(name)}\b", Ci))
+            {
+                if (!OriginLead.IsMatch(message[..match.Index]))
+                    return name;
+            }
         }
 
         return null;

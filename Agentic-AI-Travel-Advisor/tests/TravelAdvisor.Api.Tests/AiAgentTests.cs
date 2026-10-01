@@ -78,6 +78,19 @@ public class AiAgentTests
     }
 
     [SkippableFact]
+    public async Task Def019_origin_city_is_not_planned_as_the_destination()
+    {
+        Skip.If(!_fx.Available, _fx.SkipReason);
+        var user = await NewUserAsync();
+
+        var (body, _) = await ChatAsync(user, "Plan 3 days in Ella for 2 people from Kandy by train, budget Rs. 60,000");
+
+        Assert.Equal(ChatStatus.Plan, body.Status);
+        Assert.Equal("Ella", body.Plan!.Destination);
+        Assert.All(body.Plan.Hotels, h => Assert.Equal("Ella", h.City));
+    }
+
+    [SkippableFact]
     public async Task Budget_too_small_returns_over_budget_without_a_plan()
     {
         Skip.If(!_fx.Available, _fx.SkipReason);

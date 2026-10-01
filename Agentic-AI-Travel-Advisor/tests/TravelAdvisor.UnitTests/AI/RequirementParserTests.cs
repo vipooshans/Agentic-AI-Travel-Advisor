@@ -25,6 +25,25 @@ public class RequirementParserTests
     }
 
     [Theory]
+    [InlineData("Plan 3 days in Ella for 2 people from Kandy by train, budget Rs. 60,000", "Ella", "Kandy")]
+    [InlineData("From Kandy to Ella for 3 days, budget 60000", "Ella", "Kandy")]
+    [InlineData("A trip to Ella from Nuwara Eliya, budget 60000", "Ella", "Nuwara Eliya")]
+    [InlineData("Kandy for 2 nights, budget 40000", "Kandy", null)]
+    public void Def019_origin_city_is_not_taken_as_the_destination(string message, string destination, string? origin)
+    {
+        var req = Parse(message);
+
+        Assert.Equal(destination, req.Destination);
+        Assert.Equal(origin, req.Origin);
+    }
+
+    [Fact]
+    public void Def019_only_an_origin_leaves_the_destination_missing()
+    {
+        Assert.Null(Parse("A trip from Kandy, budget 60000").Destination);
+    }
+
+    [Theory]
     [InlineData("budget 50k", 50000)]
     [InlineData("around LKR 75,000 in total", 75000)]
     [InlineData("we can spend 1.5 lakhs", 150000)]

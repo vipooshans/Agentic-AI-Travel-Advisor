@@ -278,6 +278,13 @@ public class AgentOrchestrator
             reply = string.IsNullOrWhiteSpace(final)
                 ? "I couldn't complete that request. Please rephrase it or tell me the destination and budget."
                 : final.Trim();
+
+            if (QuotesUngroundedPrices(reply, context, history))
+            {
+                _logger.LogWarning("LLM reply quoted prices that no tool returned and was replaced");
+                reply = "I can only quote hotels, packages and prices from our catalog, and I haven't looked any up yet. " +
+                        "Tell me the destination and budget, or ask me to search hotels in a city, and I'll check them for you.";
+            }
         }
 
         var result = Finish(context, status, reply);
@@ -344,6 +351,39 @@ public class AgentOrchestrator
 
     public static TravelPlan? LatestPlan(IReadOnlyList<ChatMessageDto> history) =>
         history.LastOrDefault(m => m.Role == "assistant" && m.Plan is not null)?.Plan;
+
+    private static readonly Regex PriceAmount = new(
+        @"(?:\b(?:rs|lkr|rupees?|usd)\.?|\$)\s*(?<n>\d[\d,]*(?:\.\d+)?)|(?<n>\d[\d,]*(?:\.\d+)?)\s*(?:rs|lkr|rupees?)\b",
+        Ci);
+
+    private static readonly HashSet<string> CatalogToolNames =
+    [
+        ToolNames.SearchHotels, ToolNames.SearchTravelPackages, ToolNames.SearchActivities,
+        ToolNames.SearchTransportation, ToolNames.CheckAvailability, ToolNames.GenerateItinerary
+    ];
+
+    /// <summary>
+    /// Prices must come from the catalog. When no catalog tool succeeded in this turn, every amount in the
+    /// model's reply has to appear in an earlier assistant message (for example a plan it is discussing).
+    /// </summary>
+    private static bool QuotesUngroundedPrices(string reply, AgentToolContext context, IReadOnlyList<ChatMessageDto> history)
+    {
+        var amounts = PriceAmount.Matches(reply).Select(m => NormalizeAmount(m.Groups["n"].Value)).Distinct().ToList();
+        if (amounts.Count == 0 || context.Calls.Any(c => c.Success && CatalogToolNames.Contains(c.Name)))
+            return false;
+
+        var known = history
+            .Where(m => m.Role == "assistant" && !string.IsNullOrEmpty(m.Content))
+            .SelectMany(m => Regex.Matches(m.Content, @"\d[\d,]*(?:\.\d+)?").Select(x => NormalizeAmount(x.Value)))
+            .ToHashSet();
+        return amounts.Any(a => !known.Contains(a));
+    }
+
+    private static string NormalizeAmount(string value)
+    {
+        var digits = value.Replace(",", "");
+        return digits.Contains('.') ? digits.TrimEnd('0').TrimEnd('.') : digits;
+    }
 
     private static string SerializeForLlm(ToolResult result)
     {

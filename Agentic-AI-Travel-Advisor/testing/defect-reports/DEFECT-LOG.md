@@ -286,3 +286,26 @@ Defects below were found while implementing and executing tests.
 - **Retest result:** 2026-10-01:
   - The widget test passes, as do the other 64 tests (`final-test.log`).
   - Manual: in the rebuilt web app, booking #16 was created and then cancelled, and the card changed to Cancelled in place (`screenshots/11-cancel-refreshes-after-fix.png`).
+
+## DEF-019 AI planner treats the origin city as the destination
+- **Severity / Priority:** High / P1
+- **Description:** `RequirementParser.FindDestination` checked catalog names longest first and ignored context. When a message named both an origin and a destination, the longer name won. "Plan 3 days in Ella … from Kandy" was planned for Kandy (5 letters beats Ella's 4), and "to Ella from Nuwara Eliya" would have been planned for Nuwara Eliya.
+- **Steps to reproduce:** As a USER, `POST /api/ai/chat` with "Plan 3 days in Ella for 2 people from Kandy by train, budget Rs. 60,000".
+- **Expected:** A plan for Ella, with Kandy as the origin for transport.
+- **Actual:** A plan for Kandy. In the mocked AI evaluation (Kandy has no hotels there) case A-05 returned `no_match`.
+- **Evidence:** `testing/execution-results/phase8-tests/ai-evaluation/fixes-before-after.txt`. With the fix stashed, `Def019_origin_city_is_not_planned_as_the_destination` against the seeded PostgreSQL catalog failed with `Expected: "Ella"`, `Actual: "Kandy"`.
+- **Status:** Retested (Closed)
+- **Fix:** A catalog name that directly follows "from" (optionally "from the") is skipped when choosing the destination. If the only catalog name is the origin, the destination stays missing and the assistant asks for it.
+- **Retest result:** 2026-10-01. The API test passes. The parser theory `Def019_origin_city_is_not_taken_as_the_destination` (4 cases) and `Def019_only_an_origin_leaves_the_destination_missing` pass. AI evaluation A-05 passes and selects the Kandy to Ella train.
+
+## DEF-020 Model replies can quote hotels and prices that no tool returned
+- **Severity / Priority:** Medium / P2
+- **Description:** On the LLM path, when the model answered without calling a tool, its text went to the user as-is. Only secrets, system-prompt leaks and false booking claims were filtered. A reply such as "The Grand Ella Palace has rooms for Rs. 5,000 a night" (a hotel and price that do not exist in the catalog) reached the user.
+- **Steps to reproduce:** In the AI evaluation, case J-06 scripts the model to answer "What hotels are in Ella?" with that sentence and no tool call.
+- **Expected:** Prices shown to the user come from catalog tools.
+- **Actual:** The invented hotel and price were returned unchanged (`J-06 failed: invented hotel shown to the user; invented price shown to the user`).
+- **Evidence:** `testing/execution-results/phase8-tests/ai-evaluation/fixes-before-after.txt`
+- **Status:** Retested (Closed), with a limitation
+- **Fix:** `AgentOrchestrator` checks LLM replies that end without a plan or proposal. If the reply quotes an amount (Rs., LKR, rupees, USD, $), no catalog tool succeeded in that turn, and the amount does not appear in an earlier assistant message, the reply is replaced with a prompt to look the information up, and a warning is logged.
+- **Retest result:** 2026-10-01. J-06 passes. J-08 also passes: a follow-up that repeats a price from an earlier tool-backed turn is kept, so the check does not block normal conversation. All 71 evaluation cases pass.
+- **Limitation:** The check covers prices, not names. An invented hotel name mentioned without any price is not detected. The system prompt still instructs the model to use tools for every fact.
