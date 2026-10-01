@@ -1,197 +1,93 @@
 using System.Globalization;
-using System.Text.Json;
-using System.Text.RegularExpressions;
+using Microsoft.Extensions.Options;
 using TravelAdvisor.Core.DTOs.AI;
-using TravelAdvisor.Core.Interfaces;
+using TravelAdvisor.Core.DTOs.Users;
+using TravelAdvisor.Core.Enums;
+using TravelAdvisor.Infrastructure.AI.Planning;
+using TravelAdvisor.Infrastructure.AI.Tools;
 
 namespace TravelAdvisor.Infrastructure.AI.Agents;
 
+/// <summary>Understands the request: extracts requirements and fills gaps from the user's saved preferences.</summary>
 public class TravelPlanningAgent
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
+    private readonly AiOptions _options;
 
-    private readonly ILlmClient _llm;
-
-    public TravelPlanningAgent(ILlmClient llm)
+    public TravelPlanningAgent(IOptions<AiOptions> options)
     {
-        _llm = llm;
+        _options = options.Value;
     }
 
-    public async Task<TripRequirements> ExtractAsync(
+    public async Task<(TripRequirements Requirements, IReadOnlyList<string> KnownDestinations)> ExtractAsync(
         IReadOnlyList<ChatMessageDto> history,
-        IReadOnlyList<string> knownDestinations,
+        AgentToolContext context,
         CancellationToken cancellationToken = default)
     {
-        TripRequirements? extracted = null;
+        context.UseAgent(AgentNames.Planning);
 
-        if (_llm.IsConfigured)
+        var (destinations, _) = await context.Registry.InvokeAsync<List<CatalogDestinationMatch>>(
+            ToolNames.SearchDestinations, new { }, context, cancellationToken);
+        var names = destinations?.Select(d => d.Name).ToList() ?? [];
+
+        var req = RequirementParser.Parse(history, names, context.Today, _options.LkrPerUnit);
+
+        if (context.Caller.Role == RoleNames.User)
         {
-            try
-            {
-                extracted = await ExtractWithLlmAsync(history, knownDestinations, cancellationToken);
-            }
-            catch
-            {
-                extracted = null;
-            }
+            var (prefs, _) = await context.Registry.InvokeAsync<TravelPreferencesDto>(
+                ToolNames.GetTravelPreferences, new { }, context, cancellationToken);
+            if (prefs is not null)
+                MergePreferences(req, prefs);
         }
 
-        extracted ??= ExtractWithFallback(history, knownDestinations);
-        ApplyDefaults(extracted);
-        return extracted;
-    }
-
-    private async Task<TripRequirements?> ExtractWithLlmAsync(
-        IReadOnlyList<ChatMessageDto> history,
-        IReadOnlyList<string> knownDestinations,
-        CancellationToken cancellationToken)
-    {
-        var transcript = string.Join("\n", history.Select(m => $"{m.Role}: {m.Content}"));
-        var destinations = string.Join(", ", knownDestinations);
-        var system = """
-            You extract travel planning requirements from a conversation.
-            Return JSON only with keys:
-            destination, startDate (ISO date or null), endDate (ISO date or null),
-            durationDays (int or null), travelers (int), budget (number or null),
-            interests (string or null), accommodationPreference (string or null),
-            missingFields (array of strings).
-            Known catalog destinations: 
-            """ + destinations + """
-            Prefer matching a known destination name.
-            Budget numbers like "Rs. 50,000" or "50000" are LKR amounts. Strip commas.
-            If the user asks for an N-day trip, set durationDays to N.
-            missingFields should list only destination and/or budget when those are unknown.
-            """;
-
-        var raw = await _llm.CompleteAsync(system, transcript, jsonMode: true, cancellationToken);
-        raw = StripFence(raw);
-        var parsed = JsonSerializer.Deserialize<TripRequirements>(raw, JsonOptions);
-        return parsed;
-    }
-
-    public static TripRequirements ExtractWithFallback(
-        IReadOnlyList<ChatMessageDto> history,
-        IReadOnlyList<string> knownDestinations)
-    {
-        var text = string.Join(" ", history.Where(m => m.Role == "user").Select(m => m.Content));
-        var req = new TripRequirements();
-
-        foreach (var name in knownDestinations.OrderByDescending(n => n.Length))
-        {
-            if (text.Contains(name, StringComparison.OrdinalIgnoreCase))
-            {
-                req.Destination = name;
-                break;
-            }
-        }
-
-        var userMessages = history.Where(m => m.Role == "user").Select(m => m.Content).Reverse();
-        foreach (var message in userMessages)
-        {
-            var budget = ParseBudget(message);
-            if (budget is > 0)
-            {
-                req.Budget = budget;
-                break;
-            }
-        }
-
-        var daysMatch = Regex.Match(text, @"(\d+)\s*-?\s*days?", RegexOptions.IgnoreCase);
-        if (daysMatch.Success && int.TryParse(daysMatch.Groups[1].Value, out var days) && days > 0)
-            req.DurationDays = days;
-
-        var travelersMatch = Regex.Match(text, @"(\d+)\s*(?:travelers?|people|persons?|guests?)", RegexOptions.IgnoreCase);
-        if (travelersMatch.Success && int.TryParse(travelersMatch.Groups[1].Value, out var travelers) && travelers > 0)
-            req.Travelers = travelers;
-
-        if (Regex.IsMatch(text, @"hike|hiking|nature|tea|waterfall|scenic", RegexOptions.IgnoreCase))
-            req.Interests = "nature, hiking, sightseeing";
-        else if (Regex.IsMatch(text, @"beach|surf|ocean", RegexOptions.IgnoreCase))
-            req.Interests = "beach, relaxation";
-        else if (Regex.IsMatch(text, @"culture|temple|heritage|history", RegexOptions.IgnoreCase))
-            req.Interests = "culture, heritage";
-
-        if (Regex.IsMatch(text, @"\bbudget\s+(?:hotels?|stays?|accommodation|rooms?|options?)\b|cheap|hostel", RegexOptions.IgnoreCase))
-            req.AccommodationPreference = "budget";
-        else if (Regex.IsMatch(text, @"luxury|suite|5[\s-]?star", RegexOptions.IgnoreCase))
-            req.AccommodationPreference = "luxury";
-        else if (Regex.IsMatch(text, @"mid[\s-]?range|standard", RegexOptions.IgnoreCase))
-            req.AccommodationPreference = "mid-range";
-
-        return req;
-    }
-
-    private static decimal? ParseBudget(string message)
-    {
-        const string amount = @"(\d[\d,]*(?:\.\d+)?)";
-        var patterns = new[]
-        {
-            $@"(?:rs\.?|lkr|usd|\$|budget|under|below|max(?:imum)?)\s*(?:is|of|:|=|around|about|approx(?:imately)?|up\s*to|\s)*\s*{amount}",
-            $@"{amount}\s*(?:rs\.?|lkr|rupees|/-)",
-            // A reply that is only a number, e.g. "400000" after being asked for a budget.
-            $@"^\s*{amount}\s*$"
-        };
-
-        foreach (var pattern in patterns)
-        {
-            var match = Regex.Match(message, pattern, RegexOptions.IgnoreCase);
-            if (!match.Success)
-                continue;
-            if (decimal.TryParse(match.Groups[1].Value.Replace(",", ""), NumberStyles.Number, CultureInfo.InvariantCulture, out var value)
-                && value >= 1000)
-                return value;
-        }
-
-        return null;
-    }
-
-    public static void ApplyDefaults(TripRequirements req)
-    {
         req.MissingFields.Clear();
         if (string.IsNullOrWhiteSpace(req.Destination))
             req.MissingFields.Add("destination");
         if (req.Budget is null or <= 0)
             req.MissingFields.Add("budget");
 
-        if (req.Travelers <= 0)
-            req.Travelers = 2;
-        req.DurationDays ??= 3;
-
-        var start = req.StartDate?.Date ?? DateTime.UtcNow.Date.AddDays(14);
-        req.StartDate = DateTime.SpecifyKind(start, DateTimeKind.Utc);
-        var duration = req.DurationDays.Value;
-        req.EndDate = req.StartDate.Value.AddDays(Math.Max(duration - 1, 0));
-
-        req.Interests ??= "nature, hiking, sightseeing";
-        req.AccommodationPreference ??= "mid-range";
+        return (req, names);
     }
 
-    public string BuildClarifyingMessage(TripRequirements req, IReadOnlyList<string> knownDestinations)
+    public static void MergePreferences(TripRequirements req, TravelPreferencesDto prefs)
+    {
+        if (string.IsNullOrWhiteSpace(req.Interests) && !string.IsNullOrWhiteSpace(prefs.Interests))
+        {
+            req.Interests = prefs.Interests;
+            req.Assumptions.Add($"Used your saved interests: {prefs.Interests}.");
+        }
+
+        if (string.IsNullOrWhiteSpace(req.AccommodationPreference) && !string.IsNullOrWhiteSpace(prefs.AccommodationPreference))
+        {
+            req.AccommodationPreference = prefs.AccommodationPreference;
+            req.Assumptions.Add($"Used your saved {prefs.AccommodationPreference} accommodation preference.");
+        }
+
+        if (string.IsNullOrWhiteSpace(req.TransportPreference) && !string.IsNullOrWhiteSpace(prefs.TransportPreference))
+        {
+            req.TransportPreference = prefs.TransportPreference;
+            req.Assumptions.Add($"Used your saved transport preference ({prefs.TransportPreference}).");
+        }
+
+        if (req.Budget is null or <= 0 && req.OriginalCurrency is null && prefs.BudgetMax is > 0)
+        {
+            req.Budget = prefs.BudgetMax;
+            req.Assumptions.Add($"Used your saved maximum budget of Rs. {prefs.BudgetMax.Value.ToString("N0", CultureInfo.InvariantCulture)}.");
+        }
+    }
+
+    public static string BuildClarifyingMessage(TripRequirements req, IReadOnlyList<string> knownDestinations)
     {
         var options = knownDestinations.Count > 0
             ? string.Join(", ", knownDestinations)
-            : "Ella, Kandy, or Galle";
-        if (req.MissingFields.Contains("destination") && req.MissingFields.Contains("budget"))
-            return $"I can plan that. Which destination would you like (I can currently plan trips to {options}), and what is your total budget (for example Rs. 50,000)?";
-        if (req.MissingFields.Contains("destination"))
-            return $"Got your budget. Which destination should I plan for? I can currently plan trips to {options}.";
-        if (req.MissingFields.Contains("budget"))
-            return "Great destination. What is your total budget for the trip?";
-        return "Tell me the destination and budget and I will put a plan together.";
-    }
+            : "Ella, Kandy or Galle";
+        var warning = req.Warnings.Count > 0 ? " " + string.Join(" ", req.Warnings) : "";
 
-    private static string StripFence(string raw)
-    {
-        raw = raw.Trim();
-        if (!raw.StartsWith("```", StringComparison.Ordinal))
-            return raw;
-        var start = raw.IndexOf('\n');
-        var end = raw.LastIndexOf("```", StringComparison.Ordinal);
-        if (start >= 0 && end > start)
-            return raw[(start + 1)..end].Trim();
-        return raw;
+        if (req.MissingFields.Contains("destination") && req.MissingFields.Contains("budget"))
+            return $"I can plan that. Which destination would you like (I can currently plan trips to {options}), and what is your total budget (for example Rs. 50,000)?{warning}";
+        if (req.MissingFields.Contains("destination"))
+            return $"Got your budget. Which destination should I plan for? I can currently plan trips to {options}.{warning}";
+        if (req.MissingFields.Contains("budget"))
+            return $"Great choice. What is your total budget for the trip (for example Rs. 50,000)?{warning}";
+        return "Tell me the destination and budget and I will put a plan together.";
     }
 }

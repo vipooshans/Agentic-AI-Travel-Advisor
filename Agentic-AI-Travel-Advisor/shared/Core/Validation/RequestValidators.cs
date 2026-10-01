@@ -88,7 +88,15 @@ public sealed class TravelPreferencesValidator : AbstractValidator<TravelPrefere
             .WithMessage("Maximum budget must be greater than or equal to the minimum budget.");
         RuleFor(x => x.PreferredClimate).MaximumLength(64);
         RuleFor(x => x.Interests).MaximumLength(500);
+        RuleFor(x => x.AccommodationPreference)
+            .Must(v => string.IsNullOrEmpty(v) || AccommodationLevels.Contains(v.Trim(), StringComparer.OrdinalIgnoreCase))
+            .WithMessage("Accommodation preference must be budget, mid-range or luxury.");
+        RuleFor(x => x.TransportPreference)
+            .Must(v => string.IsNullOrEmpty(v) || Enum.TryParse<TransportMode>(v.Trim(), true, out _))
+            .WithMessage($"Transport preference must be one of: {string.Join(", ", Enum.GetNames<TransportMode>())}.");
     }
+
+    public static readonly string[] AccommodationLevels = ["budget", "mid-range", "luxury"];
 }
 
 public sealed class CreateHotelRequestValidator : AbstractValidator<CreateHotelRequest>

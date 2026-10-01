@@ -98,9 +98,26 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Expected:** Plan stays within budget or clearly says no in-budget option exists.
 - **Actual:** Over-budget package recommended.
 - **Evidence:** `shared/Infrastructure/AI/Agents/RecommendationAgent.cs` lines 44-65 at `4833828`.
-- **Status:** Open
+- **Status:** Retested (Closed)
 - **Fix:**
-- **Retest result:**
+  - `BudgetPlanner` prices every combination the same way `BookingService` does:
+    - packages: (price + every activity) × travelers
+    - rooms: rate × nights × rooms needed
+    - transport: return fare × travelers
+  - It only returns combinations whose total is within the budget. When nothing fits, it returns `over_budget` with the cheapest real option instead of a plan.
+  - Alternatives are only listed if swapping them in keeps the plan within budget.
+  - `TravelPlanSchema` rejects any plan whose total exceeds the budget, or whose selected items or cost breakdown don't add up to the total. `ItineraryAgent` never returns a plan that fails this check.
+  - Selected rooms and packages are re-priced with a live `checkAvailability` quote. A room that costs more on the chosen dates and would break the budget is dropped.
+- **Retest result:** Phase 5 (`testing/execution-results/phase5-agentic-ai/`). These tests passed:
+  - **Unit:**
+    - `BudgetPlannerTests.Def007_package_that_would_break_the_budget_is_not_selected`: the Ella package costs 72,000 for two, so on a 50,000 budget no package is chosen.
+    - `Selection_and_alternatives_never_exceed_the_budget`: 8 budgets × 4 group sizes × 4 durations.
+    - `Package_total_includes_activities_for_every_traveler`
+    - `Too_small_budget_reports_the_cheapest_real_option`
+    - `TravelPlanSchemaTests.Over_budget_plan_is_rejected`
+  - **API (seeded catalog, Testcontainers):**
+    - `AiAgentTests.Ella_plan_is_structured_budget_compliant_and_schema_valid`
+    - `Budget_too_small_returns_over_budget_without_a_plan`: "budget 5000 rupees" returns `over_budget` and no plan.
 
 ## DEF-008 Budget parser misses budgets and mislabels currency
 - **Severity / Priority:** Medium / P2
@@ -109,9 +126,19 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Expected:** budget = 60000, travelers = 4.
 - **Actual:** budget = null (assistant asks for a budget).
 - **Evidence:** `TravelPlanningAgent.ParseBudget` at `4833828`.
-- **Status:** Open
-- **Fix:**
-- **Retest result:**
+- **Status:** Retested (Closed)
+- **Fix:** New `RequirementParser`:
+  - **Budget:** every amount in the message is scored (currency marker +2, budget keyword +1). Numbers followed by a non-money unit (people, days, nights, stars and so on) are skipped. It understands `k`, `lakh`, `million` and comma formats.
+  - **Currency:** `$`/USD, EUR and GBP budgets are converted to LKR at the configured `Ai:LkrPerUnit` rate, and the conversion is stated as an assumption.
+  - **Travelers:** recognises "travellers"/"travelers", number words, "family of N", couple and solo.
+  - When the user sends several messages, the latest message wins for each field.
+- **Retest result:** Phase 5:
+  - **Unit:** `RequirementParserTests` passed, 32 cases, including:
+    - `Def008_people_count_is_not_read_as_budget`
+    - `Foreign_currency_is_converted_with_a_stated_assumption`
+    - `Numbers_that_are_not_money_are_ignored`
+  - **API:** `AiAgentTests.Def008_group_size_is_not_mistaken_for_budget` passed. "max 4 people, budget Rs. 60000 to Kandy for 2 nights" produced a plan with 4 travelers, a 60,000 budget and 3 days.
+  - **Manual:** the same request against the dev database (`manual-smoke-dev.log`) gave travelers=4, budget=60000, total=28000.
 
 ## DEF-009 MVC portal returns 500 on expired token or API 404
 - **Severity / Priority:** Medium / P2
@@ -164,9 +191,21 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Expected:** Fallback used and a warning logged.
 - **Actual:** Fallback used, nothing logged.
 - **Evidence:** `AgenticAiService.cs` lines 73, 102 at `4833828`.
-- **Status:** Open
+- **Status:** Retested (Closed)
 - **Fix:**
-- **Retest result:**
+  - The empty `catch {}` blocks are gone; no `catch {}` remains under `shared/Infrastructure/AI`.
+  - `AgentOrchestrator` logs `LLM orchestration failed (...); falling back to the deterministic planner` as a warning, with the exception, then answers with the deterministic agents.
+  - Tool failures are logged by `ToolRegistry`:
+    - unexpected exceptions as errors
+    - schema rejections and role denials as warnings
+  - A plan that fails schema validation is logged as an error and not shown.
+  - The user only ever gets a generic message, never the exception text.
+- **Retest result:** Phase 5:
+  - **Unit:** `AgentOrchestratorTests.Llm_failure_falls_back_to_the_deterministic_planner` passed. The scripted LLM throws `HttpRequestException` (401). The test checks:
+    - the response comes from the deterministic planner
+    - exactly one warning containing "falling back" is logged, carrying the exception
+    - "401" does not appear in the reply
+  - **Manual:** the API was run with `Ai__ApiKey=invalid-test-key` and `Ai__BaseUrl=http://127.0.0.1:9/v1`. Chat returned 200 with `mode=deterministic` and a plan, and the console logged the warning with the connection-refused exception (`def013-llm-unreachable-retest.log`).
 
 ## DEF-014 Flutter app: wrong-role login, no 401 handling, missing timeouts
 - **Severity / Priority:** Low / P2

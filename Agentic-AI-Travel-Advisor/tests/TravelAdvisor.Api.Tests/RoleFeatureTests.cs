@@ -42,7 +42,7 @@ public class RoleFeatureTests(ApiFixture fx)
 
         var created = await guest.PostAsJsonAsync("/api/reviews", new { bookingId = stay.Id, rating = 4, comment = "Lovely view" });
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
-        var review = (await created.Content.ReadFromJsonAsync<ReviewDto>(Json))!;
+        var review = (await created.Content.ReadFromJsonAsync<ReviewDto>(JsonOptions))!;
         Assert.Equal(room.HotelId, review.HotelId);
         Assert.Null(review.TravelPackageId);
         Assert.Equal("Test U.", review.AuthorName);
@@ -53,7 +53,7 @@ public class RoleFeatureTests(ApiFixture fx)
         var publicJson = await (await fx.CreateClient().GetAsync($"/api/hotels/{room.HotelId}/reviews")).Content.ReadAsStringAsync();
         Assert.Contains("Lovely view", publicJson);
         Assert.DoesNotContain(guestAuth.User.Email, publicJson, StringComparison.OrdinalIgnoreCase);
-        var hotel = await fx.CreateClient().GetFromJsonAsync<HotelDetailDto>($"/api/hotels/{room.HotelId}", Json);
+        var hotel = await fx.CreateClient().GetFromJsonAsync<HotelDetailDto>($"/api/hotels/{room.HotelId}", JsonOptions);
         Assert.Equal(4.0, hotel!.AverageRating);
         Assert.Equal(1, hotel.ReviewCount);
 
@@ -64,19 +64,19 @@ public class RoleFeatureTests(ApiFixture fx)
         Assert.Equal(HttpStatusCode.Forbidden,
             (await owner.PatchAsJsonAsync($"/api/reviews/{review.Id}/status", new { status = 1 })).StatusCode);
 
-        var ownerView = await owner.GetFromJsonAsync<List<ReviewDto>>("/api/reviews", Json);
+        var ownerView = await owner.GetFromJsonAsync<List<ReviewDto>>("/api/reviews", JsonOptions);
         Assert.Contains(ownerView!, r => r.Id == review.Id);
 
         var hidden = await admin.PatchAsJsonAsync($"/api/reviews/{review.Id}/status", new { status = 1 });
         Assert.Equal(HttpStatusCode.OK, hidden.StatusCode);
 
-        var afterHide = await fx.CreateClient().GetFromJsonAsync<List<ReviewDto>>($"/api/hotels/{room.HotelId}/reviews", Json);
+        var afterHide = await fx.CreateClient().GetFromJsonAsync<List<ReviewDto>>($"/api/hotels/{room.HotelId}/reviews", JsonOptions);
         Assert.DoesNotContain(afterHide!, r => r.Id == review.Id);
-        var hotelAfterHide = await fx.CreateClient().GetFromJsonAsync<HotelDetailDto>($"/api/hotels/{room.HotelId}", Json);
+        var hotelAfterHide = await fx.CreateClient().GetFromJsonAsync<HotelDetailDto>($"/api/hotels/{room.HotelId}", JsonOptions);
         Assert.Null(hotelAfterHide!.AverageRating);
-        Assert.DoesNotContain((await owner.GetFromJsonAsync<List<ReviewDto>>("/api/reviews", Json))!, r => r.Id == review.Id);
-        Assert.Contains((await guest.GetFromJsonAsync<List<ReviewDto>>("/api/reviews", Json))!, r => r.Id == review.Id);
-        Assert.Contains((await admin.GetFromJsonAsync<List<ReviewDto>>("/api/reviews?status=1", Json))!, r => r.Id == review.Id);
+        Assert.DoesNotContain((await owner.GetFromJsonAsync<List<ReviewDto>>("/api/reviews", JsonOptions))!, r => r.Id == review.Id);
+        Assert.Contains((await guest.GetFromJsonAsync<List<ReviewDto>>("/api/reviews", JsonOptions))!, r => r.Id == review.Id);
+        Assert.Contains((await admin.GetFromJsonAsync<List<ReviewDto>>("/api/reviews?status=1", JsonOptions))!, r => r.Id == review.Id);
     }
 
     [SkippableFact]
@@ -88,19 +88,19 @@ public class RoleFeatureTests(ApiFixture fx)
 
         var booked = await guest.PostAsJsonAsync("/api/bookings", new { travelPackageId = package.Id, checkIn = TodayUtc });
         Assert.Equal(HttpStatusCode.Created, booked.StatusCode);
-        var booking = (await booked.Content.ReadFromJsonAsync<BookingDto>(Json))!;
+        var booking = (await booked.Content.ReadFromJsonAsync<BookingDto>(JsonOptions))!;
         Assert.Equal(HttpStatusCode.OK, (await agent.PatchAsJsonAsync($"/api/bookings/{booking.Id}/status", new { status = 1 })).StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await agent.PatchAsJsonAsync($"/api/bookings/{booking.Id}/status", new { status = 3 })).StatusCode);
 
         var created = await guest.PostAsJsonAsync("/api/reviews", new { bookingId = booking.Id, rating = 5 });
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
-        var review = (await created.Content.ReadFromJsonAsync<ReviewDto>(Json))!;
+        var review = (await created.Content.ReadFromJsonAsync<ReviewDto>(JsonOptions))!;
         Assert.Equal(package.Id, review.TravelPackageId);
         Assert.Null(review.HotelId);
 
-        var list = await fx.CreateClient().GetFromJsonAsync<List<ReviewDto>>($"/api/packages/{package.Id}/reviews", Json);
+        var list = await fx.CreateClient().GetFromJsonAsync<List<ReviewDto>>($"/api/packages/{package.Id}/reviews", JsonOptions);
         Assert.Single(list!);
-        Assert.Contains((await agent.GetFromJsonAsync<List<ReviewDto>>("/api/reviews", Json))!, r => r.Id == review.Id);
+        Assert.Contains((await agent.GetFromJsonAsync<List<ReviewDto>>("/api/reviews", JsonOptions))!, r => r.Id == review.Id);
     }
 
     [SkippableFact]
@@ -132,12 +132,12 @@ public class RoleFeatureTests(ApiFixture fx)
 
         var created = await agent.PostAsJsonAsync("/api/transportation", Body(package.Id));
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
-        var option = (await created.Content.ReadFromJsonAsync<TransportationDto>(Json))!;
+        var option = (await created.Content.ReadFromJsonAsync<TransportationDto>(JsonOptions))!;
         Assert.Equal(package.DestinationId, option.DestinationId);
         Assert.Equal("07:30", option.DepartureTime);
         Assert.Equal(TransportMode.Train, option.Mode);
 
-        var search = await fx.CreateClient().GetFromJsonAsync<List<TransportationDto>>($"/api/transportation?from={Uri.EscapeDataString(from)}&mode=1", Json);
+        var search = await fx.CreateClient().GetFromJsonAsync<List<TransportationDto>>($"/api/transportation?from={Uri.EscapeDataString(from)}&mode=1", JsonOptions);
         Assert.Single(search!);
 
         Assert.Equal(HttpStatusCode.Forbidden, (await otherAgent.PutAsJsonAsync($"/api/transportation/{option.Id}", Body())).StatusCode);
@@ -145,11 +145,11 @@ public class RoleFeatureTests(ApiFixture fx)
 
         var deactivated = await agent.PutAsJsonAsync($"/api/transportation/{option.Id}", Body(package.Id, active: false));
         Assert.Equal(HttpStatusCode.OK, deactivated.StatusCode);
-        Assert.Empty((await fx.CreateClient().GetFromJsonAsync<List<TransportationDto>>($"/api/transportation?from={Uri.EscapeDataString(from)}", Json))!);
+        Assert.Empty((await fx.CreateClient().GetFromJsonAsync<List<TransportationDto>>($"/api/transportation?from={Uri.EscapeDataString(from)}", JsonOptions))!);
         Assert.Equal(HttpStatusCode.NotFound, (await fx.CreateClient().GetAsync($"/api/transportation/{option.Id}")).StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await agent.GetAsync($"/api/transportation/{option.Id}")).StatusCode);
-        Assert.Contains((await agent.GetFromJsonAsync<List<TransportationDto>>("/api/transportation/mine", Json))!, t => t.Id == option.Id);
-        Assert.DoesNotContain((await otherAgent.GetFromJsonAsync<List<TransportationDto>>("/api/transportation/mine", Json))!, t => t.Id == option.Id);
+        Assert.Contains((await agent.GetFromJsonAsync<List<TransportationDto>>("/api/transportation/mine", JsonOptions))!, t => t.Id == option.Id);
+        Assert.DoesNotContain((await otherAgent.GetFromJsonAsync<List<TransportationDto>>("/api/transportation/mine", JsonOptions))!, t => t.Id == option.Id);
 
         Assert.Equal(HttpStatusCode.NoContent, (await agent.DeleteAsync($"/api/transportation/{option.Id}")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await agent.GetAsync($"/api/transportation/{option.Id}")).StatusCode);
@@ -174,8 +174,8 @@ public class RoleFeatureTests(ApiFixture fx)
         {
             var off = await admin.PutAsJsonAsync($"/api/settings/{SystemSettingKeys.AiAssistantEnabled}", new { value = "FALSE" });
             Assert.Equal(HttpStatusCode.OK, off.StatusCode);
-            Assert.Equal("false", (await off.Content.ReadFromJsonAsync<SystemSettingDto>(Json))!.Value);
-            Assert.False((await fx.CreateClient().GetFromJsonAsync<PublicSettingsDto>("/api/settings/public", Json))!.AiAssistantEnabled);
+            Assert.Equal("false", (await off.Content.ReadFromJsonAsync<SystemSettingDto>(JsonOptions))!.Value);
+            Assert.False((await fx.CreateClient().GetFromJsonAsync<PublicSettingsDto>("/api/settings/public", JsonOptions))!.AiAssistantEnabled);
             var chat = await user.PostAsJsonAsync("/api/ai/chat", new { message = "Plan a trip to Ella" });
             Assert.Equal(HttpStatusCode.ServiceUnavailable, chat.StatusCode);
 
@@ -191,7 +191,7 @@ public class RoleFeatureTests(ApiFixture fx)
         }
 
         Assert.Equal(HttpStatusCode.OK, (await user.PostAsJsonAsync("/api/ai/chat", new { message = "Plan a trip to Ella" })).StatusCode);
-        var all = await admin.GetFromJsonAsync<List<SystemSettingDto>>("/api/settings", Json);
+        var all = await admin.GetFromJsonAsync<List<SystemSettingDto>>("/api/settings", JsonOptions);
         Assert.Contains(all!, s => s.Key == SystemSettingKeys.MaxAdvanceBookingDays && s.Value == "365" && s.UpdatedBy != null);
     }
 
@@ -214,24 +214,24 @@ public class RoleFeatureTests(ApiFixture fx)
 
         var declined = await guest.PostAsJsonAsync(cardUrl, new { method = 0, cardNumber = "4000 0000 0000 0002" });
         Assert.Equal(HttpStatusCode.Created, declined.StatusCode);
-        Assert.Equal(PaymentStatus.Failed, (await declined.Content.ReadFromJsonAsync<PaymentDto>(Json))!.Status);
+        Assert.Equal(PaymentStatus.Failed, (await declined.Content.ReadFromJsonAsync<PaymentDto>(JsonOptions))!.Status);
 
         var paid = await guest.PostAsJsonAsync(cardUrl, new { method = 0, cardNumber = "4242 4242 4242 4242" });
         Assert.Equal(HttpStatusCode.Created, paid.StatusCode);
-        var payment = (await paid.Content.ReadFromJsonAsync<PaymentDto>(Json))!;
+        var payment = (await paid.Content.ReadFromJsonAsync<PaymentDto>(JsonOptions))!;
         Assert.Equal(PaymentStatus.Completed, payment.Status);
         Assert.Equal(12000m, payment.Amount);
         Assert.StartsWith("SIM-", payment.TransactionReference);
         Assert.NotNull(payment.PaidAt);
 
         Assert.Equal(HttpStatusCode.Conflict, (await guest.PostAsJsonAsync(cardUrl, new { method = 0, cardNumber = "4242424242424242" })).StatusCode);
-        var ownerView = await owner.GetFromJsonAsync<List<PaymentDto>>(cardUrl, Json);
+        var ownerView = await owner.GetFromJsonAsync<List<PaymentDto>>(cardUrl, JsonOptions);
         Assert.Equal(2, ownerView!.Count);
         Assert.DoesNotContain("4242", await (await owner.GetAsync(cardUrl)).Content.ReadAsStringAsync());
 
         var cash = await guest.PostAsJsonAsync(cashUrl, new { method = 1 });
         Assert.Equal(HttpStatusCode.Created, cash.StatusCode);
-        var cashPayment = (await cash.Content.ReadFromJsonAsync<PaymentDto>(Json))!;
+        var cashPayment = (await cash.Content.ReadFromJsonAsync<PaymentDto>(JsonOptions))!;
         Assert.Equal(PaymentStatus.Pending, cashPayment.Status);
         Assert.Equal(HttpStatusCode.Forbidden,
             (await guest.PatchAsJsonAsync($"{cashUrl}/{cashPayment.Id}/status", new { status = 1 })).StatusCode);
@@ -240,10 +240,10 @@ public class RoleFeatureTests(ApiFixture fx)
             (await otherOwner.PatchAsJsonAsync($"{cashUrl}/{cashPayment.Id}/status", new { status = 1 })).StatusCode);
         var confirmed = await owner.PatchAsJsonAsync($"{cashUrl}/{cashPayment.Id}/status", new { status = 1 });
         Assert.Equal(HttpStatusCode.OK, confirmed.StatusCode);
-        Assert.Equal(PaymentStatus.Completed, (await confirmed.Content.ReadFromJsonAsync<PaymentDto>(Json))!.Status);
+        Assert.Equal(PaymentStatus.Completed, (await confirmed.Content.ReadFromJsonAsync<PaymentDto>(JsonOptions))!.Status);
 
         Assert.Equal(HttpStatusCode.OK, (await guest.PatchAsJsonAsync($"/api/bookings/{cardBooking.Id}/status", new { status = 2 })).StatusCode);
-        var afterCancel = await guest.GetFromJsonAsync<List<PaymentDto>>(cardUrl, Json);
+        var afterCancel = await guest.GetFromJsonAsync<List<PaymentDto>>(cardUrl, JsonOptions);
         Assert.Contains(afterCancel!, p => p.Id == payment.Id && p.Status == PaymentStatus.Refunded);
         Assert.Equal(HttpStatusCode.BadRequest, (await guest.PostAsJsonAsync(cardUrl, new { method = 0, cardNumber = "4242424242424242" })).StatusCode);
     }
@@ -255,7 +255,7 @@ public class RoleFeatureTests(ApiFixture fx)
         var user = fx.Authed((await fx.RegisterUserAsync()).Token);
         var owner = fx.Authed((await fx.CreateStaffAsync(RoleNames.HotelOwner)).Token);
 
-        var empty = await user.GetFromJsonAsync<UserProfileDto>("/api/users/me/profile", Json);
+        var empty = await user.GetFromJsonAsync<UserProfileDto>("/api/users/me/profile", JsonOptions);
         Assert.Equal("LKR", empty!.PreferredCurrency);
         Assert.Null(empty.PhoneNumber);
 
@@ -268,7 +268,7 @@ public class RoleFeatureTests(ApiFixture fx)
             preferredCurrency = "usd"
         });
         Assert.Equal(HttpStatusCode.OK, saved.StatusCode);
-        var profile = await user.GetFromJsonAsync<UserProfileDto>("/api/users/me/profile", Json);
+        var profile = await user.GetFromJsonAsync<UserProfileDto>("/api/users/me/profile", JsonOptions);
         Assert.Equal("+94 77 123 4567", profile!.PhoneNumber);
         Assert.Equal(new DateOnly(1995, 4, 12), profile.DateOfBirth);
         Assert.Equal("USD", profile.PreferredCurrency);
@@ -294,7 +294,7 @@ public class RoleFeatureTests(ApiFixture fx)
         var cancelled = await BookAndConfirmRoomAsync(owner, guest, room.Id, TodayUtc.AddDays(12));
         Assert.Equal(HttpStatusCode.OK, (await owner.PatchAsJsonAsync($"/api/bookings/{cancelled.Id}/status", new { status = 2 })).StatusCode);
 
-        var stats = await owner.GetFromJsonAsync<StatisticsDto>("/api/reports/statistics", Json);
+        var stats = await owner.GetFromJsonAsync<StatisticsDto>("/api/reports/statistics", JsonOptions);
         Assert.Equal(2, stats!.TotalBookings);
         Assert.Equal(10000m, stats.Revenue);
         Assert.Equal(0.5, stats.CancellationRate);
@@ -306,11 +306,11 @@ public class RoleFeatureTests(ApiFixture fx)
         Assert.Equal(("Hotel", room.HotelId, 1, 10000m), (top.Type, top.Id, top.Bookings, top.Revenue));
         Assert.NotEqual(kept.Id, cancelled.Id);
 
-        var otherStats = await otherOwner.GetFromJsonAsync<StatisticsDto>("/api/reports/statistics", Json);
+        var otherStats = await otherOwner.GetFromJsonAsync<StatisticsDto>("/api/reports/statistics", JsonOptions);
         Assert.Equal(0, otherStats!.TotalBookings);
         Assert.Empty(otherStats.TopListings);
 
-        var adminStats = await admin.GetFromJsonAsync<StatisticsDto>("/api/reports/statistics?top=20", Json);
+        var adminStats = await admin.GetFromJsonAsync<StatisticsDto>("/api/reports/statistics?top=20", JsonOptions);
         Assert.True(adminStats!.TotalBookings >= 2);
 
         Assert.Equal(HttpStatusCode.Forbidden, (await guest.GetAsync("/api/reports/statistics")).StatusCode);

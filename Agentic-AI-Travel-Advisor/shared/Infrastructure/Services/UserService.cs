@@ -58,6 +58,12 @@ public sealed class UserService(
         prefs.BudgetMax = request.BudgetMax;
         prefs.PreferredClimate = Clean(request.PreferredClimate);
         prefs.Interests = Clean(request.Interests);
+        if (request.AccommodationPreference is not null)
+            prefs.AccommodationPreference = Clean(request.AccommodationPreference)?.ToLowerInvariant();
+        if (request.TransportPreference is not null)
+            prefs.TransportPreference = Enum.TryParse<TransportMode>(request.TransportPreference.Trim(), true, out var mode)
+                ? mode.ToString()
+                : null;
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return prefs.ToDto();
     }

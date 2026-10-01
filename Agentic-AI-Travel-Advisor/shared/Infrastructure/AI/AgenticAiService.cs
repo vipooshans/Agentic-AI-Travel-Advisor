@@ -1,9 +1,9 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using TravelAdvisor.Core.Common;
 using TravelAdvisor.Core.DTOs.AI;
 using TravelAdvisor.Core.Entities;
 using TravelAdvisor.Core.Interfaces;
-using TravelAdvisor.Infrastructure.AI.Agents;
 using TravelAdvisor.Infrastructure.Data;
 
 namespace TravelAdvisor.Infrastructure.AI;
@@ -17,115 +17,85 @@ public class AgenticAiService : IAgenticAiService
     };
 
     private readonly AppDbContext _context;
-    private readonly ICatalogTools _catalog;
-    private readonly ILlmClient _llm;
-    private readonly TravelPlanningAgent _planning;
-    private readonly RecommendationAgent _recommendation;
-    private readonly ItineraryAgent _itinerary;
+    private readonly AgentOrchestrator _orchestrator;
+    private readonly TimeProvider _clock;
 
-    public AgenticAiService(
-        AppDbContext context,
-        ICatalogTools catalog,
-        ILlmClient llm,
-        TravelPlanningAgent planning,
-        RecommendationAgent recommendation,
-        ItineraryAgent itinerary)
+    public AgenticAiService(AppDbContext context, AgentOrchestrator orchestrator, TimeProvider clock)
     {
         _context = context;
-        _catalog = catalog;
-        _llm = llm;
-        _planning = planning;
-        _recommendation = recommendation;
-        _itinerary = itinerary;
+        _orchestrator = orchestrator;
+        _clock = clock;
     }
 
-    public async Task<ChatResponse> ChatAsync(string userId, ChatRequest request, CancellationToken cancellationToken = default)
+    public async Task<ChatResponse> ChatAsync(UserContext caller, ChatRequest request, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(request.Message))
             throw new ArgumentException("Message is required.");
 
-        var conversation = await GetOrCreateConversationAsync(userId, request, cancellationToken);
+        var conversation = await GetOrCreateConversationAsync(caller.UserId, request, cancellationToken);
         var messages = Deserialize(conversation.Messages);
-
         messages.Add(new ChatMessageDto { Role = "user", Content = request.Message.Trim() });
 
-        var knownDestinations = await _catalog.GetDestinationNamesAsync(cancellationToken);
-        var requirements = await _planning.ExtractAsync(messages, knownDestinations, cancellationToken);
-
-        string reply;
-        SuggestedTravelPlan? plan = null;
-
-        if (!requirements.HasEnoughToPlan)
-        {
-            reply = _planning.BuildClarifyingMessage(requirements, knownDestinations);
-            if (_llm.IsConfigured)
-            {
-                try
-                {
-                    var polished = await _llm.CompleteAsync(
-                        "You are a friendly travel advisor. Rewrite the following as a short clarifying question. Keep it under 40 words.",
-                        reply,
-                        jsonMode: false,
-                        cancellationToken);
-                    if (!string.IsNullOrWhiteSpace(polished))
-                        reply = polished.Trim('"');
-                }
-                catch
-                {
-                    // keep template reply
-                }
-            }
-        }
-        else
-        {
-            var rec = await _recommendation.RecommendAsync(requirements, cancellationToken);
-            if (rec.Error is not null)
-            {
-                reply = rec.Error;
-            }
-            else
-            {
-                plan = _itinerary.Build(requirements, rec);
-                reply = _itinerary.BuildReply(requirements, plan);
-                if (_llm.IsConfigured)
-                {
-                    try
-                    {
-                        var polished = await _llm.CompleteAsync(
-                            "You are a friendly Sri Lankan travel advisor. Rewrite the plan as a helpful chat reply. Keep the hotel, package, cost, assumptions, and day-by-day items. Do not invent places that are not listed.",
-                            reply,
-                            jsonMode: false,
-                            cancellationToken);
-                        if (!string.IsNullOrWhiteSpace(polished))
-                            reply = polished;
-                    }
-                    catch
-                    {
-                        // keep structured reply
-                    }
-                }
-            }
-        }
+        var result = await _orchestrator.RunAsync(caller, messages, request, cancellationToken);
+        var plan = result.Outcome?.Status == ChatStatus.Plan ? result.Outcome.Plan : null;
+        var legacy = plan is not null ? result.Outcome!.LegacyPlan : null;
+        var proposal = result.Status == ChatStatus.BookingProposal ? result.Proposal : null;
 
         messages.Add(new ChatMessageDto
         {
             Role = "assistant",
-            Content = reply,
-            SuggestedPlan = plan
+            Content = result.Reply,
+            Status = result.Status,
+            SuggestedPlan = legacy,
+            Plan = plan,
+            PendingBooking = proposal,
+            BookingId = result.Booking?.Id
         });
 
+        var now = _clock.GetUtcNow().UtcDateTime;
         if (string.IsNullOrWhiteSpace(conversation.Title) || conversation.Title == "New conversation")
             conversation.Title = TruncateTitle(request.Message);
 
         conversation.Messages = JsonSerializer.Serialize(messages, JsonOptions);
-        conversation.UpdatedAt = DateTime.UtcNow;
+        conversation.UpdatedAt = now;
+
+        if (plan is not null)
+        {
+            foreach (var record in result.Outcome!.Recommendations)
+            {
+                _context.AIRecommendations.Add(new AIRecommendation
+                {
+                    ConversationId = conversation.Id,
+                    UserId = caller.UserId,
+                    ItemType = record.Type,
+                    HotelId = record.HotelId,
+                    RoomId = record.RoomId,
+                    TravelPackageId = record.TravelPackageId,
+                    TransportationId = record.TransportationId,
+                    DestinationId = record.DestinationId,
+                    Title = record.Title,
+                    EstimatedCost = record.EstimatedCost,
+                    Score = record.Score,
+                    Reason = record.Reason,
+                    CreatedAt = now
+                });
+            }
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
 
         return new ChatResponse
         {
             ConversationId = conversation.Id,
-            Message = reply,
-            SuggestedPlan = plan
+            Message = result.Reply,
+            Status = result.Status,
+            SuggestedPlan = legacy,
+            Plan = plan,
+            PendingBooking = proposal,
+            Booking = result.Booking,
+            Mode = result.Mode,
+            Agents = result.Agents,
+            ToolCalls = result.ToolCalls
         };
     }
 
@@ -134,6 +104,7 @@ public class AgenticAiService : IAgenticAiService
         CancellationToken cancellationToken = default)
     {
         return await _context.AIConversations
+            .AsNoTracking()
             .Where(c => c.UserId == userId)
             .OrderByDescending(c => c.UpdatedAt)
             .Select(c => new ConversationSummaryDto
@@ -151,6 +122,7 @@ public class AgenticAiService : IAgenticAiService
         CancellationToken cancellationToken = default)
     {
         var conversation = await _context.AIConversations
+            .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId, cancellationToken);
         if (conversation is null)
             return null;
@@ -163,6 +135,38 @@ public class AgenticAiService : IAgenticAiService
             UpdatedAt = conversation.UpdatedAt,
             Messages = Deserialize(conversation.Messages)
         };
+    }
+
+    public async Task<List<AiRecommendationDto>> ListRecommendationsAsync(
+        string userId,
+        int? conversationId,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _context.AIRecommendations.AsNoTracking().Where(r => r.UserId == userId);
+        if (conversationId.HasValue)
+            query = query.Where(r => r.ConversationId == conversationId.Value);
+
+        return await query
+            .OrderByDescending(r => r.CreatedAt)
+            .ThenByDescending(r => r.Score)
+            .Take(200)
+            .Select(r => new AiRecommendationDto
+            {
+                Id = r.Id,
+                ConversationId = r.ConversationId,
+                ItemType = r.ItemType,
+                HotelId = r.HotelId,
+                RoomId = r.RoomId,
+                TravelPackageId = r.TravelPackageId,
+                TransportationId = r.TransportationId,
+                DestinationId = r.DestinationId,
+                Title = r.Title,
+                EstimatedCost = r.EstimatedCost,
+                Score = r.Score,
+                Reason = r.Reason,
+                CreatedAt = r.CreatedAt
+            })
+            .ToListAsync(cancellationToken);
     }
 
     private async Task<AIConversation> GetOrCreateConversationAsync(
@@ -179,13 +183,14 @@ public class AgenticAiService : IAgenticAiService
             return existing;
         }
 
+        var now = _clock.GetUtcNow().UtcDateTime;
         var created = new AIConversation
         {
             UserId = userId,
             Title = "New conversation",
             Messages = "[]",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            CreatedAt = now,
+            UpdatedAt = now
         };
         _context.AIConversations.Add(created);
         await _context.SaveChangesAsync(cancellationToken);

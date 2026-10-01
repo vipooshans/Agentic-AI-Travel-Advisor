@@ -81,7 +81,7 @@ public class SecurityHardeningTests(ApiFixture fx)
             city = "Kandy",
             country = "Sri Lanka"
         });
-        var hotel = (await created.Content.ReadFromJsonAsync<HotelDto>(Json))!;
+        var hotel = (await created.Content.ReadFromJsonAsync<HotelDto>(JsonOptions))!;
         var update = new { name = "Renamed Inn", address = "1 Owner Rd", city = "Kandy", country = "Sri Lanka" };
 
         var byOther = await fx.Authed(otherOwner.Token).PutAsJsonAsync($"/api/hotels/{hotel.Id}", update);
@@ -121,19 +121,19 @@ public class SecurityHardeningTests(ApiFixture fx)
         Skip.If(!fx.Available, fx.SkipReason);
         var alice = await fx.RegisterUserAsync();
         var bob = await fx.RegisterUserAsync();
-        var hotels = await fx.CreateClient().GetFromJsonAsync<List<HotelDto>>("/api/hotels", Json);
+        var hotels = await fx.CreateClient().GetFromJsonAsync<List<HotelDto>>("/api/hotels", JsonOptions);
         var hotel = hotels!.First(h => h.RoomCount > 0 && h.City == "Galle");
-        var room = (await fx.CreateClient().GetFromJsonAsync<List<RoomDto>>($"/api/hotels/{hotel.Id}/rooms", Json))![^1];
+        var room = (await fx.CreateClient().GetFromJsonAsync<List<RoomDto>>($"/api/hotels/{hotel.Id}/rooms", JsonOptions))![^1];
 
         var checkIn = DateTime.SpecifyKind(DateTime.UtcNow.Date.AddDays(200 + Random.Shared.Next(0, 100)), DateTimeKind.Utc);
         var created = await fx.Authed(alice.Token).PostAsJsonAsync("/api/bookings", new { roomId = room.Id, checkIn, checkOut = checkIn.AddDays(1) });
         Assert.True(created.IsSuccessStatusCode, await created.Content.ReadAsStringAsync());
-        var booking = (await created.Content.ReadFromJsonAsync<BookingDto>(Json))!;
+        var booking = (await created.Content.ReadFromJsonAsync<BookingDto>(JsonOptions))!;
 
         Assert.Equal(HttpStatusCode.Forbidden, (await fx.Authed(bob.Token).GetAsync($"/api/bookings/{booking.Id}")).StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, (await fx.Authed(bob.Token).PatchAsJsonAsync($"/api/bookings/{booking.Id}/status", new { status = 2 })).StatusCode);
 
-        var bobsList = await fx.Authed(bob.Token).GetFromJsonAsync<List<BookingDto>>("/api/bookings", Json);
+        var bobsList = await fx.Authed(bob.Token).GetFromJsonAsync<List<BookingDto>>("/api/bookings", JsonOptions);
         Assert.DoesNotContain(bobsList!, b => b.Id == booking.Id);
     }
 

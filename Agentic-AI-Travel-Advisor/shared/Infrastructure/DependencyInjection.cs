@@ -73,9 +73,22 @@ public static class DependencyInjection
         services.Configure<AI.AiOptions>(configuration.GetSection(AI.AiOptions.SectionName));
         services.AddHttpClient<ILlmClient, AI.OpenAiCompatClient>();
         services.AddScoped<ICatalogTools, AI.CatalogTools>();
+        services.AddSingleton<AI.Safety.OutputSanitizer>();
+        services.AddScoped<AI.Tools.IAgentTool, AI.Tools.SearchDestinationsTool>();
+        services.AddScoped<AI.Tools.IAgentTool, AI.Tools.SearchHotelsTool>();
+        services.AddScoped<AI.Tools.IAgentTool, AI.Tools.SearchTravelPackagesTool>();
+        services.AddScoped<AI.Tools.IAgentTool, AI.Tools.SearchActivitiesTool>();
+        services.AddScoped<AI.Tools.IAgentTool, AI.Tools.SearchTransportationTool>();
+        services.AddScoped<AI.Tools.IAgentTool, AI.Tools.CheckAvailabilityTool>();
+        services.AddScoped<AI.Tools.IAgentTool, AI.Tools.GetTravelPreferencesTool>();
+        services.AddScoped<AI.Tools.IAgentTool, AI.Tools.GenerateItineraryTool>();
+        services.AddScoped<AI.Tools.IAgentTool, AI.Tools.CreateBookingTool>();
+        services.AddScoped<AI.Tools.ToolRegistry>();
         services.AddScoped<AI.Agents.TravelPlanningAgent>();
         services.AddScoped<AI.Agents.RecommendationAgent>();
         services.AddScoped<AI.Agents.ItineraryAgent>();
+        services.AddScoped<AI.Agents.BookingAgent>();
+        services.AddScoped<AI.AgentOrchestrator>();
         services.AddScoped<IAgenticAiService, AI.AgenticAiService>();
 
         AddJwtAuthentication(services, configuration);

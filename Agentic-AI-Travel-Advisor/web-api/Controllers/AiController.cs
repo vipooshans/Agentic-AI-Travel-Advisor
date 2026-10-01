@@ -23,10 +23,9 @@ public class AiController(IAgenticAiService ai, ISystemSettingsService settings)
         if (!await settings.IsAiAssistantEnabledAsync(cancellationToken))
             throw new ServiceUnavailableException("The AI travel assistant is currently turned off by the administrator.");
 
-        var userId = User.ToUserContext().UserId;
         try
         {
-            return Ok(await ai.ChatAsync(userId, request, cancellationToken));
+            return Ok(await ai.ChatAsync(User.ToUserContext(), request, cancellationToken));
         }
         catch (KeyNotFoundException ex)
         {
@@ -41,6 +40,11 @@ public class AiController(IAgenticAiService ai, ISystemSettingsService settings)
     [HttpGet("conversations")]
     public async Task<ActionResult<List<ConversationSummaryDto>>> List(CancellationToken cancellationToken) =>
         Ok(await ai.ListConversationsAsync(User.ToUserContext().UserId, cancellationToken));
+
+    /// <summary>Hotels, packages, transport and activities the AI recommended to the caller, newest first.</summary>
+    [HttpGet("recommendations")]
+    public async Task<ActionResult<List<AiRecommendationDto>>> Recommendations([FromQuery] int? conversationId, CancellationToken cancellationToken) =>
+        Ok(await ai.ListRecommendationsAsync(User.ToUserContext().UserId, conversationId, cancellationToken));
 
     [HttpGet("conversations/{id:int}")]
     public async Task<ActionResult<ConversationDetailDto>> GetById(int id, CancellationToken cancellationToken)

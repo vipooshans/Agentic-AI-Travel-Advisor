@@ -27,7 +27,9 @@ internal static class DtoMapper
         BudgetMin = prefs?.BudgetMin,
         BudgetMax = prefs?.BudgetMax,
         PreferredClimate = prefs?.PreferredClimate,
-        Interests = prefs?.Interests
+        Interests = prefs?.Interests,
+        AccommodationPreference = prefs?.AccommodationPreference,
+        TransportPreference = prefs?.TransportPreference
     };
 
     public static HotelDto ToDto(this Hotel hotel) => Fill(new HotelDto(), hotel);

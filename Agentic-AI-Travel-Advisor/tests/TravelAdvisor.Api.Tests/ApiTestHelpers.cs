@@ -14,7 +14,7 @@ namespace TravelAdvisor.Api.Tests;
 
 internal static class ApiTestHelpers
 {
-    public static readonly JsonSerializerOptions Json = new() { PropertyNameCaseInsensitive = true };
+    public static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
     public const string AdminEmail = "admin@traveladvisor.com";
     public const string AdminPassword = "Admin@123";
@@ -34,7 +34,7 @@ internal static class ApiTestHelpers
     {
         var response = await fx.CreateClient().PostAsJsonAsync("/api/auth/login", new { email, password });
         response.EnsureSuccessStatusCode();
-        return (await response.Content.ReadFromJsonAsync<AuthResponse>(Json))!;
+        return (await response.Content.ReadFromJsonAsync<AuthResponse>(JsonOptions))!;
     }
 
     public static async Task<AuthResponse> RegisterUserAsync(this ApiFixture fx, string? email = null, string password = "User@123")
@@ -47,7 +47,7 @@ internal static class ApiTestHelpers
             lastName = "User"
         });
         response.EnsureSuccessStatusCode();
-        return (await response.Content.ReadFromJsonAsync<AuthResponse>(Json))!;
+        return (await response.Content.ReadFromJsonAsync<AuthResponse>(JsonOptions))!;
     }
 
     /// <summary>Creates a staff account through the admin API and signs in as it.</summary>
@@ -86,7 +86,7 @@ internal static class ApiTestHelpers
             description = "Integration test hotel"
         });
         Assert.Equal(HttpStatusCode.Created, hotelResponse.StatusCode);
-        var hotel = (await hotelResponse.Content.ReadFromJsonAsync<HotelDto>(Json))!;
+        var hotel = (await hotelResponse.Content.ReadFromJsonAsync<HotelDto>(JsonOptions))!;
         Assert.Equal(HttpStatusCode.OK, (await admin.PatchAsJsonAsync($"/api/hotels/{hotel.Id}/approval", new { status = 1 })).StatusCode);
 
         var roomResponse = await owner.PostAsJsonAsync($"/api/hotels/{hotel.Id}/rooms", new
@@ -97,7 +97,7 @@ internal static class ApiTestHelpers
             capacity
         });
         Assert.Equal(HttpStatusCode.Created, roomResponse.StatusCode);
-        return (owner, (await roomResponse.Content.ReadFromJsonAsync<RoomDto>(Json))!);
+        return (owner, (await roomResponse.Content.ReadFromJsonAsync<RoomDto>(JsonOptions))!);
     }
 
     /// <summary>A fresh travel agent with one approved 3-day package.</summary>
@@ -105,7 +105,7 @@ internal static class ApiTestHelpers
     {
         var agent = fx.Authed((await fx.CreateStaffAsync(RoleNames.TravelAgent)).Token);
         var admin = fx.Authed((await fx.LoginAsync(AdminEmail, AdminPassword)).Token);
-        var destinations = await fx.CreateClient().GetFromJsonAsync<List<DestinationDto>>("/api/destinations", Json);
+        var destinations = await fx.CreateClient().GetFromJsonAsync<List<DestinationDto>>("/api/destinations", JsonOptions);
 
         var created = await agent.PostAsJsonAsync("/api/packages", new
         {
@@ -117,7 +117,7 @@ internal static class ApiTestHelpers
             maxTravelers
         });
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
-        var package = (await created.Content.ReadFromJsonAsync<TravelPackageDto>(Json))!;
+        var package = (await created.Content.ReadFromJsonAsync<TravelPackageDto>(JsonOptions))!;
         Assert.Equal(HttpStatusCode.OK, (await admin.PatchAsJsonAsync($"/api/packages/{package.Id}/approval", new { status = 1 })).StatusCode);
         return (agent, package);
     }
@@ -127,7 +127,7 @@ internal static class ApiTestHelpers
     {
         var created = await user.PostAsJsonAsync("/api/bookings", new { roomId, checkIn, checkOut = checkIn.AddDays(1) });
         Assert.True(created.StatusCode == HttpStatusCode.Created, await created.Content.ReadAsStringAsync());
-        var booking = (await created.Content.ReadFromJsonAsync<BookingDto>(Json))!;
+        var booking = (await created.Content.ReadFromJsonAsync<BookingDto>(JsonOptions))!;
         var confirm = await owner.PatchAsJsonAsync($"/api/bookings/{booking.Id}/status", new { status = 1 });
         Assert.Equal(HttpStatusCode.OK, confirm.StatusCode);
         return booking;

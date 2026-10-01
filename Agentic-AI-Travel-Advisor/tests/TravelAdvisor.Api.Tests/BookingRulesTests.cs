@@ -49,7 +49,7 @@ public class BookingRulesTests(ApiFixture fx)
 
         var ok = await Book(Today.AddDays(10), Today.AddDays(12), guests: 2);
         Assert.Equal(HttpStatusCode.Created, ok.StatusCode);
-        var booking = await ok.Content.ReadFromJsonAsync<BookingDto>(Json);
+        var booking = await ok.Content.ReadFromJsonAsync<BookingDto>(JsonOptions);
         Assert.Equal(2, booking!.Guests);
         Assert.Equal(20000m, booking.TotalPrice);
         Assert.Equal(Today.AddDays(10), booking.CheckIn.ToUniversalTime());
@@ -100,7 +100,7 @@ public class BookingRulesTests(ApiFixture fx)
 
         var created = await fx.Authed(user.Token).PostAsJsonAsync("/api/bookings", new { roomId = room.Id, checkIn, checkOut = checkIn.AddDays(2) });
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
-        var booking = await created.Content.ReadFromJsonAsync<BookingDto>(Json);
+        var booking = await created.Content.ReadFromJsonAsync<BookingDto>(JsonOptions);
 
         await using var connection = new NpgsqlConnection(fx.ConnectionString);
         await connection.OpenAsync();
@@ -135,13 +135,13 @@ public class BookingRulesTests(ApiFixture fx)
         Assert.Equal(HttpStatusCode.OK, saved.StatusCode);
 
         var quote = await fx.CreateClient().GetFromJsonAsync<AvailabilityQuoteDto>(
-            $"/api/bookings/availability?roomId={room.Id}&checkIn={start:yyyy-MM-dd}&checkOut={start.AddDays(2):yyyy-MM-dd}", Json);
+            $"/api/bookings/availability?roomId={room.Id}&checkIn={start:yyyy-MM-dd}&checkOut={start.AddDays(2):yyyy-MM-dd}", JsonOptions);
         Assert.True(quote!.Available);
         Assert.Equal(2, quote.Nights);
         Assert.Equal(25000m, quote.TotalPrice);
 
         var blockedQuote = await fx.CreateClient().GetFromJsonAsync<AvailabilityQuoteDto>(
-            $"/api/bookings/availability?roomId={room.Id}&checkIn={start.AddDays(4):yyyy-MM-dd}&checkOut={start.AddDays(7):yyyy-MM-dd}", Json);
+            $"/api/bookings/availability?roomId={room.Id}&checkIn={start.AddDays(4):yyyy-MM-dd}&checkOut={start.AddDays(7):yyyy-MM-dd}", JsonOptions);
         Assert.False(blockedQuote!.Available);
         Assert.Contains(start.AddDays(5).ToString("yyyy-MM-dd"), blockedQuote.Reason);
 
@@ -160,7 +160,7 @@ public class BookingRulesTests(ApiFixture fx)
             checkOut = start.AddDays(2).ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc)
         });
         Assert.Equal(HttpStatusCode.Created, priced.StatusCode);
-        Assert.Equal(25000m, (await priced.Content.ReadFromJsonAsync<BookingDto>(Json))!.TotalPrice);
+        Assert.Equal(25000m, (await priced.Content.ReadFromJsonAsync<BookingDto>(JsonOptions))!.TotalPrice);
 
         var blockBooked = await owner.PutAsJsonAsync($"/api/hotels/{room.HotelId}/rooms/{room.Id}/calendar", new
         {
@@ -169,7 +169,7 @@ public class BookingRulesTests(ApiFixture fx)
         Assert.Equal(HttpStatusCode.Conflict, blockBooked.StatusCode);
 
         var calendar = await owner.GetFromJsonAsync<RoomCalendarDto>(
-            $"/api/hotels/{room.HotelId}/rooms/{room.Id}/calendar?from={start:yyyy-MM-dd}&to={start.AddDays(7):yyyy-MM-dd}", Json);
+            $"/api/hotels/{room.HotelId}/rooms/{room.Id}/calendar?from={start:yyyy-MM-dd}&to={start.AddDays(7):yyyy-MM-dd}", JsonOptions);
         Assert.Equal([start, start.AddDays(1)], calendar!.BookedNights);
         Assert.Equal(2, calendar.Overrides.Count);
     }
@@ -204,7 +204,7 @@ public class BookingRulesTests(ApiFixture fx)
 
         var first = await Book(a, 1);
         Assert.Equal(HttpStatusCode.Created, first.StatusCode);
-        var firstBooking = await first.Content.ReadFromJsonAsync<BookingDto>(Json);
+        var firstBooking = await first.Content.ReadFromJsonAsync<BookingDto>(JsonOptions);
         Assert.Equal(checkIn.AddDays(package.DurationDays), firstBooking!.CheckOut.ToUniversalTime());
 
         Assert.Equal(HttpStatusCode.Conflict, (await Book(a, 1)).StatusCode);
@@ -212,7 +212,7 @@ public class BookingRulesTests(ApiFixture fx)
 
         var group = await Book(b, 2);
         Assert.Equal(HttpStatusCode.Created, group.StatusCode);
-        Assert.Equal(20000m, (await group.Content.ReadFromJsonAsync<BookingDto>(Json))!.TotalPrice);
+        Assert.Equal(20000m, (await group.Content.ReadFromJsonAsync<BookingDto>(JsonOptions))!.TotalPrice);
 
         var full = await Book(c, 1);
         Assert.Equal(HttpStatusCode.Conflict, full.StatusCode);
@@ -250,7 +250,7 @@ public class BookingRulesTests(ApiFixture fx)
 
         var allowed = await user.PatchAsJsonAsync($"/api/bookings/{early.Id}/status", new { status = 2 });
         Assert.Equal(HttpStatusCode.OK, allowed.StatusCode);
-        Assert.NotNull((await allowed.Content.ReadFromJsonAsync<BookingDto>(Json))!.CancelledAt);
+        Assert.NotNull((await allowed.Content.ReadFromJsonAsync<BookingDto>(JsonOptions))!.CancelledAt);
 
         var refused = await user.PatchAsJsonAsync($"/api/bookings/{lastMinute.Id}/status", new { status = 2 });
         Assert.Equal(HttpStatusCode.BadRequest, refused.StatusCode);
@@ -275,7 +275,7 @@ public class BookingRulesTests(ApiFixture fx)
 
         var completed = await owner.PatchAsJsonAsync($"/api/bookings/{current.Id}/status", new { status = 3 });
         Assert.Equal(HttpStatusCode.OK, completed.StatusCode);
-        Assert.Equal(BookingStatus.Completed, (await completed.Content.ReadFromJsonAsync<BookingDto>(Json))!.Status);
+        Assert.Equal(BookingStatus.Completed, (await completed.Content.ReadFromJsonAsync<BookingDto>(JsonOptions))!.Status);
     }
 
     [SkippableFact]
@@ -285,7 +285,7 @@ public class BookingRulesTests(ApiFixture fx)
         var admin = fx.Authed((await fx.LoginAsync(AdminEmail, AdminPassword)).Token);
         var (owner, room) = await CreateApprovedRoomWithOwnerAsync();
         var hotelUrl = $"/api/hotels/{room.HotelId}";
-        var hotel = await owner.GetFromJsonAsync<HotelDetailDto>(hotelUrl, Json);
+        var hotel = await owner.GetFromJsonAsync<HotelDetailDto>(hotelUrl, JsonOptions);
 
         object HotelBody(string description) => new
         {
@@ -293,13 +293,13 @@ public class BookingRulesTests(ApiFixture fx)
         };
 
         var unchanged = await owner.PutAsJsonAsync(hotelUrl, HotelBody(hotel!.Description!));
-        Assert.Equal(ApprovalStatus.Approved, (await unchanged.Content.ReadFromJsonAsync<HotelDto>(Json))!.ApprovalStatus);
+        Assert.Equal(ApprovalStatus.Approved, (await unchanged.Content.ReadFromJsonAsync<HotelDto>(JsonOptions))!.ApprovalStatus);
 
         var adminEdit = await admin.PutAsJsonAsync(hotelUrl, HotelBody("Admin fixed a typo"));
-        Assert.Equal(ApprovalStatus.Approved, (await adminEdit.Content.ReadFromJsonAsync<HotelDto>(Json))!.ApprovalStatus);
+        Assert.Equal(ApprovalStatus.Approved, (await adminEdit.Content.ReadFromJsonAsync<HotelDto>(JsonOptions))!.ApprovalStatus);
 
         var ownerEdit = await owner.PutAsJsonAsync(hotelUrl, HotelBody("Now with a rooftop pool"));
-        Assert.Equal(ApprovalStatus.Pending, (await ownerEdit.Content.ReadFromJsonAsync<HotelDto>(Json))!.ApprovalStatus);
+        Assert.Equal(ApprovalStatus.Pending, (await ownerEdit.Content.ReadFromJsonAsync<HotelDto>(JsonOptions))!.ApprovalStatus);
         Assert.Equal(HttpStatusCode.NotFound, (await fx.CreateClient().GetAsync(hotelUrl)).StatusCode);
 
         var user = fx.Authed((await fx.RegisterUserAsync()).Token);
@@ -312,7 +312,7 @@ public class BookingRulesTests(ApiFixture fx)
             title = "Sunset hike", dayNumber = 1, price = 500, sortOrder = 0
         });
         Assert.Equal(HttpStatusCode.OK, activity.StatusCode);
-        var afterActivity = await agent.GetFromJsonAsync<TravelPackageDetailDto>($"/api/packages/{package.Id}", Json);
+        var afterActivity = await agent.GetFromJsonAsync<TravelPackageDetailDto>($"/api/packages/{package.Id}", JsonOptions);
         Assert.Equal(ApprovalStatus.Pending, afterActivity!.ApprovalStatus);
     }
 
