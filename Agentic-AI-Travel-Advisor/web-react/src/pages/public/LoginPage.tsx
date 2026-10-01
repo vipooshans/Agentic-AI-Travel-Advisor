@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { errorMessage } from '../../api/client';
-import { homePathFor, useAuth } from '../../auth/authContext';
+import { postLoginPath, useAuth } from '../../auth/authContext';
 import { Alert, Field } from '../../components/ui';
 
 export function LoginPage() {
@@ -14,7 +14,8 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  if (user) return <Navigate to={homePathFor(user.role)} replace />;
+  // Signing in re-renders this page with a user before submit() can navigate, so this redirect must honour `from` too.
+  if (user) return <Navigate to={postLoginPath(user.role, from)} replace />;
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -26,7 +27,7 @@ export function LoginPage() {
     setError(null);
     try {
       const signedIn = await login(email.trim(), password);
-      navigate(from ?? homePathFor(signedIn.role), { replace: true });
+      navigate(postLoginPath(signedIn.role, from), { replace: true });
     } catch (err) {
       setError(errorMessage(err));
     } finally {

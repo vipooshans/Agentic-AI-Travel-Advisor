@@ -8,6 +8,7 @@ import { clearSession, loadSession, saveSession, SESSION_EXPIRED_EVENT, updateSe
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUserState] = useState<User | null>(() => loadSession()?.user ?? null);
   const [sessionExpired, setSessionExpired] = useState(false);
+  const [signedOut, setSignedOut] = useState(false);
 
   useEffect(() => {
     const onExpired = () => {
@@ -21,6 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     const session = saveSession(await authApi.login(email, password));
     setSessionExpired(false);
+    setSignedOut(false);
     setUserState(session.user);
     return session.user;
   }, []);
@@ -28,6 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = useCallback(async (request: RegisterRequest) => {
     const session = saveSession(await authApi.register(request));
     setSessionExpired(false);
+    setSignedOut(false);
     setUserState(session.user);
     return session.user;
   }, []);
@@ -35,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     clearSession();
     setSessionExpired(false);
+    setSignedOut(true);
     setUserState(null);
   }, []);
 
@@ -48,13 +52,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       isAuthenticated: user !== null,
       sessionExpired,
+      signedOut,
       login,
       register,
       logout,
       setUser,
       hasRole: (...roles: Role[]) => user !== null && roles.includes(user.role),
     }),
-    [user, sessionExpired, login, register, logout, setUser],
+    [user, sessionExpired, signedOut, login, register, logout, setUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

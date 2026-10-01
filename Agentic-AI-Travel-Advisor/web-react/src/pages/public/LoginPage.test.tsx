@@ -1,10 +1,11 @@
-import { screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { Route } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { AuthProvider } from '../../auth/AuthProvider';
 import { getToken } from '../../auth/session';
 import { server } from '../../test/server';
-import { makeUser, renderAt } from '../../test/utils';
+import { LocationProbe, makeUser, renderAt } from '../../test/utils';
 import { LoginPage } from './LoginPage';
 
 const routes = <Route path="/signin" element={<LoginPage />} />;
@@ -64,6 +65,36 @@ describe('LoginPage', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Invalid email or password.');
     expect(getToken()).toBeNull();
+  });
+
+  it('returns to the page the visitor was sent away from (DEF-021)', async () => {
+    server.use(
+      http.post('*/api/auth/login', () =>
+        HttpResponse.json({
+          token: 'jwt-owner',
+          expiresAt: new Date(Date.now() + 3_600_000).toISOString(),
+          user: makeUser('HOTEL_OWNER'),
+        }),
+      ),
+    );
+    render(
+      <MemoryRouter initialEntries={[{ pathname: '/signin', state: { from: '/owner/hotels' } }]}>
+        <AuthProvider>
+          <Routes>
+            {routes}
+            <Route path="*" element={<LocationProbe />} />
+          </Routes>
+        </AuthProvider>
+      </MemoryRouter>,
+    );
+
+    await userEvent.type(screen.getByLabelText('Email'), 'owner@example.test');
+    await userEvent.type(screen.getByLabelText('Password'), 'Secret#1');
+    await userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+
+    await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent(/^\/owner\/hotels$/));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(screen.getByTestId('location')).toHaveTextContent(/^\/owner\/hotels$/);
   });
 
   it('validates empty fields without calling the API', async () => {
