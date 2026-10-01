@@ -404,3 +404,24 @@ Defects below were found while implementing and executing tests.
   - `OpenAiCompatClientTests` (7 tests) pass. They cover 401 and 403 suspending until the cool-down ends with no HTTP call in between, then working again; 500, 429 and 400 not suspending; the suspension being shared across client instances; and a missing key.
   - Full suites: unit 411 passed / 35 skipped (live LLM), API 130 passed (`backend-unit-tests-def026.log`, `backend-api-tests-def026.log`).
   - Live probe against the rebuilt API, with the same rejected key: one failed provider call and one "rejected the API key" error in total. Warm requests then took 15–23 ms (clarification) and 55–56 ms (plan), instead of 419–449 ms. The first requests after the restart were slower (342–1395 ms) because of start-up warm-up.
+
+## DEF-027 API responses lack a Cross-Origin-Resource-Policy header
+- **Severity / Priority:** Low / P3
+- **Description:** API responses had no `Cross-Origin-Resource-Policy` header. A page on another site could therefore embed API responses with no-cors requests such as `<img>` or `<script>`. That is the precondition for cross-site leaks and Spectre-style side channels. The JSON responses are already protected by `X-Content-Type-Options: nosniff` and a `default-src 'none'` CSP, so the risk is low.
+- **Found by:** OWASP ZAP (Phase 9), rule 90004 "Cross-Origin-Resource-Policy Header Missing or Invalid". It was reported on every 200 response in the unauthenticated API scan (7) and the authenticated USER scan (12).
+- **Steps to reproduce:** `GET /api/destinations` and look at the response headers.
+- **Expected:** `Cross-Origin-Resource-Policy: same-origin`.
+- **Actual:** The header is missing.
+- **Evidence:**
+  - `testing/execution-results/phase9-nfr/zap-api-before-def027.log`, `zap-api-user-before-def027.log` (reports in `testing/security/zap/reports/`).
+  - `def027-before-fix.log`: the extended `Responses_carry_security_headers` test fails with "/api/destinations: Cross-Origin-Resource-Policy missing".
+  - `def027-after-fix.log`.
+- **Status:** Retested (Closed)
+- **Fix:** The security-headers middleware in `web-api/Program.cs` adds `Cross-Origin-Resource-Policy: same-origin` to every response. The header only restricts no-cors embedding:
+  - The React app's CORS requests are not affected.
+  - The Flutter app and the MVC portal call the API outside a browser page.
+  - The API serves no images or other embeddable files; listing images are external URLs.
+- **Retest result:** 2026-10-01.
+  - `Responses_carry_security_headers` passes.
+  - Full suites: unit 411 passed / 35 skipped, API 130 passed (`backend-unit-tests-final.trx`, `backend-api-tests-final.trx`).
+  - ZAP rerun on the rebuilt API: the API scan and the authenticated USER scan both finish with 0 warnings and 0 failures (118 rules passed each; `zap-api.log`, `zap-api-user.log`).

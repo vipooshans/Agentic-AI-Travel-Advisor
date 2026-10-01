@@ -63,6 +63,8 @@ app.Use(async (context, next) =>
         headers["X-Content-Type-Options"] = "nosniff";
         headers["X-Frame-Options"] = "DENY";
         headers["Referrer-Policy"] = "no-referrer";
+        // Only limits no-cors embedding by other sites; the React app's CORS requests are unaffected.
+        headers["Cross-Origin-Resource-Policy"] = "same-origin";
         if (!context.Request.Path.StartsWithSegments("/swagger"))
         {
             headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'";

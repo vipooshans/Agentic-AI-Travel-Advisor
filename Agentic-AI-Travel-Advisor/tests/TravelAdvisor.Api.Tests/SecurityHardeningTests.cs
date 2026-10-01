@@ -201,6 +201,8 @@ public class SecurityHardeningTests(ApiFixture fx)
             var response = await fx.CreateClient().GetAsync(path);
             Assert.Equal("nosniff", response.Headers.GetValues("X-Content-Type-Options").Single());
             Assert.Equal("DENY", response.Headers.GetValues("X-Frame-Options").Single());
+            Assert.True(response.Headers.TryGetValues("Cross-Origin-Resource-Policy", out var corp), $"{path}: Cross-Origin-Resource-Policy missing");
+            Assert.Equal("same-origin", corp.Single());
         }
     }
 
