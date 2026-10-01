@@ -1,0 +1,15 @@
+﻿## npm run test  (2026-10-01T17:53:47.7562756+05:30)
+
+> travel-advisor-web@0.1.0 test
+> node node_modules/vitest/vitest.mjs run
+
+
+ RUN  v5.0.3 E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-react
+
+
+ Test Files  8 passed (8)
+      Tests  35 passed (35)
+   Start at  17:53:48
+   Duration  5.22s (environment 47%, tests 23%, setup 19%, import 8%, transform 3%)
+
+exit code: 0

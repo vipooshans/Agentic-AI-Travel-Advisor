@@ -1,0 +1,16 @@
+﻿## npm run build  (2026-10-01T17:53:53.7393507+05:30)
+
+> travel-advisor-web@0.1.0 build
+> node node_modules/typescript/bin/tsc -b && node node_modules/vite/bin/vite.js build
+
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 121 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.47 kB │ gzip:   0.30 kB
+dist/assets/index-6cPzhBoL.css   15.84 kB │ gzip:   3.95 kB
+dist/assets/index-Cel8PVXi.js   414.06 kB │ gzip: 123.18 kB
+
+✓ built in 584ms
+exit code: 0

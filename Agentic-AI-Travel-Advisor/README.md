@@ -89,6 +89,19 @@ dotnet run --project web-app
 
 Portal: http://localhost:7000
 
+### 3b. React Web App (all four roles)
+
+Needs Node.js 22.12+ (Vitest 5 does not support Node 20; verified on Node 24). The dev server proxies `/api` to `VITE_API_PROXY_TARGET` (default `http://localhost:5080`; see `web-react/.env.example`).
+
+```bash
+dotnet run --project web-api --urls http://localhost:5080   # in one terminal
+cd web-react
+npm install
+npm run dev        # http://localhost:5173
+```
+
+Travelers register in the app and use the AI assistant, bookings, payments, reviews and itineraries. Hotel owners, travel agents and admins get their own dashboards. `npm run build` writes `web-react/dist/`; `npm run preview` serves it on port 4173 with the same proxy.
+
 ### 4. Flutter Mobile App
 
 ```bash
@@ -123,6 +136,12 @@ dotnet test tests/TravelAdvisor.Api.Tests   # needs Docker for Testcontainers Po
 cd mobile-app && flutter test
 ```
 
+From the repository root again:
+
+```bash
+cd web-react && npm test && npm run lint && npm run typecheck
+```
+
 ## Demo Accounts
 
 | Role | Email | Password | Platform |
@@ -130,7 +149,7 @@ cd mobile-app && flutter test
 | Admin | admin@traveladvisor.com | Admin@123 | Web |
 | Hotel Owner | owner@traveladvisor.com | Owner@123 | Web |
 | Travel Agent | agent@traveladvisor.com | Agent@123 | Web |
-| User | Register via mobile | — | Flutter |
+| User | Register in the React app or on mobile | — | React web / Flutter |
 
 ## Documentation
 
