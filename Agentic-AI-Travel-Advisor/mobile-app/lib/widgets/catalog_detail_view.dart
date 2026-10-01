@@ -38,7 +38,7 @@ class CatalogDetailView extends StatelessWidget {
                 title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 18),
               ),
               background: Stack(
                 fit: StackFit.expand,

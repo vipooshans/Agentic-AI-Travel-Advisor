@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../models/chat_message.dart';
 import '../models/itinerary.dart';
 import '../models/suggested_plan.dart';
+import '../models/travel_plan.dart';
 import '../services/api_service.dart';
 import '../services/chat_service.dart';
 import '../services/itinerary_service.dart';
@@ -21,6 +22,7 @@ class ChatProvider extends ChangeNotifier {
   bool get saving => _saving;
   String? get error => _error;
   int? get savedItineraryId => _savedItineraryId;
+  bool get hasState => _conversationId != null || _messages.isNotEmpty || _error != null;
 
   SuggestedPlan? get latestPlan {
     for (final message in _messages.reversed) {
@@ -29,8 +31,40 @@ class ChatProvider extends ChangeNotifier {
     return null;
   }
 
-  Future<void> send(ApiService api, String text) async {
-    final content = text.trim();
+  /// The most recent assistant message carrying a plan, structured or legacy.
+  ChatMessage? get latestPlanMessage {
+    for (final message in _messages.reversed) {
+      if (!message.isUser && (message.plan != null || message.suggestedPlan != null)) return message;
+    }
+    return null;
+  }
+
+  ChatMessage? get latestAssistantMessage {
+    for (final message in _messages.reversed) {
+      if (!message.isUser) return message;
+    }
+    return null;
+  }
+
+  /// Only the newest unexpired proposal may be confirmed; older ones have
+  /// been superseded by later replies.
+  bool canConfirm(ChatMessage message, [DateTime? now]) {
+    final proposal = message.pendingBooking;
+    return !_sending &&
+        proposal != null &&
+        identical(message, latestAssistantMessage) &&
+        !proposal.isExpired(now);
+  }
+
+  Future<void> send(ApiService api, String text) => _send(api, text.trim());
+
+  /// Asks the backend to create the quoted booking. The booking only exists
+  /// if the reply has status `booking_created`.
+  Future<void> confirm(ApiService api, BookingProposal proposal) {
+    return _send(api, 'Confirm booking: ${proposal.title}', confirmBookingId: proposal.id);
+  }
+
+  Future<void> _send(ApiService api, String content, {String? confirmBookingId}) async {
     if (content.isEmpty || _sending) return;
 
     _error = null;
@@ -43,6 +77,7 @@ class ChatProvider extends ChangeNotifier {
       final result = await ChatService(api).send(
         conversationId: _conversationId,
         message: content,
+        confirmBookingId: confirmBookingId,
       );
       _conversationId = result.conversationId;
       _messages.add(result.message);
@@ -51,6 +86,7 @@ class ChatProvider extends ChangeNotifier {
       _messages.add(const ChatMessage(
         role: 'assistant',
         content: 'Sorry, I could not complete that request. Please try again.',
+        status: 'error',
       ));
     } finally {
       _sending = false;
@@ -59,14 +95,17 @@ class ChatProvider extends ChangeNotifier {
   }
 
   Future<Itinerary?> saveLatestPlan(ApiService api) async {
-    final plan = latestPlan;
-    if (plan == null || _saving) return null;
+    final message = latestPlanMessage;
+    if (message == null || _saving) return null;
 
     _saving = true;
     _error = null;
     notifyListeners();
     try {
-      final saved = await ItineraryService(api).createFromPlan(plan);
+      final service = ItineraryService(api);
+      final saved = message.plan != null
+          ? await service.createFromTravelPlan(message.plan!)
+          : await service.createFromPlan(message.suggestedPlan!);
       _savedItineraryId = saved.id;
       return saved;
     } catch (e) {
@@ -84,6 +123,7 @@ class ChatProvider extends ChangeNotifier {
       ..clear()
       ..addAll(messages);
     _error = null;
+    _savedItineraryId = null;
     notifyListeners();
   }
 

@@ -112,6 +112,10 @@ flutter run
 
 Use the **AI** tab (or the Home card) to chat, then **Save itinerary**.
 
+The mobile app is for travelers (`USER` accounts). Hotel owners, travel agents and admins are told to use the web app. The API address comes from `--dart-define=API_BASE_URL=...`. It defaults to `http://10.0.2.2:5000` on the Android emulator and `http://localhost:5000` elsewhere; for example, use `--dart-define=API_BASE_URL=http://localhost:5080` when the API runs with `dotnet run` on port 5080.
+
+On Windows, the `&` in this repository's folder name breaks Gradle and the Flutter tool scripts. Map the project folder to a drive letter first, e.g. `subst T: "<path>\Agentic-AI-Travel-Advisor"`, then build from `T:\mobile-app`.
+
 ### 5. Android APK
 
 From `mobile-app` (run `powershell -File ../scripts/setup-android.ps1` once if `android/` is missing):
@@ -133,7 +137,13 @@ Cleartext HTTP is allowed for classroom demos. Point `API_BASE_URL` at an ngrok 
 ```bash
 dotnet test tests/TravelAdvisor.UnitTests
 dotnet test tests/TravelAdvisor.Api.Tests   # needs Docker for Testcontainers PostgreSQL
-cd mobile-app && flutter test
+cd mobile-app && flutter analyze && flutter test
+```
+
+The Flutter contract tests in `mobile-app/test_live/` run against a live API with seeded demo data and a traveler account, and are not part of `flutter test`:
+
+```bash
+cd mobile-app && flutter test test_live --dart-define=API_BASE_URL=http://localhost:5080 --dart-define=LIVE_USER_EMAIL=you@example.com --dart-define=LIVE_USER_PASSWORD=...
 ```
 
 From the repository root again:

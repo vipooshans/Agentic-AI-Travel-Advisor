@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/itinerary.dart';
 import '../providers/auth_provider.dart';
 import '../services/itinerary_service.dart';
+import '../utils/format.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/error_widget.dart';
 import '../widgets/loading_widget.dart';
@@ -27,6 +28,12 @@ class _ItineraryListScreenState extends State<ItineraryListScreen> {
 
   Future<List<Itinerary>> _load() => ItineraryService(context.read<AuthProvider>().api).getAll();
 
+  void _reload() {
+    setState(() {
+      _future = _load();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +43,7 @@ class _ItineraryListScreenState extends State<ItineraryListScreen> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) return const LoadingWidget();
           if (snapshot.hasError) {
-            return ErrorDisplayWidget(message: snapshot.error.toString(), onRetry: () => setState(() => _future = _load()));
+            return ErrorDisplayWidget(message: snapshot.error.toString(), onRetry: _reload);
           }
           final items = snapshot.data ?? [];
           if (items.isEmpty) {
@@ -49,7 +56,7 @@ class _ItineraryListScreenState extends State<ItineraryListScreen> {
             );
           }
           return RefreshIndicator(
-            onRefresh: () async => setState(() => _future = _load()),
+            onRefresh: () async => _reload(),
             child: ListView.builder(
               padding: const EdgeInsets.all(12),
               itemCount: items.length,
@@ -61,7 +68,7 @@ class _ItineraryListScreenState extends State<ItineraryListScreen> {
                     title: Text(itinerary.title),
                     subtitle: Text('${itinerary.destinationName ?? 'Trip'} · ${itinerary.dateRange}'),
                     trailing: itinerary.estimatedCost != null
-                        ? Text('Rs. ${itinerary.estimatedCost!.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold))
+                        ? Text(formatMoney(itinerary.estimatedCost!), style: const TextStyle(fontWeight: FontWeight.bold))
                         : Text(itinerary.statusLabel, style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
                     onTap: () => context.push('/itineraries/${itinerary.id}'),
                   ),

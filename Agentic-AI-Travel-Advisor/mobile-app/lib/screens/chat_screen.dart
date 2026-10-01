@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../models/travel_plan.dart';
 import '../providers/auth_provider.dart';
 import '../providers/chat_provider.dart';
 import '../widgets/chat_bubble.dart';
@@ -43,6 +44,12 @@ class _ChatScreenState extends State<ChatScreen> {
     _controller.clear();
     final auth = context.read<AuthProvider>();
     await context.read<ChatProvider>().send(auth.api, content);
+    _scrollToEnd();
+  }
+
+  Future<void> _confirm(BookingProposal proposal) async {
+    final auth = context.read<AuthProvider>();
+    await context.read<ChatProvider>().confirm(auth.api, proposal);
     _scrollToEnd();
   }
 
@@ -111,11 +118,15 @@ class _ChatScreenState extends State<ChatScreen> {
                         );
                       }
                       final message = chat.messages[index];
-                      final isLatestPlan = message.suggestedPlan != null && identical(message.suggestedPlan, chat.latestPlan);
+                      final isLatestPlan = identical(message, chat.latestPlanMessage);
+                      final proposal = message.pendingBooking;
                       return ChatBubble(
                         message: message,
                         saving: chat.saving,
                         onSave: isLatestPlan ? _save : null,
+                        canConfirm: chat.canConfirm(message),
+                        onConfirm: proposal == null ? null : () => _confirm(proposal),
+                        onViewBookings: () => context.go('/bookings'),
                       );
                     },
                   ),

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/itinerary.dart';
 import '../providers/auth_provider.dart';
 import '../services/itinerary_service.dart';
+import '../utils/format.dart';
 import '../widgets/error_widget.dart';
 import '../widgets/loading_widget.dart';
 
@@ -40,7 +41,7 @@ class ItineraryDetailScreen extends StatelessWidget {
               if (itinerary.estimatedCost != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: Text('Estimated cost: Rs. ${itinerary.estimatedCost!.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text('Estimated cost: ${formatMoney(itinerary.estimatedCost!)}', style: const TextStyle(fontWeight: FontWeight.bold)),
                 ),
               if (itinerary.summary != null && itinerary.summary!.isNotEmpty) ...[
                 const SizedBox(height: 12),

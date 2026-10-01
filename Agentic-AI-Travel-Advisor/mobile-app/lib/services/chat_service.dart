@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import '../models/chat_message.dart';
 import '../models/conversation_summary.dart';
-import '../models/suggested_plan.dart';
 import 'api_service.dart';
 
 class ChatResult {
@@ -13,38 +12,29 @@ class ChatResult {
 }
 
 class ChatService {
+  static const chatTimeout = Duration(seconds: 90);
+
   final ApiService _api;
   ChatService(this._api);
 
-  Future<ChatResult> send({int? conversationId, required String message}) async {
+  Future<ChatResult> send({int? conversationId, required String message, String? confirmBookingId}) async {
     final body = <String, dynamic>{'message': message};
     if (conversationId != null) body['conversationId'] = conversationId;
+    if (confirmBookingId != null) body['confirmBookingId'] = confirmBookingId;
 
-    final response = await _api.post(
-      '/api/ai/chat',
-      body,
-      timeout: const Duration(seconds: 90),
-    );
-    if (response.statusCode != 200) {
-      throw Exception(_api.parseErrorMessage(response) ?? 'AI request failed');
-    }
+    final response = await _api.post('/api/ai/chat', body, timeout: chatTimeout);
+    _api.ensureSuccess(response);
 
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     return ChatResult(
       conversationId: (data['conversationId'] as num).toInt(),
-      message: ChatMessage(
-        role: 'assistant',
-        content: data['message'] as String? ?? '',
-        suggestedPlan: data['suggestedPlan'] != null
-            ? SuggestedPlan.fromJson(data['suggestedPlan'] as Map<String, dynamic>)
-            : null,
-      ),
+      message: ChatMessage.fromJson({...data, 'role': 'assistant'}),
     );
   }
 
   Future<List<ConversationSummary>> listConversations() async {
     final response = await _api.get('/api/ai/conversations');
-    if (response.statusCode != 200) throw Exception('Failed to load conversations');
+    _api.ensureSuccess(response);
     return (jsonDecode(response.body) as List)
         .map((c) => ConversationSummary.fromJson(c as Map<String, dynamic>))
         .toList();
@@ -52,7 +42,7 @@ class ChatService {
 
   Future<(int id, List<ChatMessage> messages)> getConversation(int id) async {
     final response = await _api.get('/api/ai/conversations/$id');
-    if (response.statusCode != 200) throw Exception('Failed to load conversation');
+    _api.ensureSuccess(response);
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     final messages = (data['messages'] as List? ?? [])
         .map((m) => ChatMessage.fromJson(m as Map<String, dynamic>))

@@ -9,6 +9,7 @@ import '../providers/auth_provider.dart';
 import '../services/destination_service.dart';
 import '../services/hotel_service.dart';
 import '../services/package_service.dart';
+import '../widgets/catalog_search_bar.dart';
 import '../widgets/destination_card.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/error_widget.dart';
@@ -61,6 +62,8 @@ class _DestinationListScreenState extends State<DestinationListScreen> with Sing
   @override
   Widget build(BuildContext context) {
     final api = context.read<AuthProvider>().api;
+    final hotels = HotelService(api);
+    final packages = PackageService(api);
 
     return Scaffold(
       appBar: AppBar(
@@ -78,8 +81,26 @@ class _DestinationListScreenState extends State<DestinationListScreen> with Sing
         controller: _tabController,
         children: [
           _DestinationsTab(service: DestinationService(api)),
-          _HotelsTab(service: HotelService(api)),
-          _PackagesTab(service: PackageService(api)),
+          SearchableCatalogList<Hotel>(
+            load: (s) => hotels.getAll(q: s.query, maxPrice: s.maxPrice),
+            hint: 'Hotel, city or country',
+            priceLabel: 'Max / night',
+            emptyIcon: Icons.hotel_outlined,
+            emptyTitle: 'No hotels yet',
+            emptyMessage: 'Approved hotels will show up here.',
+            noMatchTitle: 'No hotels match your search',
+            itemBuilder: (context, hotel) => HotelCard(hotel: hotel, onTap: () => context.push('/hotels/${hotel.id}')),
+          ),
+          SearchableCatalogList<TravelPackage>(
+            load: (s) => packages.getAll(q: s.query, maxPrice: s.maxPrice),
+            hint: 'Package or destination',
+            priceLabel: 'Max price',
+            emptyIcon: Icons.card_travel,
+            emptyTitle: 'No packages yet',
+            emptyMessage: 'Approved travel packages will show up here.',
+            noMatchTitle: 'No packages match your search',
+            itemBuilder: (context, pkg) => PackageCard(package: pkg, onTap: () => context.push('/packages/${pkg.id}')),
+          ),
         ],
       ),
     );
@@ -103,6 +124,12 @@ class _DestinationsTabState extends State<_DestinationsTab> {
     _future = widget.service.getAll();
   }
 
+  void _reload() {
+    setState(() {
+      _future = widget.service.getAll();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Destination>>(
@@ -110,7 +137,7 @@ class _DestinationsTabState extends State<_DestinationsTab> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) return const LoadingWidget();
         if (snapshot.hasError) {
-          return ErrorDisplayWidget(message: snapshot.error.toString(), onRetry: () => setState(() => _future = widget.service.getAll()));
+          return ErrorDisplayWidget(message: snapshot.error.toString(), onRetry: _reload);
         }
         final items = snapshot.data ?? [];
         if (items.isEmpty) {
@@ -119,11 +146,11 @@ class _DestinationsTabState extends State<_DestinationsTab> {
             title: 'No destinations',
             message: 'Travel destinations will appear here when they are added.',
             actionLabel: 'Retry',
-            onAction: () => setState(() => _future = widget.service.getAll()),
+            onAction: _reload,
           );
         }
         return RefreshIndicator(
-          onRefresh: () async => setState(() => _future = widget.service.getAll()),
+          onRefresh: () async => _reload(),
           child: GridView.builder(
             padding: const EdgeInsets.all(12),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.75, crossAxisSpacing: 12, mainAxisSpacing: 12),
@@ -136,106 +163,84 @@ class _DestinationsTabState extends State<_DestinationsTab> {
   }
 }
 
-class _HotelsTab extends StatefulWidget {
-  final HotelService service;
-  const _HotelsTab({required this.service});
+/// A catalog list with keyword and maximum-price search, backed by the API's
+/// `q` and `maxPrice` query parameters.
+class SearchableCatalogList<T> extends StatefulWidget {
+  final Future<List<T>> Function(CatalogSearch search) load;
+  final String hint;
+  final String priceLabel;
+  final IconData emptyIcon;
+  final String emptyTitle;
+  final String emptyMessage;
+  final String noMatchTitle;
+  final Widget Function(BuildContext context, T item) itemBuilder;
+
+  const SearchableCatalogList({
+    super.key,
+    required this.load,
+    required this.hint,
+    required this.priceLabel,
+    required this.emptyIcon,
+    required this.emptyTitle,
+    required this.emptyMessage,
+    required this.noMatchTitle,
+    required this.itemBuilder,
+  });
 
   @override
-  State<_HotelsTab> createState() => _HotelsTabState();
+  State<SearchableCatalogList<T>> createState() => _SearchableCatalogListState<T>();
 }
 
-class _HotelsTabState extends State<_HotelsTab> {
-  late Future<List<Hotel>> _future;
+class _SearchableCatalogListState<T> extends State<SearchableCatalogList<T>> {
+  CatalogSearch _search = const CatalogSearch();
+  late Future<List<T>> _future = widget.load(_search);
 
-  @override
-  void initState() {
-    super.initState();
-    _future = widget.service.getAll();
+  void _reload([CatalogSearch? search]) {
+    setState(() {
+      if (search != null) _search = search;
+      _future = widget.load(_search);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _future,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) return const LoadingWidget();
-        if (snapshot.hasError) {
-          return ErrorDisplayWidget(message: snapshot.error.toString(), onRetry: () => setState(() => _future = widget.service.getAll()));
-        }
-        final items = snapshot.data ?? [];
-        if (items.isEmpty) {
-          return EmptyStateWidget(
-            icon: Icons.hotel_outlined,
-            title: 'No hotels yet',
-            message: 'Approved hotels will show up here.',
-            actionLabel: 'Retry',
-            onAction: () => setState(() => _future = widget.service.getAll()),
-          );
-        }
-        return RefreshIndicator(
-          onRefresh: () async => setState(() => _future = widget.service.getAll()),
-          child: ListView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: items.length,
-            itemBuilder: (_, i) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: HotelCard(hotel: items[i], onTap: () => context.push('/hotels/${items[i].id}')),
-            ),
+    return Column(
+      children: [
+        CatalogSearchBar(hint: widget.hint, priceLabel: widget.priceLabel, onSearch: _reload),
+        Expanded(
+          child: FutureBuilder<List<T>>(
+            future: _future,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) return const LoadingWidget();
+              if (snapshot.hasError) {
+                return ErrorDisplayWidget(message: snapshot.error.toString(), onRetry: _reload);
+              }
+              final items = snapshot.data ?? [];
+              if (items.isEmpty) {
+                final filtered = !_search.isEmpty;
+                return EmptyStateWidget(
+                  icon: widget.emptyIcon,
+                  title: filtered ? widget.noMatchTitle : widget.emptyTitle,
+                  message: filtered ? 'Try different keywords or a higher price.' : widget.emptyMessage,
+                  actionLabel: 'Retry',
+                  onAction: _reload,
+                );
+              }
+              return RefreshIndicator(
+                onRefresh: () async => _reload(),
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: items.length,
+                  itemBuilder: (context, i) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: widget.itemBuilder(context, items[i]),
+                  ),
+                ),
+              );
+            },
           ),
-        );
-      },
-    );
-  }
-}
-
-class _PackagesTab extends StatefulWidget {
-  final PackageService service;
-  const _PackagesTab({required this.service});
-
-  @override
-  State<_PackagesTab> createState() => _PackagesTabState();
-}
-
-class _PackagesTabState extends State<_PackagesTab> {
-  late Future<List<TravelPackage>> _future;
-
-  @override
-  void initState() {
-    super.initState();
-    _future = widget.service.getAll();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _future,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) return const LoadingWidget();
-        if (snapshot.hasError) {
-          return ErrorDisplayWidget(message: snapshot.error.toString(), onRetry: () => setState(() => _future = widget.service.getAll()));
-        }
-        final items = snapshot.data ?? [];
-        if (items.isEmpty) {
-          return EmptyStateWidget(
-            icon: Icons.card_travel,
-            title: 'No packages yet',
-            message: 'Approved travel packages will show up here.',
-            actionLabel: 'Retry',
-            onAction: () => setState(() => _future = widget.service.getAll()),
-          );
-        }
-        return RefreshIndicator(
-          onRefresh: () async => setState(() => _future = widget.service.getAll()),
-          child: ListView.builder(
-            padding: const EdgeInsets.all(12),
-            itemCount: items.length,
-            itemBuilder: (_, i) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: PackageCard(package: items[i], onTap: () => context.push('/packages/${items[i].id}')),
-            ),
-          ),
-        );
-      },
+        ),
+      ],
     );
   }
 }

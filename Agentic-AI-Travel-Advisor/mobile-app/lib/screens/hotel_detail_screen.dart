@@ -2,29 +2,50 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../models/hotel.dart';
 import '../providers/auth_provider.dart';
 import '../services/hotel_service.dart';
+import '../services/review_service.dart';
+import '../utils/format.dart';
 import '../widgets/catalog_detail_view.dart';
 import '../widgets/error_widget.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/loading_widget.dart';
+import '../widgets/reviews_section.dart';
 
-class HotelDetailScreen extends StatelessWidget {
+class HotelDetailScreen extends StatefulWidget {
   final int id;
   const HotelDetailScreen({super.key, required this.id});
 
   @override
-  Widget build(BuildContext context) {
-    final service = HotelService(context.read<AuthProvider>().api);
+  State<HotelDetailScreen> createState() => _HotelDetailScreenState();
+}
 
-    return FutureBuilder(
-      future: service.getById(id),
+class _HotelDetailScreenState extends State<HotelDetailScreen> {
+  late Future<Hotel> _future = _load();
+
+  Future<Hotel> _load() => HotelService(context.read<AuthProvider>().api).getById(widget.id);
+
+  @override
+  Widget build(BuildContext context) {
+    final api = context.read<AuthProvider>().api;
+
+    return FutureBuilder<Hotel>(
+      future: _future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(appBar: AppBar(title: const Text('Hotel Details')), body: const LoadingWidget());
         }
         if (snapshot.hasError) {
-          return Scaffold(appBar: AppBar(title: const Text('Hotel Details')), body: ErrorDisplayWidget(message: snapshot.error.toString()));
+          return Scaffold(
+            appBar: AppBar(title: const Text('Hotel Details')),
+            body: ErrorDisplayWidget(
+              message: snapshot.error.toString(),
+              onRetry: () => setState(() {
+                _future = _load();
+              }),
+            ),
+          );
         }
         final hotel = snapshot.data!;
 
@@ -58,12 +79,21 @@ class HotelDetailScreen extends StatelessWidget {
                     margin: const EdgeInsets.only(bottom: 10),
                     child: ListTile(
                       title: Text(room.name),
-                      subtitle: Text('${room.roomType} · ${room.capacity} guests · \$${room.pricePerNight}/night'),
+                      subtitle: Text('${room.roomType} · ${room.capacity} guests · ${formatMoney(room.pricePerNight)}/night'),
                       trailing: room.isAvailable
-                          ? FilledButton(child: const Text('Book'), onPressed: () => context.push('/bookings/new?roomId=${room.id}'))
+                          ? FilledButton(
+                              child: const Text('Book'),
+                              onPressed: () => context.push('/bookings/new?roomId=${room.id}'),
+                            )
                           : const Text('Unavailable', style: TextStyle(color: Colors.red)),
                     ),
                   )),
+            const SizedBox(height: 24),
+            ReviewsSection(
+              load: () => ReviewService(api).forHotel(hotel.id),
+              averageRating: hotel.averageRating,
+              reviewCount: hotel.reviewCount,
+            ),
           ],
         );
       },

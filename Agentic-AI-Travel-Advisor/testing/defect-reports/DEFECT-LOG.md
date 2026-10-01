@@ -214,9 +214,28 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Expected:** Clear message that the app is for travelers.
 - **Actual:** "Failed to load bookings".
 - **Evidence:** `mobile-app/lib/providers/auth_provider.dart`, `services/api_service.dart` at `4833828`.
-- **Status:** Open
+- **Status:** Retested (Closed)
 - **Fix:**
-- **Retest result:**
+  - `AuthService.login` rejects any role other than `USER` before storing the token, with the message "This app is for travelers. Hotel owners, travel agents and administrators should sign in to the web app." `restoreSession` discards a stored staff session the same way.
+  - `ApiService` calls `onUnauthorized` on a 401 for a request that carried a token (sign-in and register are excluded). `AuthProvider` then clears storage and shows "Your session has expired. Please sign in again." on the login screen. The AI chat state is reset on sign-out.
+  - Every request has a timeout (20 s; the AI chat uses 90 s). Timeouts, offline errors and ProblemDetails bodies become readable messages; 403 becomes "You do not have permission to do that."
+- **Retest result:** 2026-10-01:
+  - **Offline suite:** `flutter test` passes 65/65 (`testing/execution-results/phase7-flutter/final-test.log`). It includes these tests:
+    - `auth_test.dart`:
+      - "$role is refused and nothing is stored", run for HOTEL_OWNER, TRAVEL_AGENT and ADMIN
+      - "a stored staff session is discarded on restore"
+      - "a 401 after sign-in signs the user out, clears storage and explains why"
+      - "an expired stored token on start-up explains why the user must sign in"
+    - `api_service_test.dart`:
+      - "reports a 401 on an authenticated request as an expired session"
+      - "does not treat a failed sign-in or an anonymous 401 as an expired session"
+      - "times out slow requests with a readable message"
+      - "turns connection failures into an offline message"
+  - **Live API:** `flutter test test_live` against the running API passes 9/9 (`final-live-api-test.log`):
+    - "a hotel owner is refused by the mobile app and nothing is stored"
+    - "a traveler signs in and is told when the token stops working"
+    - "a traveler calling an admin API gets the permission message"
+  - **Manual (Flutter web build in Chrome; the Android emulator stayed offline):** signing in as `owner@traveladvisor.com` shows the travelers-only message and stays on the login screen (`screenshots/01-owner-sign-in-refused.png`).
 
 ## DEF-015 Build outputs and logs tracked in git
 - **Severity / Priority:** Low / P2
@@ -254,3 +273,16 @@ Defects below were found while implementing and executing tests.
 - **Status:** Retested (Closed)
 - **Fix:** The migration now backfills both columns with 1. New audit timestamp columns were also changed from `0001-01-01` to `DEFAULT now()`.
 - **Retest result:** 2026-10-01 - `dotnet ef database update` on the same development database completes ("Done."); API tests pass on a fresh container.
+
+## DEF-018 Flutter lists do not refresh after cancel, review or Retry in debug builds
+- **Severity / Priority:** Medium / P2
+- **Description:** After cancelling a booking, the snackbar says "Booking cancelled" but the card still shows Pending with its Cancel button until the screen is reopened. The cause is `setState(() => _future = _load())`: the arrow callback returns the new `Future`, so Flutter's debug assertion in `setState` throws before the widget is marked for rebuild. In the booking list the throw was swallowed by the surrounding `catch`. The same pattern sat behind Retry and pull-to-refresh in the booking, itinerary, conversation, destination, hotel, package, preferences and reviews widgets. Release builds skip the assertion, so it only shows in debug and test builds, which is where it was found.
+- **Steps to reproduce:** In a debug build, create a room booking, then on My Bookings tap Cancel booking and confirm.
+- **Expected:** The card changes to Cancelled.
+- **Actual:** The card still shows Pending; the API has already cancelled it (`GET /api/bookings/15` returns `status: 2`).
+- **Evidence:** Phase 7 walkthrough, `testing/execution-results/phase7-flutter/screenshots/08-defect-stale-status-after-cancel.png`. The new widget test "cancelling refreshes the list with the status from the API" failed before the fix: the PATCH and the follow-up GET were both sent, but the list still rendered "Pending".
+- **Status:** Retested (Closed)
+- **Fix:** All 13 call sites assign the future inside a block body (`setState(() { _future = _load(); })`, via a `_reload()` helper where a screen used it several times).
+- **Retest result:** 2026-10-01:
+  - The widget test passes, as do the other 64 tests (`final-test.log`).
+  - Manual: in the rebuilt web app, booking #16 was created and then cancelled, and the card changed to Cancelled in place (`screenshots/11-cancel-refreshes-after-fix.png`).

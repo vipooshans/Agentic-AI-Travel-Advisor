@@ -1,0 +1,36 @@
+---
+pid: 42496
+cwd: "e:\\project\\Agentic AI Travel Advisor & Booking System\\Agentic-AI-Travel-Advisor\\mobile-app"
+command: "[Console]::OutputEncoding = [Text.Encoding]::UTF8; flutter --version 2>&1 | Select-Object -First 3; flutter pub get 2>&1 | Select-Object -Last 3; flutter analyze 2>&1 | Select-Object -Last 30; flutter test 2>&1 | Select-Object -Last 8"
+title: "Flutter baseline analyze and test"
+status: succeeded
+started_at: 2026-10-01T12:27:30.186Z
+running_for_ms: 49654    
+---
+Flutter 3.47.5 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 6a19cca564 (2 weeks ago) • 2026-09-17 14:13:22 -0400
+Engine • hash ab598368592da0064197e2bc15c7f5b0a2c6bb1f (revision af7e796e16) (14 days ago) • 2026-09-16 18:35:09.000Z
+Got dependencies!
+16 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing mobile-app...                                         
+
+warning - The value of the local variable 'user' isn't used. Try removing the variable or using it - lib\services\auth_service.dart:98:11 - unused_local_variable
+
+flutter : 1 issue found. (ran in 13.6s)
+At C:\Users\LOQ\AppData\Local\Temp\ps-script-dbcc62f0-67de-4ad1-be18-29f2d5f406e0.ps1:89 char:147
++ ... er pub get 2>&1 | Select-Object -Last 3; flutter analyze 2>&1 | Selec ...
++                                              ~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (1 issue found. (ran in 13.6s):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+00:00 +0: loading E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/mobile-app/test/widget_test.dart
+00:00 +0: empty state shows title and action
+00:00 +1: login requires email and password
+00:01 +2: All tests passed!
+
+---
+exit_code: 0
+elapsed_ms: 49654
+ended_at: 2026-10-01T12:28:19.840Z
+---

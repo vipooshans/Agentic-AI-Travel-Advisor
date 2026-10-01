@@ -74,7 +74,9 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         future: _load,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) return const LoadingWidget();
-          if (snapshot.hasError) return ErrorDisplayWidget(message: snapshot.error.toString(), onRetry: () => setState(() => _load = _fetch()));
+          if (snapshot.hasError) return ErrorDisplayWidget(message: snapshot.error.toString(), onRetry: () => setState(() {
+                _load = _fetch();
+              }));
           return ListView(
             padding: const EdgeInsets.all(24),
             children: [

@@ -9,6 +9,11 @@ class AuthService {
   static const _tokenKey = 'access_token';
   static const _userKey = 'user_data';
 
+  /// The mobile app only serves travelers; staff accounts use the web app.
+  static const travelerRole = 'USER';
+  static const travelersOnlyMessage =
+      'This app is for travelers. Hotel owners, travel agents and administrators should sign in to the web app.';
+
   final ApiService _api;
   final FlutterSecureStorage _storage;
 
@@ -20,17 +25,17 @@ class AuthService {
 
   Future<AuthResponse> login(String email, String password) async {
     final response = await _api.post('/api/auth/login', {
-      'email': email,
+      'email': email.trim(),
       'password': password,
     });
-
-    if (response.statusCode != 200) {
-      throw Exception(_api.parseErrorMessage(response) ?? 'Login failed');
-    }
+    _api.ensureSuccess(response);
 
     final auth = AuthResponse.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
     );
+    if (auth.user.role != travelerRole) {
+      throw const ApiException(travelersOnlyMessage, statusCode: 403);
+    }
     await _persistSession(auth);
     return auth;
   }
@@ -42,15 +47,12 @@ class AuthService {
     required String lastName,
   }) async {
     final response = await _api.post('/api/auth/register', {
-      'email': email,
+      'email': email.trim(),
       'password': password,
-      'firstName': firstName,
-      'lastName': lastName,
+      'firstName': firstName.trim(),
+      'lastName': lastName.trim(),
     });
-
-    if (response.statusCode != 200) {
-      throw Exception(_api.parseErrorMessage(response) ?? 'Registration failed');
-    }
+    _api.ensureSuccess(response);
 
     final auth = AuthResponse.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
@@ -61,23 +63,12 @@ class AuthService {
 
   Future<User> updateProfile({required String firstName, required String lastName}) async {
     final response = await _api.put('/api/auth/me', {
-      'firstName': firstName,
-      'lastName': lastName,
+      'firstName': firstName.trim(),
+      'lastName': lastName.trim(),
     });
-    if (response.statusCode != 200) {
-      throw Exception(_api.parseErrorMessage(response) ?? 'Update failed');
-    }
+    _api.ensureSuccess(response);
     final user = User.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
-    await _storage.write(
-      key: _userKey,
-      value: jsonEncode({
-        'id': user.id,
-        'email': user.email,
-        'firstName': user.firstName,
-        'lastName': user.lastName,
-        'role': user.role,
-      }),
-    );
+    await _writeUser(user);
     return user;
   }
 
@@ -95,10 +86,8 @@ class AuthService {
     if (token == null || userJson == null) return null;
 
     _api.setToken(token);
-    final user = User.fromJson(jsonDecode(userJson) as Map<String, dynamic>);
-
     final me = await getMe();
-    if (me == null) {
+    if (me == null || me.role != travelerRole) {
       await logout();
       return null;
     }
@@ -115,14 +104,18 @@ class AuthService {
   Future<void> _persistSession(AuthResponse auth) async {
     _api.setToken(auth.token);
     await _storage.write(key: _tokenKey, value: auth.token);
-    await _storage.write(
+    await _writeUser(auth.user);
+  }
+
+  Future<void> _writeUser(User user) {
+    return _storage.write(
       key: _userKey,
       value: jsonEncode({
-        'id': auth.user.id,
-        'email': auth.user.email,
-        'firstName': auth.user.firstName,
-        'lastName': auth.user.lastName,
-        'role': auth.user.role,
+        'id': user.id,
+        'email': user.email,
+        'firstName': user.firstName,
+        'lastName': user.lastName,
+        'role': user.role,
       }),
     );
   }

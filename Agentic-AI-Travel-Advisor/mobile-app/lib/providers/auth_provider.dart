@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../models/user.dart';
@@ -7,19 +9,28 @@ import '../services/auth_service.dart';
 enum AuthStatus { unknown, authenticated, unauthenticated }
 
 class AuthProvider extends ChangeNotifier {
+  static const sessionExpiredMessage = 'Your session has expired. Please sign in again.';
+
   final AuthService _authService;
 
-  AuthProvider(this._authService);
+  AuthProvider(this._authService) {
+    _authService.api.onUnauthorized = _handleUnauthorized;
+  }
 
   AuthStatus _status = AuthStatus.unknown;
   User? _user;
   bool _isLoading = false;
   String? _error;
+  String? _notice;
 
   AuthStatus get status => _status;
   User? get user => _user;
   bool get isLoading => _isLoading;
   String? get error => _error;
+
+  /// An informational message for the sign-in screen, e.g. why the user was
+  /// signed out.
+  String? get notice => _notice;
   bool get isAuthenticated => _status == AuthStatus.authenticated;
   ApiService get api => _authService.api;
 
@@ -46,6 +57,7 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> login(String email, String password) async {
     _isLoading = true;
     _error = null;
+    _notice = null;
     notifyListeners();
 
     try {
@@ -54,7 +66,7 @@ class AuthProvider extends ChangeNotifier {
       _status = AuthStatus.authenticated;
       return true;
     } catch (e) {
-      _error = e.toString().replaceFirst('Exception: ', '');
+      _error = _messageOf(e);
       return false;
     } finally {
       _isLoading = false;
@@ -70,6 +82,7 @@ class AuthProvider extends ChangeNotifier {
   }) async {
     _isLoading = true;
     _error = null;
+    _notice = null;
     notifyListeners();
 
     try {
@@ -83,7 +96,7 @@ class AuthProvider extends ChangeNotifier {
       _status = AuthStatus.authenticated;
       return true;
     } catch (e) {
-      _error = e.toString().replaceFirst('Exception: ', '');
+      _error = _messageOf(e);
       return false;
     } finally {
       _isLoading = false;
@@ -99,7 +112,7 @@ class AuthProvider extends ChangeNotifier {
       _user = await _authService.updateProfile(firstName: firstName, lastName: lastName);
       return true;
     } catch (e) {
-      _error = e.toString().replaceFirst('Exception: ', '');
+      _error = _messageOf(e);
       return false;
     } finally {
       _isLoading = false;
@@ -110,6 +123,8 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     await _authService.logout();
     _user = null;
+    _error = null;
+    _notice = null;
     _status = AuthStatus.unauthenticated;
     notifyListeners();
   }
@@ -118,4 +133,15 @@ class AuthProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
   }
+
+  void _handleUnauthorized() {
+    if (_status == AuthStatus.unauthenticated) return;
+    unawaited(_authService.logout());
+    _user = null;
+    _notice = sessionExpiredMessage;
+    _status = AuthStatus.unauthenticated;
+    notifyListeners();
+  }
+
+  static String _messageOf(Object error) => error.toString().replaceFirst('Exception: ', '');
 }

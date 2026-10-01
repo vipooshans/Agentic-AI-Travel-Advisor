@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/hotel.dart';
+import '../utils/format.dart';
 import 'catalog_image.dart';
 
 class HotelCard extends StatelessWidget {
@@ -37,6 +38,15 @@ class HotelCard extends StatelessWidget {
                       Icon(Icons.meeting_room_outlined, size: 16, color: Colors.blue.shade700),
                       const SizedBox(width: 6),
                       Text('${hotel.roomCount} rooms', style: TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.w600)),
+                      if (hotel.reviewCount > 0 && hotel.averageRating != null) ...[
+                        const SizedBox(width: 16),
+                        Icon(Icons.star, size: 16, color: Colors.amber.shade700),
+                        const SizedBox(width: 4),
+                        Text('${hotel.averageRating!.toStringAsFixed(1)} (${hotel.reviewCount})'),
+                      ],
+                      const Spacer(),
+                      if (hotel.minPricePerNight != null)
+                        Text('from ${formatMoney(hotel.minPricePerNight!)}', style: const TextStyle(fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ],

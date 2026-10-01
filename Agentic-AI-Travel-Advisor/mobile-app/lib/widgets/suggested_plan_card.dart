@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/suggested_plan.dart';
+import '../utils/format.dart';
 
 class SuggestedPlanCard extends StatelessWidget {
   final SuggestedPlan plan;
@@ -32,7 +33,7 @@ class SuggestedPlanCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Estimated Rs. ${plan.estimatedCost.toStringAsFixed(0)} / Budget Rs. ${plan.budget.toStringAsFixed(0)}',
+              'Estimated ${formatMoney(plan.estimatedCost)} / Budget ${formatMoney(plan.budget)}',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: overBudget ? Colors.orange.shade800 : Colors.green.shade700,
@@ -44,7 +45,7 @@ class SuggestedPlanCard extends StatelessWidget {
             ],
             if (plan.package != null) ...[
               const SizedBox(height: 4),
-              Text('Package: ${plan.package!.title} (Rs. ${plan.package!.price.toStringAsFixed(0)})'),
+              Text('Package: ${plan.package!.title} (${formatMoney(plan.package!.price)})'),
             ],
             const SizedBox(height: 12),
             ...plan.items.map((item) => Padding(

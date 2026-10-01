@@ -2,28 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../models/travel_package.dart';
 import '../providers/auth_provider.dart';
 import '../services/package_service.dart';
+import '../services/review_service.dart';
+import '../services/transportation_service.dart';
+import '../utils/format.dart';
 import '../widgets/catalog_detail_view.dart';
 import '../widgets/error_widget.dart';
 import '../widgets/loading_widget.dart';
+import '../widgets/reviews_section.dart';
+import '../widgets/transport_section.dart';
 
-class PackageDetailScreen extends StatelessWidget {
+class PackageDetailScreen extends StatefulWidget {
   final int id;
   const PackageDetailScreen({super.key, required this.id});
 
   @override
-  Widget build(BuildContext context) {
-    final service = PackageService(context.read<AuthProvider>().api);
+  State<PackageDetailScreen> createState() => _PackageDetailScreenState();
+}
 
-    return FutureBuilder(
-      future: service.getById(id),
+class _PackageDetailScreenState extends State<PackageDetailScreen> {
+  late Future<TravelPackage> _future = _load();
+
+  Future<TravelPackage> _load() => PackageService(context.read<AuthProvider>().api).getById(widget.id);
+
+  @override
+  Widget build(BuildContext context) {
+    final api = context.read<AuthProvider>().api;
+
+    return FutureBuilder<TravelPackage>(
+      future: _future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(appBar: AppBar(title: const Text('Package Details')), body: const LoadingWidget());
         }
         if (snapshot.hasError) {
-          return Scaffold(appBar: AppBar(title: const Text('Package Details')), body: ErrorDisplayWidget(message: snapshot.error.toString()));
+          return Scaffold(
+            appBar: AppBar(title: const Text('Package Details')),
+            body: ErrorDisplayWidget(
+              message: snapshot.error.toString(),
+              onRetry: () => setState(() {
+                _future = _load();
+              }),
+            ),
+          );
         }
         final pkg = snapshot.data!;
 
@@ -36,7 +59,7 @@ class PackageDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
               child: FilledButton(
                 onPressed: () => context.push('/bookings/new?packageId=${pkg.id}'),
-                child: Text('Book for \$${pkg.price.toStringAsFixed(0)}'),
+                child: Text('Book from ${formatMoney(pkg.pricePerPerson)} per person'),
               ),
             ),
           ),
@@ -48,8 +71,10 @@ class PackageDetailScreen extends StatelessWidget {
               runSpacing: 8,
               children: [
                 _InfoChip(icon: Icons.schedule, label: '${pkg.durationDays} days'),
-                _InfoChip(icon: Icons.payments_outlined, label: '\$${pkg.price.toStringAsFixed(0)}'),
+                _InfoChip(icon: Icons.payments_outlined, label: '${formatMoney(pkg.pricePerPerson)} pp'),
                 if (pkg.activityCount > 0) _InfoChip(icon: Icons.hiking, label: '${pkg.activityCount} activities'),
+                if (pkg.maxTravelers != null && pkg.maxTravelers! > 0)
+                  _InfoChip(icon: Icons.groups_outlined, label: 'Up to ${pkg.maxTravelers} travelers'),
               ],
             ),
             const SizedBox(height: 16),
@@ -64,10 +89,17 @@ class PackageDetailScreen extends StatelessWidget {
                       leading: CircleAvatar(child: Text('${a.dayNumber}')),
                       title: Text(a.title),
                       subtitle: Text(a.description ?? ''),
-                      trailing: a.price > 0 ? Text('+\$${a.price.toStringAsFixed(0)}') : null,
+                      trailing: a.price > 0 ? Text('+${formatMoney(a.price)}') : null,
                     ),
                   )),
             ],
+            TransportSection(load: () => TransportationService(api).search(travelPackageId: pkg.id)),
+            const SizedBox(height: 24),
+            ReviewsSection(
+              load: () => ReviewService(api).forPackage(pkg.id),
+              averageRating: pkg.averageRating,
+              reviewCount: pkg.reviewCount,
+            ),
           ],
         );
       },

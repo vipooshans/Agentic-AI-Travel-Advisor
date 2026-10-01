@@ -9,7 +9,7 @@ class PreferencesService {
 
   Future<TravelPreferences> get() async {
     final response = await _api.get('/api/users/me/preferences');
-    if (response.statusCode != 200) throw Exception('Failed to load preferences');
+    _api.ensureSuccess(response);
     return TravelPreferences.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
@@ -25,9 +25,7 @@ class PreferencesService {
       'preferredClimate': preferredClimate,
       'interests': interests,
     });
-    if (response.statusCode != 200) {
-      throw Exception(_api.parseErrorMessage(response) ?? 'Failed to save preferences');
-    }
+    _api.ensureSuccess(response);
     return TravelPreferences.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   }
 }

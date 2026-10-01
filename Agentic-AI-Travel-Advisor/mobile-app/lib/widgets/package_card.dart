@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/travel_package.dart';
+import '../utils/format.dart';
 import 'catalog_image.dart';
 
 class PackageCard extends StatelessWidget {
@@ -35,7 +36,7 @@ class PackageCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      '\$${package.price.toStringAsFixed(0)}',
+                      formatMoney(package.pricePerPerson),
                       style: TextStyle(fontWeight: FontWeight.w800, color: Colors.blue.shade800),
                     ),
                   ),
@@ -56,6 +57,12 @@ class PackageCard extends StatelessWidget {
                       Icon(Icons.schedule, size: 16, color: Colors.blue.shade700),
                       const SizedBox(width: 6),
                       Text('${package.durationDays} days', style: TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.w600)),
+                      if (package.reviewCount > 0 && package.averageRating != null) ...[
+                        const SizedBox(width: 16),
+                        Icon(Icons.star, size: 16, color: Colors.amber.shade700),
+                        const SizedBox(width: 4),
+                        Text('${package.averageRating!.toStringAsFixed(1)} (${package.reviewCount})'),
+                      ],
                     ],
                   ),
                 ],

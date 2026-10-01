@@ -2,36 +2,61 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../models/destination.dart';
+import '../models/travel_package.dart';
 import '../providers/auth_provider.dart';
 import '../services/destination_service.dart';
 import '../services/package_service.dart';
+import '../services/transportation_service.dart';
 import '../widgets/catalog_detail_view.dart';
 import '../widgets/error_widget.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/loading_widget.dart';
 import '../widgets/package_card.dart';
+import '../widgets/transport_section.dart';
 
-class DestinationDetailScreen extends StatelessWidget {
+class DestinationDetailScreen extends StatefulWidget {
   final int id;
   const DestinationDetailScreen({super.key, required this.id});
 
   @override
+  State<DestinationDetailScreen> createState() => _DestinationDetailScreenState();
+}
+
+class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
+  late Future<List<Object>> _future = _load();
+
+  Future<List<Object>> _load() {
+    final api = context.read<AuthProvider>().api;
+    return Future.wait<Object>([
+      DestinationService(api).getById(widget.id),
+      PackageService(api).getAll(destinationId: widget.id),
+    ]);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final api = context.read<AuthProvider>().api;
-    final destService = DestinationService(api);
-    final pkgService = PackageService(api);
 
     return FutureBuilder(
-      future: Future.wait([destService.getById(id), pkgService.getAll(destinationId: id)]),
+      future: _future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(appBar: AppBar(title: const Text('Destination')), body: const LoadingWidget());
         }
         if (snapshot.hasError) {
-          return Scaffold(appBar: AppBar(title: const Text('Destination')), body: ErrorDisplayWidget(message: snapshot.error.toString()));
+          return Scaffold(
+            appBar: AppBar(title: const Text('Destination')),
+            body: ErrorDisplayWidget(
+              message: snapshot.error.toString(),
+              onRetry: () => setState(() {
+                _future = _load();
+              }),
+            ),
+          );
         }
-        final dest = (snapshot.data as List)[0];
-        final packages = (snapshot.data as List)[1] as List;
+        final dest = snapshot.data![0] as Destination;
+        final packages = snapshot.data![1] as List<TravelPackage>;
 
         return CatalogDetailView(
           title: dest.name,
@@ -59,6 +84,7 @@ class DestinationDetailScreen extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 12),
                     child: PackageCard(package: p, onTap: () => context.push('/packages/${p.id}')),
                   )),
+            TransportSection(load: () => TransportationService(api).search(destinationId: widget.id)),
           ],
         );
       },

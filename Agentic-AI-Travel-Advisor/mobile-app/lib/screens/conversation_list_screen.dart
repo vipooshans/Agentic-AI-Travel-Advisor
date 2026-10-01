@@ -29,6 +29,12 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
 
   Future<List<ConversationSummary>> _load() => ChatService(context.read<AuthProvider>().api).listConversations();
 
+  void _reload() {
+    setState(() {
+      _future = _load();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final service = ChatService(context.read<AuthProvider>().api);
@@ -42,7 +48,7 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) return const LoadingWidget();
               if (snapshot.hasError) {
-                return ErrorDisplayWidget(message: snapshot.error.toString(), onRetry: () => setState(() => _future = _load()));
+                return ErrorDisplayWidget(message: snapshot.error.toString(), onRetry: _reload);
               }
               final items = snapshot.data ?? [];
               if (items.isEmpty) {
@@ -55,7 +61,7 @@ class _ConversationListScreenState extends State<ConversationListScreen> {
                 );
               }
               return RefreshIndicator(
-                onRefresh: () async => setState(() => _future = _load()),
+                onRefresh: () async => _reload(),
                 child: ListView.builder(
                   padding: const EdgeInsets.all(12),
                   itemCount: items.length,
