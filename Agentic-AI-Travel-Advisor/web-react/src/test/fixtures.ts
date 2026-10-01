@@ -1,4 +1,106 @@
-import type { Booking, BookingProposal, ChatResponse, TravelPlan } from '../api/types';
+import type {
+  Booking,
+  BookingProposal,
+  ChatResponse,
+  Destination,
+  Hotel,
+  ReportSummary,
+  Room,
+  Statistics,
+  TravelPackage,
+  TravelPackageDetail,
+  TravelPlan,
+} from '../api/types';
+
+export const ellaHotel: Hotel = {
+  id: 3,
+  name: 'Ella Gap View Inn',
+  address: 'Passara Road',
+  city: 'Ella',
+  country: 'Sri Lanka',
+  description: 'Views of Ella Gap',
+  imageUrl: null,
+  roomCount: 2,
+  approvalStatus: 1,
+  minPricePerNight: 8000,
+  averageRating: 4.2,
+  reviewCount: 5,
+};
+
+export const ellaRooms: Room[] = [
+  { id: 5, hotelId: 3, name: 'Garden Double', roomType: 'Double', pricePerNight: 8000, capacity: 2, isAvailable: true },
+  { id: 6, hotelId: 3, name: 'Family Room', roomType: 'Family', pricePerNight: 12000, capacity: 4, isAvailable: true },
+  { id: 9, hotelId: 3, name: 'Closed Suite', roomType: 'Suite', pricePerNight: 30000, capacity: 2, isAvailable: false },
+];
+
+export const destinations: Destination[] = [
+  { id: 6, name: 'Ella', country: 'Sri Lanka' },
+  { id: 7, name: 'Kandy', country: 'Sri Lanka' },
+];
+
+export const ellaPackage: TravelPackage = {
+  id: 7,
+  title: 'Ella Hiking Escape',
+  description: 'Two days of trails',
+  price: 28000,
+  durationDays: 2,
+  destinationId: 6,
+  destinationName: 'Ella',
+  destinationCountry: 'Sri Lanka',
+  imageUrl: null,
+  activityCount: 2,
+  approvalStatus: 1,
+  totalPrice: 36000,
+  maxTravelers: 10,
+  averageRating: null,
+  reviewCount: 0,
+};
+
+export const ellaPackageDetail: TravelPackageDetail = { ...ellaPackage, activities: [] };
+
+export const summary: ReportSummary = {
+  userCount: 120,
+  hotelOwnerCount: 8,
+  travelAgentCount: 5,
+  hotelCount: 14,
+  packageCount: 9,
+  pendingHotelApprovals: 2,
+  pendingPackageApprovals: 1,
+  pendingBookings: 6,
+  confirmedBookings: 30,
+  cancelledBookings: 4,
+  completedBookings: 50,
+  revenue: 1250000,
+};
+
+export const statistics: Statistics = {
+  from: '2025-10-01',
+  to: '2026-10-01',
+  totalBookings: 90,
+  bookingsByStatus: { Pending: 6, Confirmed: 30, Cancelled: 4, Completed: 50 },
+  revenue: 1250000,
+  averageBookingValue: 15625,
+  cancellationRate: 0.044,
+  totalGuests: 210,
+  averageRating: 4.4,
+  reviewCount: 37,
+  monthly: [{ month: '2026-09', bookings: 12, revenue: 180000 }],
+  topListings: [{ id: 3, type: 'Hotel', name: 'Ella Gap View Inn', bookings: 20, revenue: 320000, averageRating: 4.2, reviewCount: 5 }],
+};
+
+export const emptyStatistics: Statistics = {
+  ...statistics,
+  totalBookings: 0,
+  bookingsByStatus: {},
+  revenue: 0,
+  averageBookingValue: 0,
+  cancellationRate: 0,
+  totalGuests: 0,
+  averageRating: null,
+  reviewCount: 0,
+  monthly: [],
+  topListings: [],
+};
 
 export const ellaPlan: TravelPlan = {
   destination: 'Ella',

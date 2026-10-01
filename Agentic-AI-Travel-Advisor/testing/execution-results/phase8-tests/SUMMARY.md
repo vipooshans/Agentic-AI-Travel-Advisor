@@ -125,3 +125,54 @@ The first run had 8 failures. Six were a mistake in the test, not the product: t
 - **DEF-020 (Medium).** A model reply quoting a hotel and price that no tool returned went to the user unchanged (case J-06). Replies that quote prices without tool data from the same turn, or an earlier assistant message, are now replaced. J-08 shows that legitimate follow-ups still work. Limitation: a hotel name mentioned without any price is still not detected.
 
 Before/after output for both: `ai-evaluation/fixes-before-after.txt`. Details: `testing/defect-reports/DEFECT-LOG.md`.
+
+## 8d. React web app: Vitest + React Testing Library + MSW, and Playwright against the real stack
+
+### Component and page tests (Vitest, jsdom, MSW)
+
+MSW answers at the HTTP layer with the API's real JSON shapes and ProblemDetails errors. The app's own Axios client, interceptors and error mapping run unchanged.
+
+| File | Tests | What it checks |
+|---|---|---|
+| `src/App.test.tsx` (new) | 188 | Real `App` route table: every protected route x every role (19 x 4) plus anonymous redirects; profile for all roles; public pages; 404; per-role navigation; 401 from the API ends the session; post-login target per route and role (76); two DEF-021 regressions |
+| `src/pages/public/RegisterPage.test.tsx` (new) | 9 | Five client-side validation rules with no request sent; trimmed payload and redirect; duplicate-email 409; several server password rules shown together; signed-in user redirected |
+| `src/pages/owner/OwnerHotelsPage.test.tsx` (new) | 9 | Loading, list with approval status, empty, load error; create (trimmed body, Pending); API validation error keeps the form; edit (PUT to that id, re-approval shown); delete confirmed, cancelled, refused by API (409) |
+| `src/pages/agent/AgentPackagesPage.test.tsx` (new) | 10 | List and empty state; five form-validation cases with no request sent; create for the chosen destination; edit pre-fill and update; 403 message |
+| `src/pages/admin/AdminDashboardPage.test.tsx` (new) | 5 | Platform totals and pending-approval count; 12-month statistics and status counts; loading indicators; empty states; both API errors shown |
+| `src/pages/admin/AdminApprovalsPage.test.tsx` (new) | 5 | Pending queue by default; approve hotel (PATCH body, reload, empty state); reject package; switch to Rejected; failed decision keeps the listing |
+| `src/pages/admin/AdminUsersPage.test.tsx` (new) | 6 | Roles and status; no deactivate button on the admin's own row; role and text filters; deactivate after confirm; reactivate; create a staff account; load error |
+| `src/pages/public/HomePage.test.tsx` (new) | 6 | Loading then results; filters sent as query parameters; empty state; network failure message; package tab search by destination; traveler-only assistant link |
+| `src/components/BookingPanel.test.tsx` (new) | 12 | Anonymous and staff accounts cannot book; only open rooms offered; date and guest validation with no request sent; quote then booking (request payloads, Pending status from the backend); unavailable quote; 409 on create shown instead of success; package booking |
+| `src/pages/public/LoginPage.test.tsx` | 5 (1 new) | DEF-021 regression: return to the requested page |
+| Existing files | 31 | unchanged |
+
+| Run | Result | Evidence |
+|---|---|---|
+| `npm test` | **17 files, 286 tests: 286 passed, 0 failed** (was 8 files, 35 tests) | `web-vitest.log` (verbose, one line per test) |
+| `npm run lint`, `npm run typecheck` | clean | (no output) |
+
+**Checking that the tests can fail.** Two rules were broken on purpose in product code and then restored (`git diff` was empty afterwards). First, `/admin/users` was opened to USER in `App.tsx`. Second, the traveler-only check in `BookingPanel` was removed. The run failed exactly where expected: `/admin/users as USER → allowed: false`, plus the three "does not offer booking to HOTEL_OWNER / TRAVEL_AGENT / ADMIN" tests (4 failed, 118 passed). Evidence: `web-mutation-check.log`.
+
+### Browser tests (Playwright, Chromium) against the real system
+
+`web-react/playwright.config.ts` runs `e2e/*.spec.ts` against the Vite dev server, which proxies `/api` to the ASP.NET Core API on the local PostgreSQL 18 database. Nothing is mocked. If the API or Vite is not already running, Playwright starts it. Specs run serially and give every hotel, package and account a per-run suffix. A cleanup hook deletes listings left behind by a failed run.
+
+| Spec | Tests | Flow |
+|---|---|---|
+| `e2e/auth.spec.ts` | 9 | Each staff role signs in, gets only its own navigation, signs out and cannot go back; wrong password; traveler registration checked through `/api/auth/me`; weak password rejected by the server; traveler blocked from admin/owner/agent pages in the UI and with 403 from `/api/users`, `/api/settings` and `/api/reports/statistics`; `/api/reports/summary` returns only the traveler's own (zero) figures; deep link through login; tampered JWT rejected and the session cleared |
+| `e2e/listings.spec.ts` | 4 | Owner creates a hotel and a room in the UI, and it is hidden from public search; admin approves it and the hotel becomes searchable; agent hits form validation, then creates a package that the admin rejects; admin creates a second hotel owner in the Users page, who cannot see the hotel and gets 403 on PUT/DELETE; the real owner deletes it and the API returns 404 |
+| `e2e/booking.spec.ts` | 3 | Traveler checks availability and books in the UI. The API returns the stored booking as Pending, with total = 2 nights x 11,000 computed by the server, the right room, dates and guests. A second traveler cannot double-book overlapping dates. The owner confirms in the UI; the API and the traveler's My bookings page show Confirmed |
+
+| Run | Result | Evidence |
+|---|---|---|
+| `npm run e2e` | **16 passed, 0 failed** | `web-playwright.log`, `web-playwright-junit.xml` |
+| repeat run against the same database | **16 passed, 0 failed**; the cleanup script then found no leftover E2E listings | `web-playwright-rerun.log` |
+
+Environment: the auth endpoints allow 10 requests per minute per IP, and the suite signs in about 30 times. So for this run the API was started with `RateLimiting__AuthPermitsPerMinute=300`, which `playwright.config.ts` also sets when it starts the API itself. The first attempt, at the default limit, got HTTP 429 from the real limiter. The default limit is covered by `SecurityHardeningTests`. The credentials are the Development-only demo accounts and can be overridden with `E2E_*_EMAIL` / `E2E_*_PASSWORD`.
+
+### What the browser runs found
+
+Earlier Playwright attempts failed. Each failure is listed below, with whether the cause was in the test or the product:
+
+- **Test mistakes, fixed in the specs:** ambiguous locators (the label "Guests" also matched the room option "2 guests"; "Role" matched "Filter by role"; "Sign in" matched both the header link and the booking panel link). One expectation was also wrong: `/api/reports/summary` is open to every role by design and scoped to the caller. The test now checks that a traveler receives no platform figures, and it uses admin-only endpoints for the 403 check.
+- **DEF-021 (Low), product defect, fixed:** sign-in ignored the page the visitor asked for (deep link to `/owner/hotels` landed on `/owner`). After that fix, a second problem appeared: Sign out stored the page being left, so the next user was sent there (403 for another role, someone else's page for the same role). Before/after: `def021-before-fix.log`, `def021b-before-fix.log`, `def021c-before-fix.log`, `def021-after-fix.log`. Details: `testing/defect-reports/DEFECT-LOG.md`.
