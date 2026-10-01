@@ -4,7 +4,7 @@ using TravelAdvisor.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options => options.Filters.Add<ApiAuthExceptionFilter>());
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ApiAuthService>();
 builder.Services.AddScoped<TravelApiClient>();

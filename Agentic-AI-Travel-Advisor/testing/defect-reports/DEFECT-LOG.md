@@ -146,10 +146,12 @@ Defects DEF-001 to DEF-016 were found by code inspection on 2026-10-01 before im
 - **Steps to reproduce:** Let the API token expire (or restart the API with a new key) and open `/Owner/Hotels`.
 - **Expected:** Redirect to login.
 - **Actual:** HTTP 500 error page.
-- **Evidence:** `web-app/Services/TravelApiClient.cs` at `4833828`.
-- **Status:** Open
-- **Fix:**
+- **Evidence:** `web-app/Services/TravelApiClient.cs` at `4833828`. Reproduced by `tests/TravelAdvisor.UnitTests/WebPortal/PortalApiErrorTests.cs` (portal in-process, API replaced by a stub): API 401 on `/Owner/Hotels` and `/Admin/Users`, 404 on `/Owner/EditHotel/999` and 403 on `/Owner/Rooms/5` all returned 500 (`testing/execution-results/phase8-tests/def009-before-fix.log`: 4 failed, 1 passed; the passing test is the control that a real API 500 stays an error).
+- **Status:** Retested (Closed)
+- **Fix:** `TravelApiClient` reads through one helper. A 404 on a read returns null or an empty list, which the controllers already show as Not Found. 401 throws `ApiUnauthorizedException` and 403 throws `ApiForbiddenException`, on reads and writes; other failures still throw. A global MVC filter (`web-app/Middleware/ApiAuthExceptionFilter.cs`) handles those two exceptions. On 401 it signs the user out, clearing both the portal cookie and `access_token`, and redirects to `/Account/Login` (with `ReturnUrl` for GET requests only). On 403 it redirects to `/Account/AccessDenied`. Login still uses its own call, so a wrong password keeps showing the form error.
 - **Retest result:**
+  - **Automated:** `PortalApiErrorTests` 7/7 passed (`def009-after-fix.log`). These are the 5 tests above, plus 2 added with the fix: a real form post (with its antiforgery token) whose API call gets 401 redirects to the login page without a return URL, and the client reports 400 as `false`/null, 404 as null/empty, and 401/403 as the new exceptions. Full unit suite: 404 passed, 0 failed, 35 skipped (live-LLM cases) (`backend-unit-tests-def009.log`).
+  - **Manual, real API:** the portal on :7000 against the API on :5080 (`testing/scripts/def009-portal-retest.ps1`, output in `def009-manual-retest.log`). The owner signs in through the login form, and `/Owner/Hotels` gives 200. `/Owner/EditHotel/999999` gives 404. With the `access_token` cookie replaced by an invalid token, `/Owner/Hotels` gives 302 to `/Account/Login?ReturnUrl=%2FOwner%2FHotels`, the auth and token cookies are gone, and following the redirect shows the login page (200) instead of looping back to the dashboard.
 
 ## DEF-010 Approved listings can be edited without re-approval
 - **Severity / Priority:** Medium / P3

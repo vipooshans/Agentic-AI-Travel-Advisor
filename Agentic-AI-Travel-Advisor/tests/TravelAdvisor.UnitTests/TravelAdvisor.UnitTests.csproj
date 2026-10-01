@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.11" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="Moq" Version="4.20.72" />
@@ -22,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\shared\Core\TravelAdvisor.Core.csproj" />
     <ProjectReference Include="..\..\shared\Infrastructure\TravelAdvisor.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\web-app\TravelAdvisor.Web.csproj" />
   </ItemGroup>
 
 </Project>
