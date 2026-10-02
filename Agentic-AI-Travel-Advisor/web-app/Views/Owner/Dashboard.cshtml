@@ -6,7 +6,7 @@
     <div class="col-md-4"><div class="stat-card"><h6>Pending approvals</h6><p class="stat-value">@ViewBag.PendingApprovals</p></div></div>
     <div class="col-md-4"><div class="stat-card"><h6>Pending bookings</h6><p class="stat-value">@ViewBag.PendingCount</p></div></div>
     <div class="col-md-4"><div class="stat-card"><h6>Active bookings</h6><p class="stat-value">@ViewBag.BookingCount</p></div></div>
-    <div class="col-md-4"><div class="stat-card stat-card-accent"><h6>Revenue</h6><p class="stat-value">$@(((decimal)(ViewBag.Revenue ?? 0)).ToString("N0"))</p></div></div>
+    <div class="col-md-4"><div class="stat-card stat-card-accent"><h6>Revenue</h6><p class="stat-value">LKR @(((decimal)(ViewBag.Revenue ?? 0)).ToString("N0"))</p></div></div>
 </div>
 <section class="insight-card">
     <div>
