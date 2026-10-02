@@ -145,7 +145,7 @@ After the DEF-026 and DEF-027 fixes, every suite was run again on the final code
 | Flutter integration test on the real API | `flutter-integration-final.log` | 3 passed ("All tests passed.") |
 
 Notes on these runs:
-- **Live-LLM cases not run.** The 35 not-executed unit tests are the live-LLM evaluation cases. They skip themselves unless a working `Ai:ApiKey` is configured, and the local key is a placeholder that the provider rejects.
+- **Live-LLM cases not run.** The 35 not-executed unit tests are the live-LLM evaluation cases. They skip themselves unless the `AI_EVAL_API_KEY` environment variable is set, and no working model key is available on this machine (the API's `Ai:ApiKey` user secret is a placeholder that the provider rejects).
 - **Flutter test names come from the JSON file.** Flutter's text reporter does not print a line for every test, so the per-test results are taken from the JSON reporter output.
 - **Some log characters are garbled.** The k6 and Vitest logs were captured through the Windows console, so their check marks and arrows appear as code-page-437 characters (for example `Γ£ô` for ✓).
 

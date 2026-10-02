@@ -166,7 +166,7 @@ All tests run against the real system; recorded results are in `testing/executio
 
 | Suite | Command | Notes |
 |-------|---------|-------|
-| Backend unit tests (xUnit, Moq, AI evaluation) | `dotnet test tests/TravelAdvisor.UnitTests` | The live-LLM cases skip themselves unless a working `Ai:ApiKey` is configured |
+| Backend unit tests (xUnit, Moq, AI evaluation) | `dotnet test tests/TravelAdvisor.UnitTests` | The 35 live-LLM evaluation cases skip themselves unless the `AI_EVAL_API_KEY` environment variable holds a working key (optional: `AI_EVAL_BASE_URL`, `AI_EVAL_MODEL`) |
 | API, database and security tests | `dotnet test tests/TravelAdvisor.Api.Tests` | Needs Docker (Testcontainers PostgreSQL) |
 | React unit and component tests | `cd web-react && npm test && npm run lint && npm run typecheck` | Vitest, React Testing Library, MSW |
 | Web end-to-end | `cd web-react && npm run e2e` | Playwright against the real API and database; starts the API on 5080 and Vite if they are not running. Set `E2E_DB_CONNECTION` for the database checks |
