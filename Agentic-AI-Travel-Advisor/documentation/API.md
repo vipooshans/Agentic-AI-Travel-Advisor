@@ -131,3 +131,58 @@ Allowed dev origins (configured in `web-api/appsettings.json`):
 - `http://localhost:5000`, `https://localhost:5001`
 - `http://localhost:7000`, `https://localhost:7001`
 - `http://localhost:3000`
+
+---
+
+### Destinations
+
+```
+GET /api/destinations
+GET /api/destinations/{id}
+```
+
+Optional query parameters for the collection endpoint:
+
+- `search` — matches destination name or country
+- `country` — filters by an exact country name
+
+**Response 200:**
+```json
+[
+  {
+    "id": 1,
+    "name": "Ella",
+    "country": "Sri Lanka",
+    "description": "Hill-country destination known for scenic train journeys, hiking and tea estates.",
+    "imageUrl": null,
+    "packageCount": 0
+  }
+]
+```
+
+---
+
+### My Bookings
+
+All booking endpoints require a JWT bearer token.
+
+```
+GET /api/bookings/mine
+GET /api/bookings/{id}
+POST /api/bookings
+PATCH /api/bookings/{id}/cancel
+```
+
+Create a room booking:
+
+```json
+{
+  "roomId": 12,
+  "travelPackageId": null,
+  "checkIn": "2026-10-10",
+  "checkOut": "2026-10-12"
+}
+```
+
+Create a package booking by setting `travelPackageId` instead of `roomId`. The API validates date ranges, prevents overlapping active room bookings, and calculates the total price on the server.
+

@@ -76,5 +76,36 @@ public static class DbSeeder
 
             await userManager.CreateAsync(agent, "Agent@123");
         }
+
+        if (!await context.Destinations.AnyAsync())
+        {
+            context.Destinations.AddRange(
+                new Destination
+                {
+                    Name = "Ella",
+                    Country = "Sri Lanka",
+                    Description = "Hill-country destination known for scenic train journeys, hiking and tea estates."
+                },
+                new Destination
+                {
+                    Name = "Sigiriya",
+                    Country = "Sri Lanka",
+                    Description = "Historic rock fortress and cultural destination in Sri Lanka's central region."
+                },
+                new Destination
+                {
+                    Name = "Galle",
+                    Country = "Sri Lanka",
+                    Description = "Coastal city featuring the UNESCO-listed Galle Fort and nearby beaches."
+                },
+                new Destination
+                {
+                    Name = "Kandy",
+                    Country = "Sri Lanka",
+                    Description = "Cultural hill capital with temples, gardens and lake-side attractions."
+                });
+
+            await context.SaveChangesAsync();
+        }
     }
 }
