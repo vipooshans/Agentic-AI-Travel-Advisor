@@ -20,7 +20,8 @@
 | Component | Technology | Purpose |
 |-----------|------------|---------|
 | Mobile App | Flutter | User-facing mobile experience |
-| Web App | ASP.NET Core | API, business logic, data access |
+| Web API | ASP.NET Core Web API | REST endpoints, authentication, business logic |
+| Web App | ASP.NET Core MVC | Administration and role-based dashboards |
 | Agentic AI | Multi-agent system | Travel planning, recommendations, booking |
 | Database | PostgreSQL | Persistent storage |
 
