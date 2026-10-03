@@ -1,10 +1,12 @@
 import 'dart:io';
 
 class ApiConfig {
+  static const int apiPort = 5000;
+
   static String get baseUrl {
     if (Platform.isAndroid) {
-      return 'http://10.0.2.2:5000';
+      return 'http://10.0.2.2:$apiPort';
     }
-    return 'http://localhost:5000';
+    return 'http://localhost:$apiPort';
   }
 }
