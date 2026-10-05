@@ -34,6 +34,10 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<AuthResponse>> Register([FromBody] RegisterRequest request)
     {
+        request.Email = request.Email.Trim();
+        request.FirstName = request.FirstName.Trim();
+        request.LastName = request.LastName.Trim();
+
         var userRole = await _context.AppRoles.FirstOrDefaultAsync(r => r.Name == RoleNames.User);
         if (userRole is null)
         {
@@ -69,6 +73,8 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
     {
+        request.Email = request.Email.Trim();
+
         var user = await _userManager.Users
             .Include(u => u.Role)
             .FirstOrDefaultAsync(u => u.Email == request.Email);
