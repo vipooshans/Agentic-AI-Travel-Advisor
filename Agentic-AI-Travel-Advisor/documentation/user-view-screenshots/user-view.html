@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Travel Advisor — User view</title>
+  <style>
+    @page { size: A4 portrait; margin: 12mm 14mm 14mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #1c1915; font-family: "Segoe UI", sans-serif; }
+    h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; font-weight: 500; margin: 0; }
+    .sheet { break-after: page; page-break-after: always; }
+    .sheet:last-child { break-after: auto; page-break-after: auto; }
+    .kicker { letter-spacing: 0.18em; text-transform: uppercase; font-size: 11px; color: #8a7340; margin: 0 0 8px; }
+    .lede { font-size: 14px; line-height: 1.55; color: #3d3832; max-width: 150mm; }
+    .cover { min-height: 250mm; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 18mm; }
+    .cover h1 { font-size: 42px; line-height: 1.05; margin: 8px 0 16px; }
+    .rule { width: 48px; height: 2px; background: #8a7340; margin: 18px 0; }
+    h2 { font-size: 26px; }
+    h3 { font-size: 18px; margin-top: 4px; }
+    .note { font-size: 12px; color: #6b645c; margin-top: 6px; }
+    img.phone { height: 226mm; width: auto; display: block; margin: 6mm auto 0; }
+    img.desk { width: 100%; height: auto; display: block; margin-top: 5mm; border: 1px solid #e6e0d6; }
+  </style>
+</head>
+<body>
+  <section class="sheet cover">
+    <p class="kicker">Travel Advisor</p>
+    <h1>User view</h1>
+    <p class="lede">Screens from the two places people use the system. Travelers plan and book in the Flutter app. Administrators, hotel owners, and travel agents work in the ASP.NET portal.</p>
+    <div class="rule"></div>
+    <p class="note">Flutter traveler app, then the ASP.NET staff portal.</p>
+  </section>
+
+  <section class="sheet">
+    <p class="kicker">Flutter · Traveler</p>
+    <h2>Sign in</h2>
+    <p class="note">Travelers open the mobile app with their own account. Staff accounts stay on the portal.</p>
+    <img class="phone" src="flutter-01-login.png" alt="Flutter sign in" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">Flutter · Traveler</p>
+    <h2>Create an account</h2>
+    <p class="note">A new traveler registers with name, email, and password.</p>
+    <img class="phone" src="flutter-02-register.png" alt="Flutter registration" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">Flutter · Traveler</p>
+    <h2>Home</h2>
+    <p class="note">The home screen greets the traveler and offers the assistant, destinations, hotels, and packages.</p>
+    <img class="phone" src="flutter-03-home.png" alt="Flutter home" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">Flutter · Traveler</p>
+    <h2>Explore destinations</h2>
+    <p class="note">Approved places the traveler can open.</p>
+    <img class="phone" src="flutter-04-explore-destinations.png" alt="Destination list" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">Flutter · Traveler</p>
+    <h2>Explore hotels</h2>
+    <p class="note">Hotel search, here for Kandy, with nightly prices in Sri Lankan rupees.</p>
+    <img class="phone" src="flutter-05-explore-hotels.png" alt="Hotel search" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">Flutter · Traveler</p>
+    <h2>Explore packages</h2>
+    <p class="note">Approved tours, with duration and price per person.</p>
+    <img class="phone" src="flutter-06-explore-packages.png" alt="Package list" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">Flutter · Traveler</p>
+    <h2>Destination</h2>
+    <p class="note">Ella, with the packages available there.</p>
+    <img class="phone" src="flutter-07-destination-detail.png" alt="Ella destination" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">Flutter · Traveler</p>
+    <h2>Hotel</h2>
+    <p class="note">Ella Gap View Inn, with rooms the traveler can book.</p>
+    <img class="phone" src="flutter-08-hotel-detail.png" alt="Hotel detail" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">Flutter · Traveler</p>
+    <h2>Package</h2>
+    <p class="note">Ella Hills Escape, including the day activities and the booking price.</p>
+    <img class="phone" src="flutter-09-package-detail.png" alt="Package detail" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">Flutter · Traveler</p>
+    <h2>Request a room</h2>
+    <p class="note">Dates, guests, and an availability check before the booking is requested.</p>
+    <img class="phone" src="flutter-10-book-room.png" alt="Create booking" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">Flutter · Traveler</p>
+    <h2>AI travel assistant</h2>
+    <p class="note">The traveler describes a trip. A suggested prompt is ready to send.</p>
+    <img class="phone" src="flutter-11-ai-assistant.png" alt="AI assistant" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">Flutter · Traveler</p>
+    <h2>My bookings</h2>
+    <p class="note">A traveler with no requests yet.</p>
+    <img class="phone" src="flutter-12-bookings.png" alt="My bookings" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">Flutter · Traveler</p>
+    <h2>Profile</h2>
+    <p class="note">Account details, bookings, saved itineraries, preferences, and chat history.</p>
+    <img class="phone" src="flutter-13-profile.png" alt="Profile" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">Flutter · Traveler</p>
+    <h2>Saved itineraries</h2>
+    <p class="note">Plans saved from the assistant appear here.</p>
+    <img class="phone" src="flutter-14-itineraries.png" alt="Saved itineraries" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">Flutter · Traveler</p>
+    <h2>Travel preferences</h2>
+    <p class="note">Budget, climate, and interests used when planning a trip.</p>
+    <img class="phone" src="flutter-15-preferences.png" alt="Travel preferences" />
+  </section>
+
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Staff portal</p>
+    <h2>Sign in</h2>
+    <p class="note">Administrators, hotel owners, and travel agents sign in here. Traveler accounts are refused.</p>
+    <img class="desk" src="aspnet-01-login.png" alt="Portal sign in" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Administrator</p>
+    <h2>Dashboard</h2>
+    <p class="note">People, listings, approvals, and booking totals for the whole house.</p>
+    <img class="desk" src="aspnet-02-admin-dashboard.png" alt="Admin dashboard" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Administrator</p>
+    <h2>Users</h2>
+    <p class="note">Staff and traveler accounts, with role and active status.</p>
+    <img class="desk" src="aspnet-03-admin-users.png" alt="Admin users" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Administrator</p>
+    <h2>Create an owner or agent</h2>
+    <p class="note">New hotel owners and travel agents are created from the desk.</p>
+    <img class="desk" src="aspnet-04-admin-create-user.png" alt="Create staff user" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Administrator</p>
+    <h2>Destinations</h2>
+    <p class="note">Places shown in the mobile app.</p>
+    <img class="desk" src="aspnet-05-admin-destinations.png" alt="Admin destinations" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Administrator</p>
+    <h2>Hotels</h2>
+    <p class="note">Approve or reject hotels before travelers can see them.</p>
+    <img class="desk" src="aspnet-06-admin-hotels.png" alt="Admin hotels" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Administrator</p>
+    <h2>Packages</h2>
+    <p class="note">Approve or reject travel packages. A pending package is highlighted.</p>
+    <img class="desk" src="aspnet-07-admin-packages.png" alt="Admin packages" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Administrator</p>
+    <h2>Bookings</h2>
+    <p class="note">Every guest request, with confirm and cancel for pending rows.</p>
+    <img class="desk" src="aspnet-08-admin-bookings.png" alt="Admin bookings" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Hotel owner</p>
+    <h2>Dashboard</h2>
+    <p class="note">The owner's hotels, rooms, and booking requests.</p>
+    <img class="desk" src="aspnet-09-owner-dashboard.png" alt="Owner dashboard" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Hotel owner</p>
+    <h2>My hotels</h2>
+    <p class="note">Hotels this owner runs, with approval status.</p>
+    <img class="desk" src="aspnet-10-owner-hotels.png" alt="Owner hotels" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Hotel owner</p>
+    <h2>Add a hotel</h2>
+    <p class="note">A new hotel stays pending until an administrator approves it.</p>
+    <img class="desk" src="aspnet-11-owner-create-hotel.png" alt="Add hotel" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Hotel owner</p>
+    <h2>Rooms</h2>
+    <p class="note">Rooms at Ella Gap View Inn, with nightly price and availability.</p>
+    <img class="desk" src="aspnet-13-owner-rooms.png" alt="Hotel rooms" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Travel agent</p>
+    <h2>Dashboard</h2>
+    <p class="note">Packages, pending approvals, and customer requests.</p>
+    <img class="desk" src="aspnet-14-agent-dashboard.png" alt="Agent dashboard" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Travel agent</p>
+    <h2>My packages</h2>
+    <p class="note">Tours this agent offers, with activities and approval status.</p>
+    <img class="desk" src="aspnet-15-agent-packages.png" alt="Agent packages" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Travel agent</p>
+    <h2>Create a package</h2>
+    <p class="note">A new package stays hidden from travelers until it is approved.</p>
+    <img class="desk" src="aspnet-16-agent-create-package.png" alt="Create package" />
+  </section>
+  <section class="sheet">
+    <p class="kicker">ASP.NET · Travel agent</p>
+    <h2>Package bookings</h2>
+    <p class="note">Guest requests for this agent's packages.</p>
+    <img class="desk" src="aspnet-17-agent-bookings.png" alt="Agent bookings" />
+  </section>
+</body>
+</html>
