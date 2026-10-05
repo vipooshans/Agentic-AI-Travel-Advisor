@@ -22,6 +22,13 @@ public class CreateBookingRequest : IValidatableObject
                 new[] { nameof(RoomId), nameof(TravelPackageId) });
         }
 
+        if (CheckIn.Date < DateTime.UtcNow.Date)
+        {
+            yield return new ValidationResult(
+                "Check-in date cannot be in the past.",
+                new[] { nameof(CheckIn) });
+        }
+
         if (CheckOut.Date <= CheckIn.Date)
         {
             yield return new ValidationResult(
