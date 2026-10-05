@@ -67,3 +67,13 @@ Roles: `USER`, `HOTEL_OWNER`, `TRAVEL_AGENT`, `ADMIN`
 
 - Schema reference: [`database/schemas/001_initial.sql`](../database/schemas/001_initial.sql)
 - Role seed: [`database/seed/001_roles.sql`](../database/seed/001_roles.sql)
+
+## Key Relationships
+
+- A hotel can contain multiple rooms.
+- A user can create multiple bookings.
+- A destination can be linked to multiple travel packages.
+- A user has one travel-preferences profile.
+- An itinerary contains multiple ordered itinerary items.
+- AI conversation records belong to individual users.
+
