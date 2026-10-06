@@ -1,0 +1,77 @@
+﻿
+
+  Γûê THRESHOLDS 
+
+    checks
+    Γ£ô 'rate>0.99' rate=100.00%
+
+    http_req_duration{name:ai plan}
+    Γ£ô 'p(95)<2000' p(95)=34.98ms
+
+    http_req_failed
+    Γ£ô 'rate<0.01' rate=0.00%
+
+
+  Γûê TOTAL RESULTS 
+
+    checks_total.......: 1126    6.58328/s
+    checks_succeeded...: 100.00% 1126 out of 1126
+    checks_failed......: 0.00%   0 out of 1126
+
+    Γ£ô ai plan: status 200
+    Γ£ô ai plan: structured plan within budget
+
+    HTTP
+    http_req_blocked...............: avg=86.56┬╡s  min=3.08┬╡s  med=7.1┬╡s   p(90)=16.29┬╡s  p(95)=22.92┬╡s  p(99)=3.29ms   max=7.53ms  
+    http_req_connecting............: avg=68.02┬╡s  min=0s      med=0s      p(90)=0s       p(95)=0s       p(99)=3.05ms   max=7.09ms  
+    http_req_duration..............: avg=28.78ms  min=19.46ms med=27.6ms  p(90)=33.09ms  p(95)=36.4ms   p(99)=61.26ms  max=88.55ms 
+      { expected_response:true }...: avg=28.78ms  min=19.46ms med=27.6ms  p(90)=33.09ms  p(95)=36.4ms   p(99)=61.26ms  max=88.55ms 
+      { name:ai plan }.............: avg=28.21ms  min=19.46ms med=27.53ms p(90)=32.83ms  p(95)=34.98ms  p(99)=46.52ms  max=88.55ms 
+    http_req_failed................: 0.00%  0 out of 573
+    http_req_receiving.............: avg=250.17┬╡s min=86.3┬╡s  med=199.7┬╡s p(90)=430.53┬╡s p(95)=515.64┬╡s p(99)=1ms      max=1.55ms  
+    http_req_sending...............: avg=63.3┬╡s   min=12.68┬╡s med=58.55┬╡s p(90)=104.49┬╡s p(95)=125.26┬╡s p(99)=193.66┬╡s max=288.12┬╡s
+    http_req_tls_handshaking.......: avg=0s       min=0s      med=0s      p(90)=0s       p(95)=0s       p(99)=0s       max=0s      
+    http_req_waiting...............: avg=28.47ms  min=19.16ms med=27.25ms p(90)=32.76ms  p(95)=35.95ms  p(99)=60.8ms   max=88.4ms  
+    http_reqs......................: 573    3.350106/s
+
+    EXECUTION
+    iteration_duration.............: avg=2.02s    min=2.02s   med=2.02s   p(90)=2.03s    p(95)=2.03s    p(99)=2.04s    max=2.08s   
+    iterations.....................: 563    3.29164/s
+    vus............................: 2      min=0        max=10
+    vus_max........................: 10     min=10       max=10
+
+    NETWORK
+    data_received..................: 3.8 MB 22 kB/s
+    data_sent......................: 554 kB 3.2 kB/s
+
+
+  Γûê SCENARIO: plan_trips 
+
+    checks_total.......: 1126    6.58328/s
+    checks_succeeded...: 100.00% 1126 out of 1126
+    checks_failed......: 0.00%   0 out of 1126
+
+    Γ£ô ai plan: status 200
+    Γ£ô ai plan: structured plan within budget
+
+    HTTP
+    http_req_blocked...........: avg=75.95┬╡s  min=3.73┬╡s  med=7.11┬╡s  p(90)=16.29┬╡s  p(95)=22.73┬╡s  p(99)=3.03ms   max=7.53ms  
+    http_req_connecting........: avg=63.62┬╡s  min=0s      med=0s      p(90)=0s       p(95)=0s       p(99)=2.86ms   max=7.09ms  
+    http_req_duration..........: avg=28.21ms  min=19.46ms med=27.53ms p(90)=32.83ms  p(95)=34.98ms  p(99)=46.52ms  max=88.55ms 
+    http_req_failed............: 0.00%  0 out of 563
+    http_req_receiving.........: avg=250.66┬╡s min=86.3┬╡s  med=199.5┬╡s p(90)=430.82┬╡s p(95)=522.03┬╡s p(99)=1.02ms   max=1.55ms  
+    http_req_sending...........: avg=63.23┬╡s  min=14.89┬╡s med=58.5┬╡s  p(90)=103.64┬╡s p(95)=124.78┬╡s p(99)=193.78┬╡s max=288.12┬╡s
+    http_req_tls_handshaking...: avg=0s       min=0s      med=0s      p(90)=0s       p(95)=0s       p(99)=0s       max=0s      
+    http_req_waiting...........: avg=27.89ms  min=19.16ms med=27.21ms p(90)=32.48ms  p(95)=34.75ms  p(99)=46.23ms  max=88.4ms  
+    http_reqs..................: 563    3.29164/s
+
+    EXECUTION
+    iteration_duration.........: avg=2.02s    min=2.02s   med=2.02s   p(90)=2.03s    p(95)=2.03s    p(99)=2.04s    max=2.08s   
+    iterations.................: 563    3.29164/s
+
+    NETWORK
+    data_received..............: 3.7 MB 22 kB/s
+    data_sent..................: 551 kB 3.2 kB/s
+
+
+

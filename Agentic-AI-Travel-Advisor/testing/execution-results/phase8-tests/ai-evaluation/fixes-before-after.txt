@@ -1,0 +1,19 @@
+﻿Before/after runs for the two defects found by the AI evaluation (2026-10-01). Output lines copied verbatim from dotnet test.
+
+== DEF-019, API test against the seeded PostgreSQL catalog, RequirementParser fix stashed ==
+  Failed TravelAdvisor.Api.Tests.AiAgentTests.Def019_origin_city_is_not_planned_as_the_destination [1 s]
+   Assert.Equal() Failure: Strings differ
+Expected: "Ella"
+Actual:   "Kandy"
+Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1, Duration: 1 s - TravelAdvisor.Api.Tests.dll (net8.0)
+
+== DEF-019, same test with the fix ==
+Passed!  - Failed:     0, Passed:     1, Skipped:     0, Total:     1, Duration: 977 ms - TravelAdvisor.Api.Tests.dll (net8.0)
+
+== DEF-020, AI evaluation J-06/J-08, AgentOrchestrator fix stashed ==
+  Failed TravelAdvisor.UnitTests.AI.Evaluation.AiEvaluationTests.Ai_evaluation_case(id: "J-06") [123 ms]
+   J-06 failed: invented hotel shown to the user; invented price shown to the user
+Failed!  - Failed:     1, Passed:    70, Skipped:     0, Total:    71, Duration: 1 s - TravelAdvisor.UnitTests.dll (net8.0)
+
+== DEF-020, same cases with the fix ==
+Passed!  - Failed:     0, Passed:    71, Skipped:     0, Total:    71, Duration: 1 s - TravelAdvisor.UnitTests.dll (net8.0)

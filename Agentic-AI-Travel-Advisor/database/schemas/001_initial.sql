@@ -1,4 +1,6 @@
 -- Travel Advisor — Initial Schema Reference
+-- HISTORICAL: this hand-written sketch predates later migrations and is out of date.
+-- The current schema is database/schemas/full_schema.sql (generated from the migrations).
 -- Source of truth: EF Core migration in shared/Infrastructure/Migrations/
 
 -- Application roles (custom RBAC)
@@ -90,6 +92,16 @@ CREATE TABLE IF NOT EXISTS "ItineraryItems" (
     "Title" TEXT NOT NULL,
     "Description" TEXT,
     "StartTime" INTERVAL,
+    "SortOrder" INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "PackageActivities" (
+    "Id" SERIAL PRIMARY KEY,
+    "TravelPackageId" INTEGER NOT NULL REFERENCES "TravelPackages"("Id") ON DELETE CASCADE,
+    "Title" TEXT NOT NULL,
+    "Description" TEXT,
+    "DayNumber" INTEGER NOT NULL,
+    "Price" NUMERIC NOT NULL,
     "SortOrder" INTEGER NOT NULL
 );
 

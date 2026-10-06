@@ -1,0 +1,39 @@
+@model List<TravelAdvisor.Core.DTOs.Destinations.DestinationDto>
+@{ Layout = "_AdminLayout"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Destinations</h5>
+    <a asp-action="CreateDestination" class="btn btn-primary btn-sm">Add destination</a>
+</div>
+<p class="text-muted">Name, country, description, and image URL shown in the mobile app. Use a public https image link.</p>
+@if (!Model.Any())
+{
+    ViewData["EmptyTitle"] = "No destinations";
+    ViewData["EmptyMessage"] = "Add a destination to show it in the mobile app.";
+    @await Html.PartialAsync("_EmptyState")
+}
+else
+{
+<div class="table-responsive">
+<table class="table table-striped align-middle">
+    <thead><tr><th></th><th>Name</th><th>Country</th><th>Description</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var d in Model)
+    {
+        <tr>
+            <td style="width:72px">
+                @if (!string.IsNullOrWhiteSpace(d.ImageUrl))
+                {
+                    <img src="@d.ImageUrl" alt="" width="64" height="40" style="object-fit:cover;border-radius:6px" />
+                }
+            </td>
+            <td>@d.Name</td>
+            <td>@d.Country</td>
+            <td>@(string.IsNullOrWhiteSpace(d.Description) ? "—" : d.Description)</td>
+            <td><a asp-action="EditDestination" asp-route-id="@d.Id" class="btn btn-sm btn-outline-primary">Edit</a></td>
+        </tr>
+    }
+    </tbody>
+</table>
+</div>
+}

@@ -1,0 +1,596 @@
+﻿
+> test
+> node node_modules/newman/bin/newman.js run TravelAdvisor.postman_collection.json -e local.postman_environment.json --reporters cli,junit,htmlextra --reporter-junit-export reports/newman-junit.xml --reporter-htmlextra-export reports/newman-report.html --reporter-htmlextra-skipSensitiveData
+
+node.exe : (node:43788) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:43788) [D...ts.F_OK instead:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-deprecation ...` to show where the warning was created)
+newman
+
+Travel Advisor API
+
+Γûí 01 Health and public catalog
+Γöö Health check
+  GET http://localhost:5080/api/health [200 OK, 457B, 298ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  API and database are healthy
+
+Γöö Public settings
+  GET http://localhost:5080/api/settings/public [200 OK, 510B, 12ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  exposes only public settings
+
+Γöö List destinations
+  GET http://localhost:5080/api/destinations [200 OK, 1.99kB, 7ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  includes Ella
+
+Γöö Get destination
+  GET http://localhost:5080/api/destinations/6 [200 OK, 637B, 38ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  returns the requested destination
+
+Γöö Unknown destination is 404
+  GET http://localhost:5080/api/destinations/999999 [404 Not Found, 578B, 38ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 404
+
+Γöö Search hotels lists approved hotels only
+  GET http://localhost:5080/api/hotels?q=Ella [200 OK, 3.29kB, 44ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  every hotel is approved
+
+Γöö List packages
+  GET http://localhost:5080/api/packages [200 OK, 3.45kB, 68ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  returns an array of packages with prices
+
+Γöö List transportation
+  GET http://localhost:5080/api/transportation [200 OK, 2.61kB, 19ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  returns an array
+
+Γûí 02 Authentication
+Γöö Register traveler
+  POST http://localhost:5080/api/auth/register [200 OK, 1.33kB, 119ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  new account is a USER with a token
+
+Γöö Register second traveler
+  POST http://localhost:5080/api/auth/register [200 OK, 1.31kB, 91ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  stores the second token
+
+Γöö Duplicate email is 409
+  POST http://localhost:5080/api/auth/register [409 Conflict, 582B, 18ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 409
+
+Γöö Weak password is 400
+  POST http://localhost:5080/api/auth/register [400 Bad Request, 808B, 8ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 400
+  ΓêÜ  names the password field
+
+Γöö Registration cannot pick a role
+  POST http://localhost:5080/api/auth/register [200 OK, 1.33kB, 106ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  role is ignored or rejected
+
+Γöö Wrong password is 401
+  POST http://localhost:5080/api/auth/login [401 Unauthorized, 583B, 81ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 401
+  ΓêÜ  does not return a token
+
+Γöö Log in as owner
+  POST http://localhost:5080/api/auth/login [200 OK, 1.32kB, 76ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  returns a token for the owner
+
+Γöö Log in as agent
+  POST http://localhost:5080/api/auth/login [200 OK, 1.33kB, 67ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  returns a token for the agent
+
+Γöö Log in as admin
+  POST http://localhost:5080/api/auth/login [200 OK, 1.3kB, 71ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  returns a token for the admin
+
+Γöö Current user
+  GET http://localhost:5080/api/auth/me [200 OK, 572B, 10ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  returns the signed-in traveler
+
+Γöö Tampered token is 401
+  GET http://localhost:5080/api/auth/me [401 Unauthorized, 495B, 4ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  token claims were really altered
+  ΓêÜ  status is 401
+
+Γöö Missing token is 401
+  GET http://localhost:5080/api/auth/me [401 Unauthorized, 495B, 4ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 401
+
+Γûí 03 Role-based access
+Γöö USER cannot list users
+  GET http://localhost:5080/api/users [403 Forbidden, 489B, 3ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 403
+
+Γöö USER cannot read settings
+  GET http://localhost:5080/api/settings [403 Forbidden, 489B, 3ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 403
+
+Γöö USER cannot create hotels
+  POST http://localhost:5080/api/hotels [403 Forbidden, 489B, 2ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 403
+
+Γöö HOTEL_OWNER cannot list users
+  GET http://localhost:5080/api/users [403 Forbidden, 489B, 7ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 403
+
+Γöö HOTEL_OWNER cannot create packages
+  POST http://localhost:5080/api/packages [403 Forbidden, 489B, 5ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 403
+
+Γöö TRAVEL_AGENT cannot approve hotels
+  PATCH http://localhost:5080/api/hotels/1/approval [403 Forbidden, 489B, 5ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 403
+
+Γöö TRAVEL_AGENT cannot use the AI booking assistant
+  POST http://localhost:5080/api/ai/chat [403 Forbidden, 489B, 3ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 403
+
+Γöö Anonymous cannot list bookings
+  GET http://localhost:5080/api/bookings [401 Unauthorized, 495B, 3ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 401
+
+Γöö ADMIN can list users
+  GET http://localhost:5080/api/users [200 OK, 38.56kB, 10ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  no password hashes in the user list
+
+Γöö ADMIN can read platform statistics
+  GET http://localhost:5080/api/reports/statistics [200 OK, 1.88kB, 15ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+
+Γûí 04 Provider listings and approval
+Γöö Owner creates a hotel (pending)
+  POST http://localhost:5080/api/hotels [201 Created, 691B, 9ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 201
+  ΓêÜ  new hotel waits for approval
+
+Γöö Owner adds a room
+  POST http://localhost:5080/api/hotels/41/rooms [201 Created, 547B, 10ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 201
+  ΓêÜ  room is stored with its price
+
+Γöö Room with zero price is 400
+  POST http://localhost:5080/api/hotels/41/rooms [400 Bad Request, 707B, 14ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 400
+
+Γöö Pending hotel is hidden from the public
+  GET http://localhost:5080/api/hotels/41 [404 Not Found, 556B, 11ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 404
+
+Γöö Another provider cannot edit the hotel
+  PUT http://localhost:5080/api/hotels/41 [403 Forbidden, 489B, 2ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 403
+
+Γöö Owner cannot approve their own hotel
+  PATCH http://localhost:5080/api/hotels/41/approval [403 Forbidden, 489B, 4ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 403
+
+Γöö Booking a pending hotel is refused
+  POST http://localhost:5080/api/bookings [400 Bad Request, 595B, 44ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 400
+
+Γöö Admin approves the hotel
+  PATCH http://localhost:5080/api/hotels/41/approval [200 OK, 642B, 9ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  hotel is approved
+
+Γöö Approved hotel is public
+  GET http://localhost:5080/api/hotels/41 [200 OK, 774B, 5ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  shows the new room
+
+Γöö Agent creates a package (pending)
+  POST http://localhost:5080/api/packages [201 Created, 837B, 10ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 201
+  ΓêÜ  new package waits for approval
+
+Γöö Owner cannot edit the agent's package
+  PUT http://localhost:5080/api/packages/23 [403 Forbidden, 489B, 3ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 403
+
+Γöö Admin rejects the package
+  PATCH http://localhost:5080/api/packages/23/approval [200 OK, 789B, 9ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  package is rejected
+
+Γûí 05 Booking workflow
+Γöö Availability quote
+  GET http://localhost:5080/api/bookings/availability?roomId=85&checkIn=2026-11-10&checkOut=2026-11-12&guests=2 [200 OK, 572B, 10ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  room is free and priced by the server
+
+Γöö Too many guests is 400
+  POST http://localhost:5080/api/bookings [400 Bad Request, 654B, 10ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 400
+
+Γöö Check-out before check-in is 400
+  POST http://localhost:5080/api/bookings [400 Bad Request, 665B, 3ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 400
+
+Γöö Check-in in the past is 400
+  POST http://localhost:5080/api/bookings [400 Bad Request, 661B, 8ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 400
+
+Γöö Traveler books the room
+  POST http://localhost:5080/api/bookings [201 Created, 860B, 13ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 201
+  ΓêÜ  booking starts Pending at the server price
+
+Γöö Overlapping booking is 409
+  POST http://localhost:5080/api/bookings [409 Conflict, 613B, 12ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 409
+
+Γöö Another traveler cannot read the booking
+  GET http://localhost:5080/api/bookings/2371 [403 Forbidden, 628B, 7ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 403
+
+Γöö Another provider cannot confirm the booking
+  PATCH http://localhost:5080/api/bookings/2371/status [403 Forbidden, 635B, 8ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 403
+
+Γöö Traveler cannot confirm their own booking
+  PATCH http://localhost:5080/api/bookings/2371/status [400 Bad Request, 633B, 9ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  refused
+
+Γöö Owner sees the booking
+  GET http://localhost:5080/api/bookings [200 OK, 1.05MB, 58ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  booking for the owner's room is listed
+
+Γöö Owner confirms the booking
+  PATCH http://localhost:5080/api/bookings/2371/status [200 OK, 802B, 10ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  booking is Confirmed
+
+Γöö Confirmed booking cannot go back to Pending
+  PATCH http://localhost:5080/api/bookings/2371/status [400 Bad Request, 633B, 8ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 400
+
+Γöö Completing before check-in is 400
+  PATCH http://localhost:5080/api/bookings/2371/status [400 Bad Request, 677B, 10ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 400
+
+Γöö Traveler sees the confirmation
+  GET http://localhost:5080/api/bookings/2371 [200 OK, 802B, 4ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  booking is Confirmed for the traveler
+
+Γöö Room is no longer available for those dates
+  GET http://localhost:5080/api/bookings/availability?roomId=85&checkIn=2026-11-10&checkOut=2026-11-12&guests=2 [200 OK, 610B, 8ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  quote reports the room as taken
+
+Γûí 06 Agentic AI
+Γöö Plan a trip
+  POST http://localhost:5080/api/ai/chat [200 OK, 5.87kB, 162ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  returns a structured plan within budget
+  ΓêÜ  the selected hotel came from an availability check
+  ΓêÜ  the plan was built with backend tools
+
+Γöö Ask to book: proposal only
+  POST http://localhost:5080/api/ai/chat [200 OK, 1.26kB, 16ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  returns a proposal, not a booking
+
+Γöö Proposal created no booking
+  GET http://localhost:5080/api/bookings [200 OK, 804B, 6ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  no booking exists for the proposed room and dates yet
+
+Γöö Confirm the proposal
+  POST http://localhost:5080/api/ai/chat [200 OK, 1.3kB, 20ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  backend created a Pending booking at the quoted price
+  ΓêÜ  reply does not claim the booking is confirmed
+
+Γöö Confirming the same proposal again books nothing
+  POST http://localhost:5080/api/ai/chat [200 OK, 732B, 8ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  no second booking
+
+Γöö AI booking is stored as Pending
+  GET http://localhost:5080/api/bookings/2372 [200 OK, 814B, 6ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  status is Pending until the provider confirms
+
+Γöö Prompt injection is refused
+  POST http://localhost:5080/api/ai/chat [200 OK, 683B, 13ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  assistant refuses
+  ΓêÜ  no internal details in the reply
+
+Γöö Booking for another user is refused
+  POST http://localhost:5080/api/ai/chat [200 OK, 801B, 12ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  no booking and no other user's data
+
+Γöö Anonymous cannot chat
+  POST http://localhost:5080/api/ai/chat [401 Unauthorized, 495B, 2ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 401
+
+Γöö Conversation list includes the chat
+  GET http://localhost:5080/api/ai/conversations [200 OK, 509B, 3ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  conversation is listed
+
+Γöö Another traveler cannot read the conversation
+  GET http://localhost:5080/api/ai/conversations/1108 [404 Not Found, 582B, 8ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 404
+
+Γöö Recommendations come from the plan
+  GET http://localhost:5080/api/ai/recommendations?conversationId=1108 [200 OK, 1.72kB, 2ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  recommendations belong to this conversation
+
+Γöö Traveler cancels the AI booking
+  PATCH http://localhost:5080/api/bookings/2372/status [200 OK, 840B, 26ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 200
+  ΓêÜ  booking is Cancelled
+
+Γöö Cancelling twice is 400
+  PATCH http://localhost:5080/api/bookings/2372/status [400 Bad Request, 597B, 6ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 400
+
+Γûí 07 Itineraries
+Γöö Save the plan as an itinerary
+  POST http://localhost:5080/api/itineraries [201 Created, 1.01kB, 23ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 201
+  ΓêÜ  keeps travelers, budget and conversation
+  ΓêÜ  items are ordered by day, then by the given order
+
+Γöö Zero travelers is 400
+  POST http://localhost:5080/api/itineraries [400 Bad Request, 675B, 6ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 400
+
+Γöö Another traveler cannot attach this conversation
+  POST http://localhost:5080/api/itineraries [400 Bad Request, 576B, 6ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 400
+
+Γöö Another traveler cannot read the itinerary
+  GET http://localhost:5080/api/itineraries/21 [404 Not Found, 569B, 5ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  hidden from other users
+
+Γöö Owner of the itinerary deletes it
+  DELETE http://localhost:5080/api/itineraries/21 [204 No Content, 304B, 30ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 204
+
+Γöö Deleted itinerary is 404
+  GET http://localhost:5080/api/itineraries/21 [404 Not Found, 569B, 5ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 404
+
+Γûí 08 Cleanup
+Γöö Hotel with bookings cannot be deleted
+  DELETE http://localhost:5080/api/hotels/41 [409 Conflict, 686B, 8ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  error body is ProblemDetails
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 409
+
+Γöö Agent deletes the rejected package
+  DELETE http://localhost:5080/api/packages/23 [204 No Content, 304B, 8ms]
+  ΓêÜ  no secrets or stack traces in the response
+  ΓêÜ  responds within 5 s
+  ΓêÜ  status is 204
+
+ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö¼ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö¼ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+Γöé                         Γöé          executed Γöé           failed Γöé
+Γö£ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöñ
+Γöé              iterations Γöé                 1 Γöé                0 Γöé
+Γö£ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöñ
+Γöé                requests Γöé                79 Γöé                0 Γöé
+Γö£ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöñ
+Γöé            test-scripts Γöé               158 Γöé                0 Γöé
+Γö£ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöñ
+Γöé      prerequest-scripts Γöé                 2 Γöé                0 Γöé
+Γö£ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöñ
+Γöé              assertions Γöé               315 Γöé                0 Γöé
+Γö£ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö┤ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö┤ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöñ
+Γöé total run duration: 9s                                         Γöé
+Γö£ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöñ
+Γöé total data received: 1.13MB (approx)                           Γöé
+Γö£ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöñ
+Γöé average response time: 24ms [min: 2ms, max: 298ms, s.d.: 42ms] Γöé
+ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+EXIT=0

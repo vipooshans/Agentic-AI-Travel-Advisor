@@ -1,0 +1,41 @@
+Using launch settings from web-api\Properties\launchSettings.json...
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:5080
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\web-api
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/1.1 POST http://localhost:5080/api/auth/register - application/json 154
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/1.1 POST http://localhost:5080/api/auth/register - 200 - application/json;+charset=utf-8 352.3822ms
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/1.1 POST http://localhost:5080/api/ai/chat - application/json 79
+warn: TravelAdvisor.Infrastructure.AI.AgentOrchestrator[0]
+      LLM orchestration failed (HttpRequestException); falling back to the deterministic planner
+      System.Net.Http.HttpRequestException: No connection could be made because the target machine actively refused it. (127.0.0.1:9)
+       ---> System.Net.Sockets.SocketException (10061): No connection could be made because the target machine actively refused it.
+         at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+         at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+         at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+         --- End of inner exception stack trace ---
+         at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.AddHttp11ConnectionAsync(QueueItem queueItem)
+         at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+         at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+         at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+         at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|5_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+         at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|5_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+         at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+         at TravelAdvisor.Infrastructure.AI.OpenAiCompatClient.SendAsync(JsonObject payload, CancellationToken cancellationToken) in E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\AI\OpenAiCompatClient.cs:line 140
+         at TravelAdvisor.Infrastructure.AI.OpenAiCompatClient.ChatWithToolsAsync(IReadOnlyList`1 messages, IReadOnlyList`1 tools, CancellationToken cancellationToken) in E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\AI\OpenAiCompatClient.cs:line 108
+         at TravelAdvisor.Infrastructure.AI.AgentOrchestrator.RunLlmAsync(AgentToolContext context, IReadOnlyList`1 history, String message, CancellationToken cancellationToken) in E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\AI\AgentOrchestrator.cs:line 240
+         at TravelAdvisor.Infrastructure.AI.AgentOrchestrator.RunAsync(UserContext caller, IReadOnlyList`1 history, ChatRequest request, CancellationToken cancellationToken) in E:\project\Agentic AI Travel Advisor & Booking System\Agentic-AI-Travel-Advisor\shared\Infrastructure\AI\AgentOrchestrator.cs:line 119
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/1.1 POST http://localhost:5080/api/ai/chat - 200 - application/json;+charset=utf-8 3045.3906ms

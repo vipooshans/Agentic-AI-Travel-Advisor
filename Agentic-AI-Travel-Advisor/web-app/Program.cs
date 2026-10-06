@@ -4,9 +4,10 @@ using TravelAdvisor.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options => options.Filters.Add<ApiAuthExceptionFilter>());
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ApiAuthService>();
+builder.Services.AddScoped<TravelApiClient>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -28,13 +29,19 @@ builder.Services.AddHttpClient("TravelAdvisorApi", client =>
 
 var app = builder.Build();
 
+var urls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? string.Empty;
+var httpOnly = urls.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+               && !urls.Contains("https://", StringComparison.OrdinalIgnoreCase);
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    if (!httpOnly)
+        app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+if (!httpOnly)
+    app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();

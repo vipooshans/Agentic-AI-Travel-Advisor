@@ -1,0 +1,12 @@
+@using TravelAdvisor.Core.Enums
+@model BookingStatus
+@{
+    var (css, label) = Model switch
+    {
+        BookingStatus.Confirmed => ("bg-success", "Confirmed"),
+        BookingStatus.Cancelled => ("bg-secondary", "Cancelled"),
+        BookingStatus.Completed => ("bg-primary", "Completed"),
+        _ => ("bg-warning text-dark", "Pending")
+    };
+}
+<span class="badge @css">@label</span>

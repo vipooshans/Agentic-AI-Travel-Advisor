@@ -1,0 +1,13 @@
+@model TravelAdvisor.Web.Models.RoomFormViewModel
+@{ Layout = "_AdminLayout"; }
+
+<form asp-action="EditRoom" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" /><input type="hidden" asp-for="HotelId" />
+    <div class="mb-3"><label asp-for="Name" class="form-label"></label><input asp-for="Name" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="RoomType" class="form-label"></label><input asp-for="RoomType" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="PricePerNight" class="form-label"></label><input asp-for="PricePerNight" class="form-control" type="number" step="0.01" /></div>
+    <div class="mb-3"><label asp-for="Capacity" class="form-label"></label><input asp-for="Capacity" class="form-control" type="number" /></div>
+    <div class="mb-3 form-check"><input asp-for="IsAvailable" class="form-check-input" /><label asp-for="IsAvailable" class="form-check-label">Available</label></div>
+    <button type="submit" class="btn btn-primary">Save Room</button>
+</form>

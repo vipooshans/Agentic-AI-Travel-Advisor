@@ -1,0 +1,1505 @@
+{
+	"@programName": "ZAP",
+	"@version": "2.17.0",
+	"@generated": "Thu, 1 Oct 2026 16:43:30",
+	"created": "2026-10-01T16:43:30.787040635Z",
+	"insights":[
+		{
+			"level": "Low",
+			"reason": "Warning",
+			"site": "",
+			"key": "insight.log.warn",
+			"description": "ZAP warnings logged - see the zap.log file for details",
+			"statistic": "1553"
+		},
+		{
+			"level": "Low",
+			"reason": "Exceeded Low",
+			"site": "",
+			"key": "insight.network.failure",
+			"description": "Percentage of network failures",
+			"statistic": "23"
+		},
+		{
+			"level": "Low",
+			"reason": "Exceeded High",
+			"site": "http://host.docker.internal:5080",
+			"key": "insight.code.4xx",
+			"description": "Percentage of responses with status code 4xx",
+			"statistic": "93"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://host.docker.internal:5080",
+			"key": "insight.code.2xx",
+			"description": "Percentage of responses with status code 2xx",
+			"statistic": "6"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://host.docker.internal:5080",
+			"key": "insight.endpoint.ctype.application/json",
+			"description": "Percentage of endpoints with content type application/json",
+			"statistic": "12"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://host.docker.internal:5080",
+			"key": "insight.endpoint.ctype.application/problem+json",
+			"description": "Percentage of endpoints with content type application/problem+json",
+			"statistic": "47"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://host.docker.internal:5080",
+			"key": "insight.endpoint.method.DELETE",
+			"description": "Percentage of endpoints with method DELETE",
+			"statistic": "6"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://host.docker.internal:5080",
+			"key": "insight.endpoint.method.GET",
+			"description": "Percentage of endpoints with method GET",
+			"statistic": "64"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://host.docker.internal:5080",
+			"key": "insight.endpoint.method.PATCH",
+			"description": "Percentage of endpoints with method PATCH",
+			"statistic": "5"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://host.docker.internal:5080",
+			"key": "insight.endpoint.method.POST",
+			"description": "Percentage of endpoints with method POST",
+			"statistic": "16"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://host.docker.internal:5080",
+			"key": "insight.endpoint.method.PUT",
+			"description": "Percentage of endpoints with method PUT",
+			"statistic": "8"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://host.docker.internal:5080",
+			"key": "insight.endpoint.total",
+			"description": "Count of total endpoints",
+			"statistic": "131"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://host.docker.internal:5080",
+			"key": "insight.response.slow",
+			"description": "Percentage of slow responses",
+			"statistic": "1"
+		}
+	],
+	"site":[ 
+		{
+			"@name": "http://host.docker.internal:5080",
+			"@host": "host.docker.internal",
+			"@port": "5080",
+			"@ssl": "false",
+			"alerts": [ 
+				{
+					"pluginid": "100000",
+					"alertRef": "100000-1",
+					"alert": "A Client Error response code was returned by the server",
+					"name": "A Client Error response code was returned by the server",
+					"riskcode": "0",
+					"confidence": "3",
+					"riskdesc": "Informational (High)",
+					"desc": "<p>A response code of 403 was returned by the server.</p><p>This may indicate that the application is failing to handle unexpected input correctly.</p><p>Raised by the 'Alert on HTTP Response Code Error' script</p>",
+					"instances":[ 
+						{
+							"id": "11",
+							"uri": "http://host.docker.internal:5080/api/Destinations/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Destinations\/10",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "16",
+							"uri": "http://host.docker.internal:5080/api/Hotels/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Hotels\/10",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "20",
+							"uri": "http://host.docker.internal:5080/api/Itineraries/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Itineraries\/10",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "25",
+							"uri": "http://host.docker.internal:5080/api/Packages/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Packages\/10",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "27",
+							"uri": "http://host.docker.internal:5080/api/Packages/10/activities/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Packages\/10\/activities\/10",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "43",
+							"uri": "http://host.docker.internal:5080/api/hotels/10/rooms/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/hotels\/10\/rooms\/10",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "37",
+							"uri": "http://host.docker.internal:5080/api/reviews/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/reviews\/10",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "61",
+							"uri": "http://host.docker.internal:5080/api/transportation/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/transportation\/10",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "142",
+							"uri": "http://host.docker.internal:5080",
+							"nodeName": "http:\/\/host.docker.internal:5080",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "71",
+							"uri": "http://host.docker.internal:5080/5186037562523186838",
+							"nodeName": "http:\/\/host.docker.internal:5080\/5186037562523186838",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "149",
+							"uri": "http://host.docker.internal:5080/api",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "72",
+							"uri": "http://host.docker.internal:5080/api/8701350255680518298",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/8701350255680518298",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "179",
+							"uri": "http://host.docker.internal:5080/api/Auth",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Auth",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "73",
+							"uri": "http://host.docker.internal:5080/api/Auth/5292649454398604983",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Auth\/5292649454398604983",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "6",
+							"uri": "http://host.docker.internal:5080/api/Bookings/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Bookings\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "75",
+							"uri": "http://host.docker.internal:5080/api/Bookings/10/1007143228647357347",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Bookings\/10\/1007143228647357347",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "74",
+							"uri": "http://host.docker.internal:5080/api/Bookings/2846053754217070572",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Bookings\/2846053754217070572",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5",
+							"uri": "http://host.docker.internal:5080/api/Bookings/availability?RoomId=10&TravelPackageId=10&CheckIn=CheckIn&CheckOut=CheckOut&Guests=10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Bookings\/availability (CheckIn,CheckOut,Guests,RoomId,TravelPackageId)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "9",
+							"uri": "http://host.docker.internal:5080/api/Destinations/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Destinations\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "76",
+							"uri": "http://host.docker.internal:5080/api/Destinations/4650352115130867524",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Destinations\/4650352115130867524",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1215",
+							"uri": "http://host.docker.internal:5080/api/Hotels?Q=Q&City=East+Romaineburgh&Country=Country&ApprovalStatus=http%3A%2F%2Fwww.google.com%2F&MaxPrice=1.2&Guests=10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Hotels (ApprovalStatus,City,Country,Guests,MaxPrice,Q)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "14",
+							"uri": "http://host.docker.internal:5080/api/Hotels/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Hotels\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "79",
+							"uri": "http://host.docker.internal:5080/api/Hotels/10/1867767396094326928",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Hotels\/10\/1867767396094326928",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "78",
+							"uri": "http://host.docker.internal:5080/api/Hotels/1787347832934458627",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Hotels\/1787347832934458627",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "13",
+							"uri": "http://host.docker.internal:5080/api/Hotels/mine",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Hotels\/mine",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "19",
+							"uri": "http://host.docker.internal:5080/api/Itineraries/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Itineraries\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "80",
+							"uri": "http://host.docker.internal:5080/api/Itineraries/4644602826175526788",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Itineraries\/4644602826175526788",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "738",
+							"uri": "http://host.docker.internal:5080/api/Packages?Q=Q&DestinationId=http%3A%2F%2Fwww.google.com%2F&ApprovalStatus=0&MaxPrice=1.2&MaxDurationDays=10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Packages (ApprovalStatus,DestinationId,MaxDurationDays,MaxPrice,Q)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "23",
+							"uri": "http://host.docker.internal:5080/api/Packages/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Packages\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "82",
+							"uri": "http://host.docker.internal:5080/api/Packages/10/7043996653834073338",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Packages\/10\/7043996653834073338",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "480",
+							"uri": "http://host.docker.internal:5080/api/Packages/10/activities",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Packages\/10\/activities",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "405",
+							"otherinfo": ""
+						},
+						{
+							"id": "83",
+							"uri": "http://host.docker.internal:5080/api/Packages/10/activities/596225152715098733",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Packages\/10\/activities\/596225152715098733",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "405",
+							"otherinfo": ""
+						},
+						{
+							"id": "81",
+							"uri": "http://host.docker.internal:5080/api/Packages/6021700158706573955",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Packages\/6021700158706573955",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "22",
+							"uri": "http://host.docker.internal:5080/api/Packages/mine",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Packages\/mine",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "508",
+							"uri": "http://host.docker.internal:5080/api/ai",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/ai",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "84",
+							"uri": "http://host.docker.internal:5080/api/ai/7262058013741963293",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/ai\/7262058013741963293",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1",
+							"uri": "http://host.docker.internal:5080/api/ai/conversations/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/ai\/conversations\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "85",
+							"uri": "http://host.docker.internal:5080/api/ai/conversations/5118144636772650050",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/ai\/conversations\/5118144636772650050",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "553",
+							"uri": "http://host.docker.internal:5080/api/ai/recommendations?conversationId=http%3A%2F%2Fwww.google.com%2F",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/ai\/recommendations (conversationId)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "574",
+							"uri": "http://host.docker.internal:5080/api/bookings/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/bookings\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "87",
+							"uri": "http://host.docker.internal:5080/api/bookings/10/6838956486717304186",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/bookings\/10\/6838956486717304186",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "29",
+							"uri": "http://host.docker.internal:5080/api/bookings/10/payments",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/bookings\/10\/payments",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "591",
+							"uri": "http://host.docker.internal:5080/api/bookings/10/payments/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/bookings\/10\/payments\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "89",
+							"uri": "http://host.docker.internal:5080/api/bookings/10/payments/10/1335311791411308544",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/bookings\/10\/payments\/10\/1335311791411308544",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "88",
+							"uri": "http://host.docker.internal:5080/api/bookings/10/payments/8431080328209668099",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/bookings\/10\/payments\/8431080328209668099",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "86",
+							"uri": "http://host.docker.internal:5080/api/bookings/4837993211428835084",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/bookings\/4837993211428835084",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "642",
+							"uri": "http://host.docker.internal:5080/api/hotels/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/hotels\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "91",
+							"uri": "http://host.docker.internal:5080/api/hotels/10/4123864802293829459",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/hotels\/10\/4123864802293829459",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "33",
+							"uri": "http://host.docker.internal:5080/api/hotels/10/reviews",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/hotels\/10\/reviews",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "39",
+							"uri": "http://host.docker.internal:5080/api/hotels/10/rooms",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/hotels\/10\/rooms",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "685",
+							"uri": "http://host.docker.internal:5080/api/hotels/10/rooms/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/hotels\/10\/rooms\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "405",
+							"otherinfo": ""
+						},
+						{
+							"id": "93",
+							"uri": "http://host.docker.internal:5080/api/hotels/10/rooms/10/3721840379217706487",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/hotels\/10\/rooms\/10\/3721840379217706487",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "48",
+							"uri": "http://host.docker.internal:5080/api/hotels/10/rooms/10/calendar?from=from&to=to",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/hotels\/10\/rooms\/10\/calendar (from,to)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "92",
+							"uri": "http://host.docker.internal:5080/api/hotels/10/rooms/6552003666011198738",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/hotels\/10\/rooms\/6552003666011198738",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "405",
+							"otherinfo": ""
+						},
+						{
+							"id": "90",
+							"uri": "http://host.docker.internal:5080/api/hotels/8632856757116507200",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/hotels\/8632856757116507200",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "758",
+							"uri": "http://host.docker.internal:5080/api/packages/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/packages\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "95",
+							"uri": "http://host.docker.internal:5080/api/packages/10/2616521097875747367",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/packages\/10\/2616521097875747367",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "34",
+							"uri": "http://host.docker.internal:5080/api/packages/10/reviews",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/packages\/10\/reviews",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "94",
+							"uri": "http://host.docker.internal:5080/api/packages/7838777062792127926",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/packages\/7838777062792127926",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "790",
+							"uri": "http://host.docker.internal:5080/api/reports",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/reports",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "96",
+							"uri": "http://host.docker.internal:5080/api/reports/4654408719516368982",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/reports\/4654408719516368982",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "32",
+							"uri": "http://host.docker.internal:5080/api/reports/statistics?From=From&To=To&Top=10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/reports\/statistics (From,To,Top)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "859",
+							"uri": "http://host.docker.internal:5080/api/reviews?Status=http%3A%2F%2Fwww.google.com%2F&HotelId=10&TravelPackageId=10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/reviews (HotelId,Status,TravelPackageId)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "837",
+							"uri": "http://host.docker.internal:5080/api/reviews/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/reviews\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "405",
+							"otherinfo": ""
+						},
+						{
+							"id": "98",
+							"uri": "http://host.docker.internal:5080/api/reviews/10/581317043478517004",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/reviews\/10\/581317043478517004",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "97",
+							"uri": "http://host.docker.internal:5080/api/reviews/4237586818814535447",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/reviews\/4237586818814535447",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "405",
+							"otherinfo": ""
+						},
+						{
+							"id": "50",
+							"uri": "http://host.docker.internal:5080/api/settings",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/settings",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "99",
+							"uri": "http://host.docker.internal:5080/api/settings/7461070055460123606",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/settings\/7461070055460123606",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "405",
+							"otherinfo": ""
+						},
+						{
+							"id": "1315",
+							"uri": "http://host.docker.internal:5080/api/transportation?From=From&To=To&DestinationId=http%3A%2F%2Fwww.google.com%2F&TravelPackageId=10&Mode=0&MaxPrice=1.2",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/transportation (DestinationId,From,MaxPrice,Mode,To,TravelPackageId)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "55",
+							"uri": "http://host.docker.internal:5080/api/transportation/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/transportation\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "100",
+							"uri": "http://host.docker.internal:5080/api/transportation/1933759519397311150",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/transportation\/1933759519397311150",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "54",
+							"uri": "http://host.docker.internal:5080/api/transportation/mine",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/transportation\/mine",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "893",
+							"uri": "http://host.docker.internal:5080/api/users",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/users",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "68",
+							"uri": "http://host.docker.internal:5080/api/users?role=role",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/users (role)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "101",
+							"uri": "http://host.docker.internal:5080/api/users/5668100627943706752",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/users\/5668100627943706752",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "915",
+							"uri": "http://host.docker.internal:5080/api/users/id",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/users\/id",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "102",
+							"uri": "http://host.docker.internal:5080/api/users/id/7519067357420269586",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/users\/id\/7519067357420269586",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "936",
+							"uri": "http://host.docker.internal:5080/api/users/me",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/users\/me",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "103",
+							"uri": "http://host.docker.internal:5080/api/users/me/8956592563663296922",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/users\/me\/8956592563663296922",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "104",
+							"uri": "http://host.docker.internal:5080/swagger/1189012386290924029",
+							"nodeName": "http:\/\/host.docker.internal:5080\/swagger\/1189012386290924029",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "995",
+							"uri": "http://host.docker.internal:5080/swagger/v1",
+							"nodeName": "http:\/\/host.docker.internal:5080\/swagger\/v1",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "105",
+							"uri": "http://host.docker.internal:5080/swagger/v1/4053137297293068556",
+							"nodeName": "http:\/\/host.docker.internal:5080\/swagger\/v1\/4053137297293068556",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "113",
+							"uri": "http://host.docker.internal:5080/api/Bookings/10/status",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Bookings\/10\/status ()({status})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "7",
+							"uri": "http://host.docker.internal:5080/api/Bookings/10/status",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Bookings\/10\/status ()({status})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "17",
+							"uri": "http://host.docker.internal:5080/api/Hotels/10/approval",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Hotels\/10\/approval ()({status})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "28",
+							"uri": "http://host.docker.internal:5080/api/Packages/10/approval",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Packages\/10\/approval ()({status})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "31",
+							"uri": "http://host.docker.internal:5080/api/bookings/10/payments/10/status",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/bookings\/10\/payments\/10\/status ()({status})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "47",
+							"uri": "http://host.docker.internal:5080/api/hotels/10/rooms/10/availability",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/hotels\/10\/rooms\/10\/availability ()({isAvailable})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "38",
+							"uri": "http://host.docker.internal:5080/api/reviews/10/status",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/reviews\/10\/status ()({status})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "70",
+							"uri": "http://host.docker.internal:5080/api/users/id/active",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/users\/id\/active ()({isActive})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "107",
+							"uri": "http://host.docker.internal:5080/api/Auth/login",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Auth\/login ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "3",
+							"uri": "http://host.docker.internal:5080/api/Auth/login",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Auth\/login ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "2",
+							"uri": "http://host.docker.internal:5080/api/Auth/register",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Auth\/register ()({email,password,firstName,lastName})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "339",
+							"uri": "http://host.docker.internal:5080/api/Auth/register",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Auth\/register ()({email,password,firstName,lastName})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "409",
+							"otherinfo": ""
+						},
+						{
+							"id": "4",
+							"uri": "http://host.docker.internal:5080/api/Bookings",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Bookings ()({roomId,travelPackageId,checkIn,checkOut,guests,notes})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "8",
+							"uri": "http://host.docker.internal:5080/api/Destinations",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Destinations ()({name,country,description,imageUrl})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "12",
+							"uri": "http://host.docker.internal:5080/api/Hotels",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Hotels ()({name,address,city,country,description,imageUrl})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "18",
+							"uri": "http://host.docker.internal:5080/api/Itineraries",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Itineraries ()({title,startDate,endDate,destinationId,estimatedCost,budget,travelers,conversationId,summary,items:[{dayNumber,title,description,startTime,sortOrder}]})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "21",
+							"uri": "http://host.docker.internal:5080/api/Packages",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Packages ()({destinationId,title,description,price,durationDays,imageUrl,maxTravelers})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "26",
+							"uri": "http://host.docker.internal:5080/api/Packages/10/activities",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Packages\/10\/activities ()({title,description,dayNumber,price,sortOrder})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "121",
+							"uri": "http://host.docker.internal:5080/api/ai/chat",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/ai\/chat ()({conversationId,message,confirmBookingId})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "0",
+							"uri": "http://host.docker.internal:5080/api/ai/chat",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/ai\/chat ()({conversationId,message,confirmBookingId})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "30",
+							"uri": "http://host.docker.internal:5080/api/bookings/10/payments",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/bookings\/10\/payments ()({method,cardNumber})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "40",
+							"uri": "http://host.docker.internal:5080/api/hotels/10/rooms",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/hotels\/10\/rooms ()({name,roomType,pricePerNight,capacity})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "35",
+							"uri": "http://host.docker.internal:5080/api/reviews",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/reviews ()({bookingId,rating,comment})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "52",
+							"uri": "http://host.docker.internal:5080/api/transportation",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/transportation ()({travelPackageId,destinationId,mode,fromLocation,toLocation,departureTime,durationMinutes,pricePerPerson,capacity,description,isActive})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "69",
+							"uri": "http://host.docker.internal:5080/api/users",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/users ()({email,password,firstName,lastName,role})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "11974",
+							"uri": "http://host.docker.internal:5080/computeMetadata/v1/",
+							"nodeName": "http:\/\/host.docker.internal:5080\/computeMetadata\/v1\/ ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "11972",
+							"uri": "http://host.docker.internal:5080/latest/meta-data/",
+							"nodeName": "http:\/\/host.docker.internal:5080\/latest\/meta-data\/ ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "12128",
+							"uri": "http://host.docker.internal:5080/metadata/instance",
+							"nodeName": "http:\/\/host.docker.internal:5080\/metadata\/instance ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "12151",
+							"uri": "http://host.docker.internal:5080/metadata/v1",
+							"nodeName": "http:\/\/host.docker.internal:5080\/metadata\/v1 ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "11976",
+							"uri": "http://host.docker.internal:5080/opc/v1/instance/",
+							"nodeName": "http:\/\/host.docker.internal:5080\/opc\/v1\/instance\/ ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "11996",
+							"uri": "http://host.docker.internal:5080/opc/v2/instance/",
+							"nodeName": "http:\/\/host.docker.internal:5080\/opc\/v2\/instance\/ ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "12169",
+							"uri": "http://host.docker.internal:5080/openstack/latest/meta_data.json",
+							"nodeName": "http:\/\/host.docker.internal:5080\/openstack\/latest\/meta_data.json ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "14195",
+							"uri": "http://host.docker.internal:5080/api/Auth/me",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Auth\/me ()({firstName,lastName})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "10",
+							"uri": "http://host.docker.internal:5080/api/Destinations/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Destinations\/10 ()({name,country,description,imageUrl})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "15",
+							"uri": "http://host.docker.internal:5080/api/Hotels/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Hotels\/10 ()({name,address,city,country,description,imageUrl})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "24",
+							"uri": "http://host.docker.internal:5080/api/Packages/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Packages\/10 ()({destinationId,title,description,price,durationDays,imageUrl,maxTravelers})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "42",
+							"uri": "http://host.docker.internal:5080/api/hotels/10/rooms/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/hotels\/10\/rooms\/10 ()({name,roomType,pricePerNight,capacity})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "49",
+							"uri": "http://host.docker.internal:5080/api/hotels/10/rooms/10/calendar",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/hotels\/10\/rooms\/10\/calendar ()({entries:[{date,isBlocked,priceOverride,note}]})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "36",
+							"uri": "http://host.docker.internal:5080/api/reviews/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/reviews\/10 ()({rating,comment})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "51",
+							"uri": "http://host.docker.internal:5080/api/settings/key",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/settings\/key ()({value})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "57",
+							"uri": "http://host.docker.internal:5080/api/transportation/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/transportation\/10 ()({travelPackageId,destinationId,mode,fromLocation,toLocation,departureTime,durationMinutes,pricePerPerson,capacity,description,isActive})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "403",
+							"otherinfo": ""
+						},
+						{
+							"id": "67",
+							"uri": "http://host.docker.internal:5080/api/users/me/preferences",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/users\/me\/preferences ()({budgetMin,budgetMax,preferredClimate,interests,accommodationPreference,transportPreference})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "66",
+							"uri": "http://host.docker.internal:5080/api/users/me/profile",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/users\/me\/profile ()({phoneNumber,nationality,dateOfBirth,avatarUrl,bio,preferredCurrency})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						}
+					],
+					"count": "125",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "388",
+					"wascid": "20",
+					"sourceid": "29"
+				},
+				{
+					"pluginid": "10111",
+					"alertRef": "10111",
+					"alert": "Authentication Request Identified",
+					"name": "Authentication Request Identified",
+					"riskcode": "0",
+					"confidence": "1",
+					"riskdesc": "Informational (Low)",
+					"desc": "<p>The given request has been identified as an authentication request. The 'Other Info' field contains a set of key=value lines which identify any relevant fields. If the request is in a context which has an Authentication Method set to \"Auto-Detect\" then this rule will change the authentication to match the request identified.</p>",
+					"instances":[ 
+						{
+							"id": "77",
+							"uri": "http://host.docker.internal:5080/api/users",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/users ()({email,password,firstName,lastName,role})",
+							"method": "POST",
+							"param": "email",
+							"attack": "",
+							"evidence": "password",
+							"otherinfo": "userParam=email\nuserValue=zaproxy@example.com\npasswordParam=password"
+						},
+						{
+							"id": "41",
+							"uri": "http://host.docker.internal:5080/api/Auth/login",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Auth\/login ()({email,password})",
+							"method": "POST",
+							"param": "email",
+							"attack": "",
+							"evidence": "password",
+							"otherinfo": "userParam=email\nuserValue=zaproxy@example.com\npasswordParam=password"
+						}
+					],
+					"count": "2",
+					"systemic": false,
+					"solution": "<p>This is an informational alert rather than a vulnerability and so there is nothing to fix.</p>",
+					"otherinfo": "<p>userParam=email</p><p>userValue=zaproxy@example.com</p><p>passwordParam=password</p>",
+					"reference": "<p>https://www.zaproxy.org/docs/desktop/addons/authentication-helper/auth-req-id/</p>",
+					"cweid": "-1",
+					"wascid": "-1",
+					"sourceid": "107"
+				},
+				{
+					"pluginid": "10049",
+					"alertRef": "10049-1",
+					"alert": "Non-Storable Content",
+					"name": "Non-Storable Content",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The response contents are not storable by caching components such as proxy servers. If the response does not contain sensitive, personal or user-specific information, it may benefit from being stored and cached, to improve performance.</p>",
+					"instances":[ 
+						{
+							"id": "44",
+							"uri": "http://host.docker.internal:5080/api/ai/conversations/10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/ai\/conversations\/10",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "no-store",
+							"otherinfo": ""
+						},
+						{
+							"id": "46",
+							"uri": "http://host.docker.internal:5080/api/ai/recommendations?conversationId=10",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/ai\/recommendations (conversationId)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "no-store",
+							"otherinfo": ""
+						},
+						{
+							"id": "53",
+							"uri": "http://host.docker.internal:5080/api/Bookings/10/status",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Bookings\/10\/status ()({status})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "PATCH ",
+							"otherinfo": ""
+						},
+						{
+							"id": "56",
+							"uri": "http://host.docker.internal:5080/api/Auth/login",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/Auth\/login ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "no-store",
+							"otherinfo": ""
+						},
+						{
+							"id": "45",
+							"uri": "http://host.docker.internal:5080/api/ai/chat",
+							"nodeName": "http:\/\/host.docker.internal:5080\/api\/ai\/chat ()({conversationId,message,confirmBookingId})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "no-store",
+							"otherinfo": ""
+						}
+					],
+					"count": "5",
+					"systemic": true,
+					"solution": "<p>The content may be marked as storable by ensuring that the following conditions are satisfied:</p><p>The request method must be understood by the cache and defined as being cacheable (\"GET\", \"HEAD\", and \"POST\" are currently defined as cacheable)</p><p>The response status code must be understood by the cache (one of the 1XX, 2XX, 3XX, 4XX, or 5XX response classes are generally understood)</p><p>The \"no-store\" cache directive must not appear in the request or response header fields</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"private\" response directive must not appear in the response</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"Authorization\" header field must not appear in the request, unless the response explicitly allows it (using one of the \"must-revalidate\", \"public\", or \"s-maxage\" Cache-Control response directives)</p><p>In addition to the conditions above, at least one of the following conditions must also be satisfied by the response:</p><p>It must contain an \"Expires\" header field</p><p>It must contain a \"max-age\" response directive</p><p>For \"shared\" caches such as \"proxy\" caches, it must contain a \"s-maxage\" response directive</p><p>It must contain a \"Cache Control Extension\" that allows it to be cached</p><p>It must have a status code that is defined as cacheable by default (200, 203, 204, 206, 300, 301, 404, 405, 410, 414, 501).</p>",
+					"otherinfo": "",
+					"reference": "<p>https://datatracker.ietf.org/doc/html/rfc7234</p><p>https://datatracker.ietf.org/doc/html/rfc7231</p><p>https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html</p>",
+					"cweid": "524",
+					"wascid": "13",
+					"sourceid": "10"
+				}
+			]
+		}
+	],
+	"sequences":[
+	]
+
+}

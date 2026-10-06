@@ -35,7 +35,7 @@ public class AccountController : Controller
             return View(model);
         }
 
-        var (success, error) = await _authService.LoginAsync(model);
+        var (success, error, role) = await _authService.LoginAsync(model);
         if (!success)
         {
             ModelState.AddModelError(string.Empty, error ?? "Login failed.");
@@ -47,7 +47,7 @@ public class AccountController : Controller
             return Redirect(model.ReturnUrl);
         }
 
-        return RedirectToRoleDashboard();
+        return RedirectToRoleDashboard(role);
     }
 
     [Authorize]
@@ -65,9 +65,9 @@ public class AccountController : Controller
         return View();
     }
 
-    private IActionResult RedirectToRoleDashboard()
+    private IActionResult RedirectToRoleDashboard(string? role = null)
     {
-        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+        role ??= User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
 
         return role switch
         {

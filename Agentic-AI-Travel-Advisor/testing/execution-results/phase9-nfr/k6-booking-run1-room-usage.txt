@@ -1,0 +1,13 @@
+﻿hotel 37 k6 Hotel 1790870085
+k6 Room 1: bookings=232 distinct travelers=1 still active=0
+k6 Room 2: bookings=232 distinct travelers=1 still active=0
+k6 Room 3: bookings=232 distinct travelers=1 still active=0
+k6 Room 4: bookings=116 distinct travelers=1 still active=0
+k6 Room 5: bookings=116 distinct travelers=1 still active=0
+k6 Room 6: bookings=116 distinct travelers=1 still active=0
+k6 Room 7: bookings=0 distinct travelers=0 still active=0
+k6 Room 8: bookings=116 distinct travelers=1 still active=0
+k6 Room 9: bookings=0 distinct travelers=0 still active=0
+k6 Room 10: bookings=0 distinct travelers=0 still active=0
+k6 Room 11: bookings=1 distinct travelers=1 still active=1
+total bookings=1161, rooms with bookings=8 of 11

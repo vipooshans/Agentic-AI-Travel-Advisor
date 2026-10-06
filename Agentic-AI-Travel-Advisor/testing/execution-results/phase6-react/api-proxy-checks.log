@@ -1,0 +1,10 @@
+﻿## Live checks through the Vite dev proxy (http://localhost:5173 -> http://localhost:5080)  2026-10-01T17:51:31.6471070+05:30
+login nimal.p6.react@example.com -> role=USER
+GET /api/users as USER -> 403
+GET /api/settings as USER -> 403
+GET /api/reports/statistics as USER -> 403
+GET /api/bookings as USER -> 200
+GET /api/bookings/12 as USER -> status=1 (1 = Confirmed) total=16000.00
+GET /api/bookings/12/payments -> count=1 status=1 (1 = Completed) amount=16000.00
+POST second payment on fully paid booking -> 409 {"title":"Conflict","status":409,"detail":"This booking is already paid or has a payment awaiting confirmation.","instance":"/api/bookings/12/payments","message":"This booking is already paid or has a payment awaiting confirmation.","traceId":"0HNOVMJARK9A5:00000001"}
+GET /api/bookings anonymous -> 401

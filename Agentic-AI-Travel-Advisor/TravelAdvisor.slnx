@@ -6,6 +6,10 @@
   <Folder Name="/shared/Infrastructure/">
     <Project Path="shared/Infrastructure/TravelAdvisor.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TravelAdvisor.Api.Tests/TravelAdvisor.Api.Tests.csproj" />
+    <Project Path="tests/TravelAdvisor.UnitTests/TravelAdvisor.UnitTests.csproj" />
+  </Folder>
   <Folder Name="/web-api/">
     <Project Path="web-api/TravelAdvisor.Api.csproj" />
   </Folder>
