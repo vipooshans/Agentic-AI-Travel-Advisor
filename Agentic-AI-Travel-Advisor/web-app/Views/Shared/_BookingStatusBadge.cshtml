@@ -4,7 +4,7 @@
     var (css, label) = Model switch
     {
         BookingStatus.Confirmed => ("bg-success", "Confirmed"),
-        BookingStatus.Cancelled => ("bg-secondary", "Cancelled"),
+        BookingStatus.Cancelled => ("bg-danger", "Cancelled"),
         BookingStatus.Completed => ("bg-primary", "Completed"),
         _ => ("bg-warning text-dark", "Pending")
     };
