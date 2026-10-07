@@ -3,6 +3,7 @@
 @model BookingDto
 @{
     var controller = (string)ViewData["StatusController"]!;
+    var canComplete = DateTime.UtcNow.Date >= Model.CheckIn.Date;
 }
 
 @if (Model.Status == BookingStatus.Pending)
@@ -22,12 +23,21 @@
 }
 else if (Model.Status == BookingStatus.Confirmed)
 {
-    <form asp-controller="@controller" asp-action="UpdateBookingStatus" method="post" class="d-inline">
-        @Html.AntiForgeryToken()
-        <input type="hidden" name="id" value="@Model.Id" />
-        <input type="hidden" name="status" value="@((int)BookingStatus.Completed)" />
-        <button class="btn btn-sm btn-primary">Complete</button>
-    </form>
+    @if (canComplete)
+    {
+        <form asp-controller="@controller" asp-action="UpdateBookingStatus" method="post" class="d-inline">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <input type="hidden" name="status" value="@((int)BookingStatus.Completed)" />
+            <button class="btn btn-sm btn-primary">Complete</button>
+        </form>
+    }
+    else
+    {
+        <span class="d-inline-block" tabindex="0" title="Can be completed from @Model.CheckIn.ToString("yyyy-MM-dd")">
+            <button type="button" class="btn btn-sm btn-primary" disabled>Complete</button>
+        </span>
+    }
     <form asp-controller="@controller" asp-action="UpdateBookingStatus" method="post" class="d-inline">
         @Html.AntiForgeryToken()
         <input type="hidden" name="id" value="@Model.Id" />
