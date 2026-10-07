@@ -5,6 +5,7 @@ import '../models/itinerary.dart';
 import '../providers/auth_provider.dart';
 import '../services/itinerary_service.dart';
 import '../widgets/error_widget.dart';
+import '../widgets/itinerary_share_dialog.dart';
 import '../widgets/loading_widget.dart';
 
 class ItineraryDetailScreen extends StatelessWidget {
@@ -16,7 +17,9 @@ class ItineraryDetailScreen extends StatelessWidget {
     final service = ItineraryService(context.read<AuthProvider>().api);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Itinerary')),
+      appBar: AppBar(
+        title: const Text('Itinerary Details'),
+      ),
       body: FutureBuilder<Itinerary>(
         future: service.getById(id),
         builder: (context, snapshot) {
@@ -33,7 +36,22 @@ class ItineraryDetailScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              Text(itinerary.title, style: Theme.of(context).textTheme.headlineSmall),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(itinerary.title, style: Theme.of(context).textTheme.headlineSmall),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.share_outlined, color: Color(0xFF1E56A0)),
+                    tooltip: 'Share Plan',
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (_) => ItineraryShareDialog(itinerary: itinerary),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 8),
               Text('${itinerary.destinationName ?? 'Trip'} · ${itinerary.dateRange}'),
               Text('Status: ${itinerary.statusLabel}', style: TextStyle(color: Colors.grey.shade600)),
