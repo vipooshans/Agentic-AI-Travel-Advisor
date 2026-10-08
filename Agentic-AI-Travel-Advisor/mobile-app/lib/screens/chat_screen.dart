@@ -17,7 +17,12 @@ class _ChatScreenState extends State<ChatScreen> {
   final _controller = TextEditingController();
   final _scroll = ScrollController();
 
-  static const _starter = 'Plan a 3-day trip to Ella under Rs. 50,000.';
+  static const _quickPrompts = [
+    'Plan a 3-day trip to Ella under Rs. 50,000.',
+    'Beach vacation in Mirissa for 2 adults.',
+    'Cultural tour to Sigiriya & Kandy in October.',
+    'Wildlife safari in Yala National Park.',
+  ];
 
   @override
   void dispose() {
@@ -95,56 +100,48 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           Expanded(
             child: chat.messages.isEmpty
-                ? _EmptyState(onStarter: () => _send(_starter))
+                ? _EmptyState(
+                    prompts: _quickPrompts,
+                    onSelectPrompt: (p) => _send(p),
+                  )
                 : ListView.builder(
                     controller: _scroll,
-                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-                    itemCount: chat.messages.length + (chat.sending ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index == chat.messages.length) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      }
-                      final message = chat.messages[index];
-                      final isLatestPlan = message.suggestedPlan != null && identical(message.suggestedPlan, chat.latestPlan);
-                      return ChatBubble(
-                        message: message,
-                        saving: chat.saving,
-                        onSave: isLatestPlan ? _save : null,
-                      );
-                    },
+                    padding: const EdgeInsets.all(16),
+                    itemCount: chat.messages.length,
+                    itemBuilder: (_, i) => ChatBubble(
+                      message: chat.messages[i],
+                      onSavePlan: chat.suggestedPlan != null && i == chat.messages.length - 1
+                          ? _save
+                          : null,
+                    ),
                   ),
           ),
+          if (chat.sending)
+            const Padding(
+              padding: EdgeInsets.all(8),
+              child: LinearProgressIndicator(),
+            ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              padding: const EdgeInsets.all(8),
               child: Row(
                 children: [
                   Expanded(
                     child: TextField(
                       controller: _controller,
-                      minLines: 1,
-                      maxLines: 4,
-                      textInputAction: TextInputAction.send,
-                      onSubmitted: chat.sending ? null : _send,
                       decoration: InputDecoration(
-                        hintText: 'Ask to plan a trip...',
-                        filled: true,
-                        fillColor: Colors.grey.shade100,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide.none),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        hintText: 'Ask AI: destination, budget, days...',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       ),
+                      onSubmitted: _send,
                     ),
                   ),
                   const SizedBox(width: 8),
-                  IconButton.filled(
+                  IconButton(
                     onPressed: chat.sending ? null : () => _send(_controller.text),
                     icon: const Icon(Icons.send),
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ],
               ),
@@ -157,31 +154,59 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class _EmptyState extends StatelessWidget {
-  final VoidCallback onStarter;
-  const _EmptyState({required this.onStarter});
+  final List<String> prompts;
+  final ValueChanged<String> onSelectPrompt;
+
+  const _EmptyState({
+    required this.prompts,
+    required this.onSelectPrompt,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.smart_toy_outlined, size: 56, color: Colors.blue),
+            const Icon(Icons.smart_toy_outlined, size: 64, color: Color(0xFF1E56A0)),
             const SizedBox(height: 16),
-            Text('Plan your next trip', style: Theme.of(context).textTheme.titleLarge),
+            const Text(
+              'Agentic AI Advisor',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
-            Text(
-              'Tell me a destination, dates, and budget. I will recommend hotels, packages, and a day-by-day itinerary.',
+            const Text(
+              'Tell me where you want to travel, your budget, and preferences. I will tailor recommendations and schedule your day-by-day plan.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600),
+              style: TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 24),
-            ActionChip(
-              avatar: const Icon(Icons.auto_awesome, size: 18),
-              label: const Text('Plan a 3-day trip to Ella under Rs. 50,000.'),
-              onPressed: onStarter,
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Try asking:',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.grey),
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...prompts.map(
+              (p) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () => onSelectPrompt(p),
+                    child: Text(p, style: const TextStyle(fontSize: 13)),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
