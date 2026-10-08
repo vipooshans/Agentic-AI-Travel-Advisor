@@ -21,8 +21,10 @@ public class HealthController : ControllerBase
         var canConnect = await _context.Database.CanConnectAsync();
         return Ok(new
         {
+            application = "Agentic AI Travel Advisor",
             status = canConnect ? "healthy" : "unhealthy",
             database = canConnect ? "connected" : "disconnected",
+            environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Unknown",
             timestamp = DateTime.UtcNow
         });
     }

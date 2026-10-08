@@ -474,6 +474,37 @@ public static class DbSeeder
                 new PackageActivity { TravelPackageId = gallePkg.Id, Title = "Jungle Beach Walk", Description = "Coastal trail and picnic", DayNumber = 3, Price = 2000, SortOrder = 4 });
             await context.SaveChangesAsync();
         }
+
+        if (!await context.Destinations.AnyAsync())
+        {
+            context.Destinations.AddRange(
+                new Destination
+                {
+                    Name = "Ella",
+                    Country = "Sri Lanka",
+                    Description = "Hill-country destination known for scenic train journeys, hiking and tea estates."
+                },
+                new Destination
+                {
+                    Name = "Sigiriya",
+                    Country = "Sri Lanka",
+                    Description = "Historic rock fortress and cultural destination in Sri Lanka's central region."
+                },
+                new Destination
+                {
+                    Name = "Galle",
+                    Country = "Sri Lanka",
+                    Description = "Coastal city featuring the UNESCO-listed Galle Fort and nearby beaches."
+                },
+                new Destination
+                {
+                    Name = "Kandy",
+                    Country = "Sri Lanka",
+                    Description = "Cultural hill capital with temples, gardens and lake-side attractions."
+                });
+
+            await context.SaveChangesAsync();
+        }
     }
 
     private static async Task BackfillCatalogImagesAsync(AppDbContext context)
