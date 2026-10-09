@@ -1,0 +1,42 @@
+Agentic AI Travel Advisor — test execution evidence
+Run date: 2026-10-06
+Workspace OS: Windows
+
+IMPORTANT
+No project test command or application-start command ran in a terminal during this session. The shell launcher was unavailable. The messages below are the complete outputs returned by the available tools for the actual attempts; they are not substituted or presented as terminal test output.
+
+1. Terminal availability / initial git-status command attempt
+Requested shell: PowerShell
+Result:
+Error: PowerShell is not available. Tried "pwsh.exe", "powershell.exe". Install PowerShell from https://aka.ms/powershell or ensure Windows PowerShell is available. Errors: pwsh.exe: Error: spawn pwsh.exe ENOENT; powershell.exe: Error: spawn powershell.exe ENOENT
+
+The PowerShell process did not start. Consequently, the commands in the submitted PowerShell block, including `git status --short` and runtime-version checks, did not execute.
+
+2. React test discovery attempt
+Requested files: existing `web-react/src/**/*.test.tsx` and `*.test.ts` files
+Available test-runner response:
+No tests found in the files. Ensure the correct absolute paths are passed to the tool.
+
+No `npm test` command was executed; no test cases or exit code were reported.
+
+3. Flutter test discovery attempt
+Requested files: existing `mobile-app/test/*.dart` unit/widget test files
+Available test-runner response:
+No tests found in the files. Ensure the correct absolute paths are passed to the tool.
+
+No `flutter test` command was executed; no test cases or exit code were reported.
+
+4. Browser navigation attempts (application was not started)
+http://localhost:5173
+ERR_FAILED (-2) loading 'http://localhost:5173/'
+
+http://localhost:5080/swagger
+ERR_FAILED (-2) loading 'http://localhost:5080/swagger'
+
+http://localhost:7000
+ERR_CONNECTION_REFUSED (-102) loading 'http://localhost:7000/'
+
+5. Commands not run
+The README-documented .NET, npm, Flutter, Postman/Newman, and app startup commands were not run because no terminal process could be started. No raw command output or exit codes exist for those commands.
+
+`git status` was not executed: the attempted PowerShell process failed before running the requested command. The final working-tree status therefore could not be independently verified in this session.
