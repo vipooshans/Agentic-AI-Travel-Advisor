@@ -3079,11 +3079,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\web-api\\TravelAdvisor.Api.csproj",
+      "projectUniqueName": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\FianlSEFProject\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\web-api\\TravelAdvisor.Api.csproj",
       "projectName": "TravelAdvisor.Api",
-      "projectPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\web-api\\TravelAdvisor.Api.csproj",
+      "projectPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\FianlSEFProject\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\web-api\\TravelAdvisor.Api.csproj",
       "packagesPath": "C:\\Users\\Ajay pc\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\web-api\\obj\\",
+      "outputPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\FianlSEFProject\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\web-api\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -3106,11 +3106,11 @@
           "framework": "net8.0",
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj": {
-              "projectPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj"
+            "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\FianlSEFProject\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj": {
+              "projectPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\FianlSEFProject\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Core\\TravelAdvisor.Core.csproj"
             },
-            "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj": {
-              "projectPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj"
+            "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\FianlSEFProject\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj": {
+              "projectPath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\FianlSEFProject\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\shared\\Infrastructure\\TravelAdvisor.Infrastructure.csproj"
             }
           }
         }

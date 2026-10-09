@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "HFKoBnyPglA=",
+  "dgSpecHash": "3FbgLZXJfDM=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\AI_advisor\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\web-api\\TravelAdvisor.Api.csproj",
+  "projectFilePath": "C:\\Users\\Ajay pc\\OneDrive\\Desktop\\FianlSEFProject\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor\\web-api\\TravelAdvisor.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Ajay pc\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Ajay pc\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\8.0.11\\microsoft.aspnetcore.authentication.jwtbearer.8.0.11.nupkg.sha512",
