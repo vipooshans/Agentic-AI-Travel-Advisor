@@ -48,6 +48,23 @@ public class TravelApiClient
 
     private static bool Succeeded(HttpResponseMessage response) => Authorized(response).IsSuccessStatusCode;
 
+    /// <summary>On failure, <c>Error</c> is the API's problem <c>message</c>, or null if the body has none.</summary>
+    private static async Task<(bool Succeeded, string? Error)> ResultAsync(HttpResponseMessage response)
+    {
+        if (Authorized(response).IsSuccessStatusCode) return (true, null);
+        try
+        {
+            var problem = await response.Content.ReadFromJsonAsync<ApiProblem>();
+            return (false, problem?.Message ?? problem?.Detail);
+        }
+        catch (Exception ex) when (ex is System.Text.Json.JsonException or NotSupportedException)
+        {
+            return (false, null);
+        }
+    }
+
+    private sealed record ApiProblem(string? Message, string? Detail);
+
     public Task<List<DestinationDto>> GetDestinationsAsync()
         => GetListAsync<DestinationDto>("/api/destinations");
 
@@ -123,8 +140,8 @@ public class TravelApiClient
     public Task<List<BookingDto>> GetBookingsAsync()
         => GetListAsync<BookingDto>("/api/bookings");
 
-    public async Task<bool> UpdateBookingStatusAsync(int id, BookingStatus status)
-        => Succeeded(await Client.PatchAsJsonAsync($"/api/bookings/{id}/status", new UpdateBookingStatusRequest { Status = status }));
+    public async Task<(bool Succeeded, string? Error)> UpdateBookingStatusAsync(int id, BookingStatus status)
+        => await ResultAsync(await Client.PatchAsJsonAsync($"/api/bookings/{id}/status", new UpdateBookingStatusRequest { Status = status }));
 
     public Task<ReportSummaryDto?> GetReportSummaryAsync()
         => GetAsync<ReportSummaryDto>("/api/reports/summary");
