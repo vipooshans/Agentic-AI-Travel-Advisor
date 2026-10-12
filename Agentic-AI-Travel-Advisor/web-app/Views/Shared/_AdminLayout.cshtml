@@ -18,7 +18,7 @@
     <title>@ViewData["Title"] - Travel Advisor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
 </head>
@@ -76,10 +76,12 @@
                 }
                 else
                 {
+                    <p class="nav-group-label">Overview</p>
                     <a class="@NavClass("Admin", "Dashboard")" asp-controller="Admin" asp-action="Dashboard">
                         <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
                         Dashboard
                     </a>
+                    <p class="nav-group-label">People</p>
                     <a class="@NavClass("Admin", "Users")" asp-controller="Admin" asp-action="Users">
                         <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 19c.6-3 2.8-4.5 6-4.5s5.4 1.5 6 4.5"/><circle cx="17" cy="9" r="2.2"/><path d="M16 14.6c2.2.3 3.8 1.5 4.4 4.4"/></svg>
                         Users
@@ -88,6 +90,7 @@
                         <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
                         Create owner / agent
                     </a>
+                    <p class="nav-group-label">Catalog</p>
                     <a class="@(currentAction is "Destinations" or "CreateDestination" or "EditDestination" ? "nav-link active" : "nav-link")" asp-controller="Admin" asp-action="Destinations">
                         <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
                         Destinations
@@ -100,6 +103,7 @@
                         <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v11H4z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg>
                         Packages
                     </a>
+                    <p class="nav-group-label">Operations</p>
                     <a class="@NavClass("Admin", "Bookings")" asp-controller="Admin" asp-action="Bookings">
                         <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>
                         Bookings

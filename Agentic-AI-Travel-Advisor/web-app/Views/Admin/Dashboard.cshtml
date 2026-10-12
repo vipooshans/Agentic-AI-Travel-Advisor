@@ -1,29 +1,165 @@
+@using System.Globalization
 @model TravelAdvisor.Core.DTOs.Reports.ReportSummaryDto?
-@{ Layout = "_AdminLayout"; }
+@{
+    Layout = "_AdminLayout";
+    var pending = Model?.PendingBookings ?? 0;
+    var confirmed = Model?.ConfirmedBookings ?? 0;
+    var completed = Model?.CompletedBookings ?? 0;
+    var cancelled = Model?.CancelledBookings ?? 0;
+    var totalBookings = pending + confirmed + completed + cancelled;
+    var pendingApprovals = (Model?.PendingHotelApprovals ?? 0) + (Model?.PendingPackageApprovals ?? 0);
+    string Pct(int value) => totalBookings == 0
+        ? "0"
+        : (value * 100m / totalBookings).ToString("0.#", CultureInfo.InvariantCulture);
+    var mix = new[]
+    {
+        (Label: "Pending", Value: pending, Css: "mix-pending"),
+        (Label: "Confirmed", Value: confirmed, Css: "mix-confirmed"),
+        (Label: "Completed", Value: completed, Css: "mix-completed"),
+        (Label: "Cancelled", Value: cancelled, Css: "mix-cancelled")
+    };
+}
 
-<div class="row g-4">
-    <div class="col-md-3"><div class="stat-card"><h6>Total Users</h6><p class="stat-value">@(Model?.UserCount ?? 0)</p></div></div>
-    <div class="col-md-3"><div class="stat-card"><h6>Hotel Owners</h6><p class="stat-value">@(Model?.HotelOwnerCount ?? 0)</p></div></div>
-    <div class="col-md-3"><div class="stat-card"><h6>Travel Agents</h6><p class="stat-value">@(Model?.TravelAgentCount ?? 0)</p></div></div>
-    <div class="col-md-3"><div class="stat-card stat-card-accent"><h6>Revenue</h6><p class="stat-value">$@((Model?.Revenue ?? 0).ToString("N0"))</p></div></div>
-    <div class="col-md-3"><div class="stat-card"><h6>Hotels</h6><p class="stat-value">@(Model?.HotelCount ?? 0)</p></div></div>
-    <div class="col-md-3"><div class="stat-card"><h6>Packages</h6><p class="stat-value">@(Model?.PackageCount ?? 0)</p></div></div>
-    <div class="col-md-3"><div class="stat-card"><h6>Hotel approvals pending</h6><p class="stat-value">@(Model?.PendingHotelApprovals ?? 0)</p></div></div>
-    <div class="col-md-3"><div class="stat-card"><h6>Package approvals pending</h6><p class="stat-value">@(Model?.PendingPackageApprovals ?? 0)</p></div></div>
-    <div class="col-md-3"><div class="stat-card"><h6>Pending bookings</h6><p class="stat-value">@(Model?.PendingBookings ?? 0)</p></div></div>
-    <div class="col-md-3"><div class="stat-card"><h6>Confirmed</h6><p class="stat-value">@(Model?.ConfirmedBookings ?? 0)</p></div></div>
-    <div class="col-md-3"><div class="stat-card"><h6>Completed</h6><p class="stat-value">@(Model?.CompletedBookings ?? 0)</p></div></div>
-    <div class="col-md-3"><div class="stat-card"><h6>Cancelled</h6><p class="stat-value">@(Model?.CancelledBookings ?? 0)</p></div></div>
-</div>
-
-<section class="insight-card">
+<section class="dashboard-hero">
     <div>
-        <p class="eyebrow">Reports</p>
-        <h2>How the house is moving</h2>
-        <p>Live counts from the API. Revenue is the sum of confirmed and completed booking totals. Traveler accounts stay on the mobile app; create owners and agents from Users.</p>
+        <p class="eyebrow">Admin overview</p>
+        <h2>Every journey, at a glance</h2>
+        <p>Track people, listings, approvals, and bookings across the Travel Advisor platform.</p>
     </div>
-    <div class="insight-actions">
-        <a asp-action="Users" class="btn btn-primary">People</a>
-        <a asp-action="Bookings" class="btn btn-outline-primary">Bookings</a>
+    <div class="hero-actions">
+        <span class="hero-chip">@pendingApprovals awaiting approval</span>
+        <a asp-action="Hotels" class="btn btn-light">Review hotels</a>
     </div>
 </section>
+
+<p class="dash-section-label">People &amp; revenue</p>
+<div class="row g-3">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-head">
+                <h6>Total Users</h6>
+                <span class="stat-icon stat-icon-blue" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 19c.6-3 2.8-4.5 6-4.5s5.4 1.5 6 4.5"/><circle cx="17" cy="9" r="2.2"/><path d="M16 14.6c2.2.3 3.8 1.5 4.4 4.4"/></svg></span>
+            </div>
+            <p class="stat-value">@(Model?.UserCount ?? 0)</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-head">
+                <h6>Hotel Owners</h6>
+                <span class="stat-icon stat-icon-purple" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V8l8-4 8 4v12"/><path d="M9 20v-6h6v6"/></svg></span>
+            </div>
+            <p class="stat-value">@(Model?.HotelOwnerCount ?? 0)</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-head">
+                <h6>Travel Agents</h6>
+                <span class="stat-icon stat-icon-green" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/></svg></span>
+            </div>
+            <p class="stat-value">@(Model?.TravelAgentCount ?? 0)</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-card-accent">
+            <div class="stat-head">
+                <h6>Revenue</h6>
+                <span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M17 7.5c0-1.9-2.2-3-5-3s-5 1.1-5 3 2.2 2.8 5 3.5 5 1.6 5 3.5-2.2 3-5 3-5-1.1-5-3"/></svg></span>
+            </div>
+            <p class="stat-value">$@((Model?.Revenue ?? 0).ToString("N0"))</p>
+        </div>
+    </div>
+</div>
+
+<p class="dash-section-label">Catalog &amp; approvals</p>
+<div class="row g-3">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-head">
+                <h6>Hotels</h6>
+                <span class="stat-icon stat-icon-blue" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V8l8-4 8 4v12"/><path d="M9 20v-6h6v6"/></svg></span>
+            </div>
+            <p class="stat-value">@(Model?.HotelCount ?? 0)</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-head">
+                <h6>Packages</h6>
+                <span class="stat-icon stat-icon-purple" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8h16v11H4z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg></span>
+            </div>
+            <p class="stat-value">@(Model?.PackageCount ?? 0)</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-head">
+                <h6>Hotel approvals pending</h6>
+                <span class="stat-icon stat-icon-orange" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            </div>
+            <p class="stat-value">@(Model?.PendingHotelApprovals ?? 0)</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-head">
+                <h6>Package approvals pending</h6>
+                <span class="stat-icon stat-icon-orange" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9 14l2 2 4-4"/></svg></span>
+            </div>
+            <p class="stat-value">@(Model?.PendingPackageApprovals ?? 0)</p>
+        </div>
+    </div>
+</div>
+
+<p class="dash-section-label">Bookings</p>
+<div class="row g-3">
+    <div class="col-lg-7">
+        <section class="panel-card">
+            <div class="panel-head">
+                <div>
+                    <h3>Booking status</h3>
+                    <p>Share of all bookings by current status.</p>
+                </div>
+                <div class="panel-total">
+                    <strong>@totalBookings</strong>
+                    <span>Total bookings</span>
+                </div>
+            </div>
+            <div class="mix-bar" role="img" aria-label="Pending @pending, confirmed @confirmed, completed @completed, cancelled @cancelled">
+                @foreach (var item in mix.Where(m => m.Value > 0))
+                {
+                    <span class="mix-seg @item.Css" style="width: @Pct(item.Value)%"></span>
+                }
+            </div>
+            @if (totalBookings == 0)
+            {
+                <p class="mix-empty">No bookings yet.</p>
+            }
+            <ul class="mix-legend">
+                @foreach (var item in mix)
+                {
+                    <li>
+                        <span class="mix-dot @item.Css" aria-hidden="true"></span>
+                        <span class="mix-label">@item.Label</span>
+                        <span class="mix-value">@item.Value</span>
+                        <span class="mix-pct">@Pct(item.Value)%</span>
+                    </li>
+                }
+            </ul>
+        </section>
+    </div>
+    <div class="col-lg-5">
+        <section class="insight-card insight-card-stacked">
+            <div>
+                <p class="eyebrow">Reports</p>
+                <h2>How the house is moving</h2>
+                <p>Live counts from the API. Revenue is the sum of confirmed and completed booking totals. Traveler accounts stay on the mobile app; create owners and agents from Users.</p>
+            </div>
+            <div class="insight-actions">
+                <a asp-action="Users" class="btn btn-primary">People</a>
+                <a asp-action="Bookings" class="btn btn-outline-primary">Bookings</a>
+            </div>
+        </section>
+    </div>
+</div>
