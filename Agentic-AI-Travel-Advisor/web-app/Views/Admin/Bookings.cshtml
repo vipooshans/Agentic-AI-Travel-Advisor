@@ -23,7 +23,7 @@ else
             <td>@(b.HotelName ?? b.PackageTitle)</td>
             <td>@b.CheckIn.ToString("yyyy-MM-dd")</td>
             <td>@b.CheckOut.ToString("yyyy-MM-dd")</td>
-            <td>$@b.TotalPrice</td>
+            <td>LKR @b.TotalPrice.ToString("N2")</td>
             <td>@await Html.PartialAsync("_BookingStatusBadge", b.Status)</td>
             <td>@await Html.PartialAsync("_BookingStatusActions", b)</td>
         </tr>

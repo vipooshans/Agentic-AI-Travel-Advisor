@@ -21,7 +21,7 @@ else
         <tr class="@(b.Status == BookingStatus.Pending ? "table-warning" : null)">
             <td>@b.UserEmail</td><td>@b.RoomName</td><td>@b.HotelName</td>
             <td>@b.CheckIn.ToString("yyyy-MM-dd")</td><td>@b.CheckOut.ToString("yyyy-MM-dd")</td>
-            <td>$@b.TotalPrice</td>
+            <td>LKR @b.TotalPrice.ToString("N2")</td>
             <td>@await Html.PartialAsync("_BookingStatusBadge", b.Status)</td>
             <td>@await Html.PartialAsync("_BookingStatusActions", b)</td>
         </tr>

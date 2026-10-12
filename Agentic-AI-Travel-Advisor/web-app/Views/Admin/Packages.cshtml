@@ -29,7 +29,7 @@ else
     @foreach (var p in Model)
     {
         <tr class="@(p.ApprovalStatus == ApprovalStatus.Pending ? "table-warning" : null)">
-            <td>@p.Title</td><td>@p.DestinationName</td><td>@p.DurationDays days</td><td>$@p.Price</td>
+            <td>@p.Title</td><td>@p.DestinationName</td><td>@p.DurationDays days</td><td>LKR @p.Price.ToString("N2")</td>
             <td>@await Html.PartialAsync("_ApprovalBadge", p.ApprovalStatus)</td>
             <td>
                 @if (p.ApprovalStatus != ApprovalStatus.Approved)
