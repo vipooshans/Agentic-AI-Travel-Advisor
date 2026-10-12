@@ -127,3 +127,17 @@ cd mobile-app && flutter test
 - [API Reference](documentation/API.md)
 - [Database Setup](documentation/DATABASE.md)
 - [Architecture](documentation/ARCHITECTURE.md)
+
+## Student Contribution (Branch IT24102892)
+
+- **Student Developer**: IT24102892 (gowshikaruban@gmail.com)
+- **Assigned Module**: Flutter Mobile Application (`mobile-app`)
+- **Key Deliverables**:
+  - Material 3 Design System & `AppTheme` token architecture with dark mode support
+  - `TravelFormatters` for localized LKR currency, dates, and durations
+  - Search filtering bar & `CategoryFilterChips` for Sri Lanka catalog exploration
+  - Date range booking selector with real-time price & guest estimation
+  - Status segmented filter tabs & cancellation confirmation in `BookingListScreen`
+  - Shareable Markdown itinerary export modal dialog (`ItineraryShareDialog`)
+  - AI chat prompt chips and auto-scroll UX
+  - Automated widget & unit test suites (`flutter test`)
