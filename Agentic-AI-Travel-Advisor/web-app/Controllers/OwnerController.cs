@@ -222,8 +222,9 @@ public class OwnerController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateBookingStatus(int id, BookingStatus status)
     {
-        if (!await _api.UpdateBookingStatusAsync(id, status))
-            TempData["Error"] = "Could not update booking status.";
+        var (succeeded, error) = await _api.UpdateBookingStatusAsync(id, status);
+        if (!succeeded)
+            TempData["Error"] = error ?? "Could not update booking status.";
         return RedirectToAction(nameof(Bookings));
     }
 }

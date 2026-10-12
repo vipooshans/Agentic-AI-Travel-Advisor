@@ -893,7 +893,8 @@ a:hover {
     font-weight: 500;
 }
 
-.table .d-inline + .d-inline {
+.table .d-inline + .d-inline,
+.table .d-inline-block + .d-inline {
     margin-left: 0.35rem;
 }
 
