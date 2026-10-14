@@ -17,6 +17,7 @@ public class HomeController : Controller
                 RoleNames.Admin => RedirectToAction("Dashboard", "Admin"),
                 RoleNames.HotelOwner => RedirectToAction("Dashboard", "Owner"),
                 RoleNames.TravelAgent => RedirectToAction("Dashboard", "Agent"),
+                RoleNames.User => RedirectToAction("Dashboard", "Customer"),
                 _ => RedirectToAction("AccessDenied", "Account")
             };
         }

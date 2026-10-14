@@ -1,0 +1,83 @@
+@using TravelAdvisor.Core.DTOs.Bookings
+@using TravelAdvisor.Core.DTOs.Packages
+@model CreateBookingRequest
+@{
+    Layout = "_AdminLayout";
+    var package = ViewBag.Package as TravelPackageDetailDto;
+}
+
+<div class="mb-4">
+    @if (package != null)
+    {
+        <a asp-action="Package" asp-route-id="@package.Id" class="text-decoration-none small text-muted">&larr; Back to @package.Title</a>
+    }
+    else
+    {
+        <a asp-action="Packages" class="text-decoration-none small text-muted">&larr; Back to packages</a>
+    }
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h5 class="fw-bold mb-1">Book Tour Package</h5>
+            <p class="text-muted small mb-4">Complete the form below to submit your tour reservation. The package provider will confirm your booking.</p>
+
+            <form asp-action="BookPackage" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="TravelPackageId" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="CheckIn" class="form-label small fw-semibold">Tour Start Date</label>
+                    <input asp-for="CheckIn" type="date" class="form-control" min="@DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-dd")" />
+                    <span asp-validation-for="CheckIn" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Guests" class="form-label small fw-semibold">Number of Travelers</label>
+                    <input asp-for="Guests" type="number" min="1" max="@(package?.MaxTravelers ?? 20)" class="form-control" />
+                    <span class="text-muted small">Max group size: @(package?.MaxTravelers ?? 10) travelers</span>
+                    <span asp-validation-for="Guests" class="text-danger small d-block"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Notes" class="form-label small fw-semibold">Special Requests / Notes (Optional)</label>
+                    <textarea asp-for="Notes" class="form-control" rows="3" placeholder="e.g. pickup location, dietary needs, language preferences"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2">Submit Tour Booking Request</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <h6 class="fw-bold mb-3">Tour Summary</h6>
+            @if (package != null)
+            {
+                <div class="mb-3">
+                    <h5 class="fw-bold mb-1 text-primary">@package.Title</h5>
+                    <div class="border-top pt-2 mt-2">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Duration:</span>
+                            <span class="fw-semibold">@package.DurationDays Days</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Base Price / Person:</span>
+                            <span class="fw-semibold">LKR @package.Price.ToString("N0")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Activities Included:</span>
+                            <span class="fw-semibold">@package.Activities.Count</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-light border small text-muted mb-0">
+                    <i class="bi bi-info-circle me-1"></i> Final total includes activities and scales with party size. The request will be reviewed by the travel agent.
+                </div>
+            }
+        </div>
+    </div>
+</div>

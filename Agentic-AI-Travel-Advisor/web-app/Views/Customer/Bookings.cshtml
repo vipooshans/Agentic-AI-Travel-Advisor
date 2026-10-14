@@ -1,0 +1,85 @@
+@using TravelAdvisor.Core.DTOs.Bookings
+@using TravelAdvisor.Core.Enums
+@model List<BookingDto>
+@{
+    Layout = "_AdminLayout";
+    var activeFilter = ViewBag.ActiveFilter as string ?? "All";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h5 class="mb-1">My Reservations</h5>
+        <p class="text-muted small mb-0">Follow your room bookings and tour package requests in real-time.</p>
+    </div>
+    <div class="btn-group btn-group-sm" role="group">
+        <a asp-action="Bookings" class="btn @(activeFilter == "All" ? "btn-primary" : "btn-outline-secondary")">All</a>
+        <a asp-action="Bookings" asp-route-status="Pending" class="btn @(activeFilter == "Pending" ? "btn-primary" : "btn-outline-secondary")">Pending</a>
+        <a asp-action="Bookings" asp-route-status="Confirmed" class="btn @(activeFilter == "Confirmed" ? "btn-primary" : "btn-outline-secondary")">Confirmed</a>
+        <a asp-action="Bookings" asp-route-status="Completed" class="btn @(activeFilter == "Completed" ? "btn-primary" : "btn-outline-secondary")">Completed</a>
+        <a asp-action="Bookings" asp-route-status="Cancelled" class="btn @(activeFilter == "Cancelled" ? "btn-primary" : "btn-outline-secondary")">Cancelled</a>
+    </div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="card p-5 text-center border-0 shadow-sm rounded-4">
+        <h6 class="fw-bold mb-2">No @(activeFilter == "All" ? "" : activeFilter.ToLower()) bookings found</h6>
+        <p class="text-muted small mb-3">You do not have any bookings in this view.</p>
+        <div>
+            <a asp-action="Hotels" class="btn btn-primary btn-sm me-2">Explore Hotels</a>
+            <a asp-action="Packages" class="btn btn-outline-primary btn-sm">Explore Packages</a>
+        </div>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Listing</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Guests</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var b in Model)
+                {
+                    <tr class="@(b.Status == BookingStatus.Pending ? "table-warning" : null)">
+                        <td><strong>#@b.Id</strong></td>
+                        <td>
+                            <div class="fw-semibold">@(b.HotelName ?? b.PackageTitle)</div>
+                            @if (!string.IsNullOrWhiteSpace(b.RoomName))
+                            {
+                                <small class="text-muted">@b.RoomName</small>
+                            }
+                        </td>
+                        <td>@b.CheckIn.ToString("yyyy-MM-dd")</td>
+                        <td>@b.CheckOut.ToString("yyyy-MM-dd")</td>
+                        <td>@b.Guests guest@(b.Guests == 1 ? "" : "s")</td>
+                        <td><strong>LKR @b.TotalPrice.ToString("N0")</strong></td>
+                        <td>@await Html.PartialAsync("_BookingStatusBadge", b.Status)</td>
+                        <td>
+                            @if (b.Status is BookingStatus.Pending or BookingStatus.Confirmed)
+                            {
+                                <form asp-action="CancelBooking" asp-route-id="@b.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel booking #@b.Id?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">—</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

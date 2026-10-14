@@ -50,6 +50,36 @@ public class AccountController : Controller
         return RedirectToRoleDashboard(role);
     }
 
+    [HttpGet]
+    public IActionResult Register()
+    {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return RedirectToRoleDashboard();
+        }
+
+        return View(new RegisterViewModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Register(RegisterViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var (success, error, role) = await _authService.RegisterAsync(model);
+        if (!success)
+        {
+            ModelState.AddModelError(string.Empty, error ?? "Registration failed.");
+            return View(model);
+        }
+
+        return RedirectToRoleDashboard(role);
+    }
+
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -74,6 +104,7 @@ public class AccountController : Controller
             RoleNames.Admin => RedirectToAction("Dashboard", "Admin"),
             RoleNames.HotelOwner => RedirectToAction("Dashboard", "Owner"),
             RoleNames.TravelAgent => RedirectToAction("Dashboard", "Agent"),
+            RoleNames.User => RedirectToAction("Dashboard", "Customer"),
             _ => RedirectToAction(nameof(AccessDenied))
         };
     }

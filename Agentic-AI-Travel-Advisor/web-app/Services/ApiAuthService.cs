@@ -39,9 +39,31 @@ public class ApiAuthService
             return (false, "Invalid response from server.", null);
         }
 
-        if (auth.User.Role == "USER")
+        await SignInAsync(auth);
+        return (true, null, auth.User.Role);
+    }
+
+    public async Task<(bool Success, string? Error, string? Role)> RegisterAsync(RegisterViewModel model)
+    {
+        var client = _httpClientFactory.CreateClient("TravelAdvisorApi");
+        var response = await client.PostAsJsonAsync("/api/auth/register", new RegisterRequest
         {
-            return (false, "Regular users should use the mobile app.", null);
+            Email = model.Email,
+            Password = model.Password,
+            FirstName = model.FirstName,
+            LastName = model.LastName
+        });
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+            return (false, error?.Message ?? "Registration failed.", null);
+        }
+
+        var auth = await response.Content.ReadFromJsonAsync<AuthResponse>();
+        if (auth is null)
+        {
+            return (false, "Invalid response from server.", null);
         }
 
         await SignInAsync(auth);

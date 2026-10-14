@@ -1,0 +1,58 @@
+@using TravelAdvisor.Core.DTOs.Users
+@model UserProfileDto
+@{
+    Layout = "_AdminLayout";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h5 class="fw-bold mb-1">My Traveler Profile</h5>
+            <p class="text-muted small mb-4">Manage your personal information, travel preferences, and contact details.</p>
+
+            <form asp-action="Profile" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="PhoneNumber" class="form-label small fw-semibold">Phone Number</label>
+                        <input asp-for="PhoneNumber" class="form-control" placeholder="+94 77 123 4567" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Nationality" class="form-label small fw-semibold">Nationality</label>
+                        <input asp-for="Nationality" class="form-control" placeholder="e.g. Sri Lankan, British, etc." />
+                        <span asp-validation-for="Nationality" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="DateOfBirth" class="form-label small fw-semibold">Date of Birth</label>
+                        <input asp-for="DateOfBirth" type="date" class="form-control" />
+                        <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="PreferredCurrency" class="form-label small fw-semibold">Preferred Currency</label>
+                        <select asp-for="PreferredCurrency" class="form-select">
+                            <option value="LKR">LKR (Sri Lankan Rupee)</option>
+                            <option value="USD">USD (US Dollar)</option>
+                            <option value="EUR">EUR (Euro)</option>
+                            <option value="GBP">GBP (British Pound)</option>
+                        </select>
+                        <span asp-validation-for="PreferredCurrency" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Bio" class="form-label small fw-semibold">Traveler Bio / Preferences</label>
+                    <textarea asp-for="Bio" class="form-control" rows="3" placeholder="Tell us a little about your travel style (e.g. nature enthusiast, cultural explorer, luxury stays)..."></textarea>
+                    <span asp-validation-for="Bio" class="text-danger small"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary px-4 py-2">Save Profile Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
