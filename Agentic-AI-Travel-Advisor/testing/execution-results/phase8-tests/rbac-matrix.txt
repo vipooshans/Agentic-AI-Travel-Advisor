@@ -1,0 +1,71 @@
+﻿# TravelAdvisor.Api.Tests.AccessControlMatrixTests.Every_protected_endpoint_enforces_its_role_policy -> Passed
+GET    /api/auth/me                                                           ANONYMOUS=401 USER=200 HOTEL_OWNER=200 TRAVEL_AGENT=200 ADMIN=200
+PUT    /api/auth/me                                                           ANONYMOUS=401 USER=400 HOTEL_OWNER=400 TRAVEL_AGENT=400 ADMIN=400
+GET    /api/users/me/profile                                                  ANONYMOUS=401 USER=200 HOTEL_OWNER=200 TRAVEL_AGENT=200 ADMIN=200
+GET    /api/users/me/preferences                                              ANONYMOUS=401 USER=200 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=403
+PUT    /api/users/me/preferences                                              ANONYMOUS=401 USER=400 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=403
+GET    /api/users                                                             ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=200
+POST   /api/users                                                             ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=400
+PATCH  /api/users/999999/active                                               ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=404
+GET    /api/hotels/mine                                                       ANONYMOUS=401 USER=403 HOTEL_OWNER=200 TRAVEL_AGENT=403 ADMIN=403
+POST   /api/hotels                                                            ANONYMOUS=401 USER=403 HOTEL_OWNER=400 TRAVEL_AGENT=403 ADMIN=403
+PUT    /api/hotels/999999                                                     ANONYMOUS=401 USER=403 HOTEL_OWNER=400 TRAVEL_AGENT=403 ADMIN=400
+DELETE /api/hotels/999999                                                     ANONYMOUS=401 USER=403 HOTEL_OWNER=404 TRAVEL_AGENT=403 ADMIN=404
+PATCH  /api/hotels/999999/approval                                            ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=404
+POST   /api/hotels/999999/rooms                                               ANONYMOUS=401 USER=403 HOTEL_OWNER=400 TRAVEL_AGENT=403 ADMIN=400
+PUT    /api/hotels/999999/rooms/1                                             ANONYMOUS=401 USER=403 HOTEL_OWNER=400 TRAVEL_AGENT=403 ADMIN=400
+PATCH  /api/hotels/999999/rooms/1/availability                                ANONYMOUS=401 USER=403 HOTEL_OWNER=404 TRAVEL_AGENT=403 ADMIN=404
+GET    /api/hotels/999999/rooms/1/calendar?from=2030-01-01&to=2030-01-10      ANONYMOUS=401 USER=403 HOTEL_OWNER=404 TRAVEL_AGENT=403 ADMIN=404
+PUT    /api/hotels/999999/rooms/1/calendar                                    ANONYMOUS=401 USER=403 HOTEL_OWNER=400 TRAVEL_AGENT=403 ADMIN=400
+DELETE /api/hotels/999999/rooms/1                                             ANONYMOUS=401 USER=403 HOTEL_OWNER=404 TRAVEL_AGENT=403 ADMIN=404
+GET    /api/packages/mine                                                     ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=200 ADMIN=403
+POST   /api/packages                                                          ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=400 ADMIN=403
+PUT    /api/packages/999999                                                   ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=400 ADMIN=400
+DELETE /api/packages/999999                                                   ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=404 ADMIN=404
+POST   /api/packages/999999/activities                                        ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=400 ADMIN=400
+DELETE /api/packages/999999/activities/1                                      ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=404 ADMIN=404
+PATCH  /api/packages/999999/approval                                          ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=404
+POST   /api/destinations                                                      ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=400
+PUT    /api/destinations/999999                                               ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=400
+DELETE /api/destinations/999999                                               ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=404
+GET    /api/transportation/mine                                               ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=200 ADMIN=200
+POST   /api/transportation                                                    ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=400 ADMIN=400
+PUT    /api/transportation/999999                                             ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=400 ADMIN=400
+DELETE /api/transportation/999999                                             ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=404 ADMIN=404
+GET    /api/settings                                                          ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=200
+PUT    /api/settings/Unknown.Key                                              ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=404
+GET    /api/reports/summary                                                   ANONYMOUS=401 USER=200 HOTEL_OWNER=200 TRAVEL_AGENT=200 ADMIN=200
+GET    /api/reports/statistics                                                ANONYMOUS=401 USER=403 HOTEL_OWNER=200 TRAVEL_AGENT=200 ADMIN=200
+POST   /api/bookings                                                          ANONYMOUS=401 USER=400 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=403
+GET    /api/bookings                                                          ANONYMOUS=401 USER=200 HOTEL_OWNER=200 TRAVEL_AGENT=200 ADMIN=200
+GET    /api/bookings/999999                                                   ANONYMOUS=401 USER=404 HOTEL_OWNER=404 TRAVEL_AGENT=404 ADMIN=404
+PATCH  /api/bookings/999999/status                                            ANONYMOUS=401 USER=404 HOTEL_OWNER=404 TRAVEL_AGENT=404 ADMIN=404
+GET    /api/bookings/999999/payments                                          ANONYMOUS=401 USER=404 HOTEL_OWNER=404 TRAVEL_AGENT=404 ADMIN=404
+POST   /api/bookings/999999/payments                                          ANONYMOUS=401 USER=400 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=403
+PATCH  /api/bookings/999999/payments/1/status                                 ANONYMOUS=401 USER=403 HOTEL_OWNER=404 TRAVEL_AGENT=404 ADMIN=404
+POST   /api/ai/chat                                                           ANONYMOUS=401 USER=400 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=403
+GET    /api/ai/conversations                                                  ANONYMOUS=401 USER=200 HOTEL_OWNER=200 TRAVEL_AGENT=200 ADMIN=200
+GET    /api/ai/conversations/999999                                           ANONYMOUS=401 USER=404 HOTEL_OWNER=404 TRAVEL_AGENT=404 ADMIN=404
+GET    /api/ai/recommendations                                                ANONYMOUS=401 USER=200 HOTEL_OWNER=200 TRAVEL_AGENT=200 ADMIN=200
+POST   /api/itineraries                                                       ANONYMOUS=401 USER=400 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=403
+GET    /api/itineraries                                                       ANONYMOUS=401 USER=200 HOTEL_OWNER=200 TRAVEL_AGENT=200 ADMIN=200
+GET    /api/itineraries/999999                                                ANONYMOUS=401 USER=404 HOTEL_OWNER=404 TRAVEL_AGENT=404 ADMIN=404
+DELETE /api/itineraries/999999                                                ANONYMOUS=401 USER=404 HOTEL_OWNER=404 TRAVEL_AGENT=404 ADMIN=404
+GET    /api/reviews                                                           ANONYMOUS=401 USER=200 HOTEL_OWNER=200 TRAVEL_AGENT=200 ADMIN=200
+POST   /api/reviews                                                           ANONYMOUS=401 USER=400 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=403
+PUT    /api/reviews/999999                                                    ANONYMOUS=401 USER=400 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=403
+DELETE /api/reviews/999999                                                    ANONYMOUS=401 USER=404 HOTEL_OWNER=404 TRAVEL_AGENT=404 ADMIN=404
+PATCH  /api/reviews/999999/status                                             ANONYMOUS=401 USER=403 HOTEL_OWNER=403 TRAVEL_AGENT=403 ADMIN=404
+57 endpoints x 5 callers = 285 checks, 0 failures
+
+# TravelAdvisor.Api.Tests.AccessControlMatrixTests.Public_catalog_endpoints_do_not_require_a_token -> Passed
+GET /api/health anonymous=200
+GET /api/destinations anonymous=200
+GET /api/hotels anonymous=200
+GET /api/packages anonymous=200
+GET /api/transportation anonymous=200
+GET /api/settings/public anonymous=200
+GET /api/hotels/1/reviews anonymous=200
+GET /api/packages/1/reviews anonymous=200
+GET /api/bookings/availability?roomId=1&checkIn=2026-10-31&checkOut=2026-11-01&guests=1 anonymous=200
+

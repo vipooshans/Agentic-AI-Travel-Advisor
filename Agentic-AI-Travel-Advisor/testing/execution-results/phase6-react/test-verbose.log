@@ -1,0 +1,46 @@
+﻿## vitest run --reporter=verbose  (2026-10-01T17:53:57.5403956+05:30)
+
+ RUN  v5.0.3 E:/project/Agentic AI Travel Advisor & Booking System/Agentic-AI-Travel-Advisor/web-react
+
+ ✓ src/lib/lib.test.ts > planToItinerary > maps every plan day item to an itinerary item with an HH:mm:ss start time 6ms
+ ✓ src/lib/lib.test.ts > statusCount > reads enum-name keys 2ms
+ ✓ src/lib/lib.test.ts > statusCount > reads numeric keys 1ms
+ ✓ src/lib/lib.test.ts > statusCount > defaults to zero 1ms
+ ✓ src/lib/lib.test.ts > format helpers > formats money with the currency code 20ms
+ ✓ src/lib/lib.test.ts > format helpers > formats the date part without time-zone drift 6ms
+ ✓ src/lib/lib.test.ts > format helpers > parses optional numbers 0ms
+ ✓ src/auth/session.test.ts > session storage > round-trips a valid session 2ms
+ ✓ src/auth/session.test.ts > session storage > drops an expired session instead of sending a stale token 1ms
+ ✓ src/auth/session.test.ts > session storage > drops corrupt JSON 0ms
+ ✓ src/auth/session.test.ts > session storage > clearSession removes the token 0ms
+ ✓ src/api/client.test.ts > api client > sends the bearer token from the stored session 47ms
+ ✓ src/api/client.test.ts > api client > uses the ProblemDetails detail as the error message 9ms
+ ✓ src/api/client.test.ts > api client > keeps validation field errors 7ms
+ ✓ src/api/client.test.ts > api client > reports an unreachable server clearly 4ms
+ ✓ src/api/client.test.ts > api client > clears the session and announces expiry when the API rejects the token 7ms
+ ✓ src/api/client.test.ts > api client > does not treat a failed login as an expired session 7ms
+ ✓ src/auth/RequireRole.test.tsx > RequireRole > sends anonymous visitors to the login page 48ms
+ ✓ src/auth/RequireRole.test.tsx > RequireRole > blocks USER from admin pages 9ms
+ ✓ src/auth/RequireRole.test.tsx > RequireRole > blocks HOTEL_OWNER from admin pages 5ms
+ ✓ src/auth/RequireRole.test.tsx > RequireRole > blocks TRAVEL_AGENT from admin pages 4ms
+ ✓ src/auth/RequireRole.test.tsx > RequireRole > lets an admin in 92ms
+ ✓ src/pages/shared/ManageBookingsPage.test.tsx > ManageBookingsPage > confirms a pending booking through the status endpoint 284ms
+ ✓ src/pages/shared/ManageBookingsPage.test.tsx > ManageBookingsPage > shows the server reason when a transition is rejected 83ms
+ ✓ src/pages/shared/ManageBookingsPage.test.tsx > ManageBookingsPage > shows 403 from the API as a permission error 15ms
+ ✓ src/pages/user/MyBookingsPage.test.tsx > MyBookingsPage payments > pays the outstanding amount and then reports the booking as paid in full 682ms
+ ✓ src/pages/user/MyBookingsPage.test.tsx > MyBookingsPage payments > hides the pay form while a cash payment awaits provider confirmation 88ms
+ ✓ src/pages/public/LoginPage.test.tsx > LoginPage > signs in and routes each role to its home page 723ms
+ ✓ src/pages/user/AssistantPage.test.tsx > AssistantPage > renders the structured plan and books only after explicit confirmation 987ms
+ ✓ src/pages/public/LoginPage.test.tsx > LoginPage > submits with the Enter key from the password field 483ms
+ ✓ src/pages/public/LoginPage.test.tsx > LoginPage > shows the API error and stores nothing when credentials are wrong 527ms
+ ✓ src/pages/public/LoginPage.test.tsx > LoginPage > validates empty fields without calling the API 65ms
+ ✓ src/pages/user/AssistantPage.test.tsx > AssistantPage > shows a refusal without any plan or booking controls 915ms
+ ✓ src/pages/user/AssistantPage.test.tsx > AssistantPage > surfaces API errors such as the rate limit 241ms
+ ✓ src/pages/user/AssistantPage.test.tsx > AssistantPage > disables the composer when the admin has turned the assistant off 31ms
+
+ Test Files  8 passed (8)
+      Tests  35 passed (35)
+   Start at  17:53:57
+   Duration  4.94s (environment 48%, tests 22%, setup 18%, import 7%, transform 4%)
+
+exit code: 0

@@ -1,0 +1,72 @@
+<testsuites id="" name="" tests="17" failures="0" skipped="0" errors="0" time="36.192961000000004">
+<testsuite name="ai-journey.spec.ts" timestamp="2026-10-01T15:26:21.022Z" hostname="chromium" tests="1" failures="0" skipped="0" time="7.91" errors="0">
+<testcase name="Full journey: UI -&gt; API -&gt; AI -&gt; PostgreSQL -&gt; itinerary -&gt; booking -&gt; confirmation › a traveler plans, saves and books with the assistant; the owner confirms; every step is in the database" classname="ai-journey.spec.ts" time="7.91">
+</testcase>
+</testsuite>
+<testsuite name="auth.spec.ts" timestamp="2026-10-01T15:26:21.022Z" hostname="chromium" tests="9" failures="0" skipped="0" time="9.527" errors="0">
+<testcase name="Authentication and role-based access (real API) › ADMIN signs in, lands on their home page and sees only their navigation" classname="auth.spec.ts" time="1.098">
+</testcase>
+<testcase name="Authentication and role-based access (real API) › HOTEL_OWNER signs in, lands on their home page and sees only their navigation" classname="auth.spec.ts" time="1.122">
+</testcase>
+<testcase name="Authentication and role-based access (real API) › TRAVEL_AGENT signs in, lands on their home page and sees only their navigation" classname="auth.spec.ts" time="1.158">
+</testcase>
+<testcase name="Authentication and role-based access (real API) › wrong password shows the API error and stores no session" classname="auth.spec.ts" time="0.741">
+</testcase>
+<testcase name="Authentication and role-based access (real API) › a new traveler registers, keeps the session after reload, and the account exists in the API" classname="auth.spec.ts" time="1.126">
+</testcase>
+<testcase name="Authentication and role-based access (real API) › the server rejects a weak password that passes the client-side length check" classname="auth.spec.ts" time="0.749">
+</testcase>
+<testcase name="Authentication and role-based access (real API) › a traveler cannot open admin, owner or agent pages, and the API refuses the data too" classname="auth.spec.ts" time="1.629">
+</testcase>
+<testcase name="Authentication and role-based access (real API) › an anonymous visitor is sent to login and returned to the page they asked for" classname="auth.spec.ts" time="0.822">
+</testcase>
+<testcase name="Authentication and role-based access (real API) › a tampered token is rejected by the API and the user is asked to sign in again" classname="auth.spec.ts" time="1.082">
+</testcase>
+</testsuite>
+<testsuite name="booking.spec.ts" timestamp="2026-10-01T15:26:21.022Z" hostname="chromium" tests="3" failures="0" skipped="0" time="4.398" errors="0">
+<testcase name="Direct booking workflow: traveler -&gt; API -&gt; PostgreSQL -&gt; provider confirmation › a traveler checks availability and books; the booking is stored as Pending with the server-side price" classname="booking.spec.ts" time="1.636">
+<properties>
+<property name="serial" value="">
+</property>
+</properties>
+</testcase>
+<testcase name="Direct booking workflow: traveler -&gt; API -&gt; PostgreSQL -&gt; provider confirmation › a second traveler cannot double-book the same room for overlapping dates" classname="booking.spec.ts" time="1.14">
+<properties>
+<property name="serial" value="">
+</property>
+</properties>
+</testcase>
+<testcase name="Direct booking workflow: traveler -&gt; API -&gt; PostgreSQL -&gt; provider confirmation › the hotel owner confirms the booking and the traveler sees the confirmed status" classname="booking.spec.ts" time="1.622">
+<properties>
+<property name="serial" value="">
+</property>
+</properties>
+</testcase>
+</testsuite>
+<testsuite name="listings.spec.ts" timestamp="2026-10-01T15:26:21.022Z" hostname="chromium" tests="4" failures="0" skipped="0" time="11.91" errors="0">
+<testcase name="Provider listings and admin approval (real API + PostgreSQL) › a hotel owner creates a hotel and a room; it stays hidden until approved" classname="listings.spec.ts" time="2.115">
+<properties>
+<property name="serial" value="">
+</property>
+</properties>
+</testcase>
+<testcase name="Provider listings and admin approval (real API + PostgreSQL) › the admin approves the hotel and travelers can find it in search" classname="listings.spec.ts" time="3.944">
+<properties>
+<property name="serial" value="">
+</property>
+</properties>
+</testcase>
+<testcase name="Provider listings and admin approval (real API + PostgreSQL) › a travel agent sees form validation, then creates a package that the admin rejects" classname="listings.spec.ts" time="2.558">
+<properties>
+<property name="serial" value="">
+</property>
+</properties>
+</testcase>
+<testcase name="Provider listings and admin approval (real API + PostgreSQL) › a second hotel owner created by the admin cannot see or edit the hotel; its owner can delete it" classname="listings.spec.ts" time="3.293">
+<properties>
+<property name="serial" value="">
+</property>
+</properties>
+</testcase>
+</testsuite>
+</testsuites>

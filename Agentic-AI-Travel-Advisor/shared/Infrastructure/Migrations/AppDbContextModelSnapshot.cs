@@ -20,6 +20,7 @@ namespace TravelAdvisor.Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "btree_gist");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -171,7 +172,8 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -180,11 +182,78 @@ namespace TravelAdvisor.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId", "UpdatedAt");
+
+                    b.ToTable("AIConversations");
+                });
+
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.AIRecommendation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DestinationId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("EstimatedCost")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<int?>("HotelId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ItemType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int?>("RoomId")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("Score")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int?>("TransportationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TravelPackageId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConversationId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AIConversations");
+                    b.ToTable("AIRecommendations");
                 });
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.ApplicationUser", b =>
@@ -211,14 +280,16 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
@@ -252,6 +323,9 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -259,7 +333,8 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
+                        .IsUnique()
+                        .HasDatabaseName("UX_AspNetUsers_NormalizedEmail");
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
@@ -278,6 +353,9 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("CancelledAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime>("CheckIn")
                         .HasColumnType("timestamp with time zone");
 
@@ -287,6 +365,13 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("Guests")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
                     b.Property<int?>("RoomId")
                         .HasColumnType("integer");
 
@@ -294,26 +379,42 @@ namespace TravelAdvisor.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<decimal>("TotalPrice")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<int?>("TravelPackageId")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("RoomId");
+                    b.HasIndex("TravelPackageId", "CheckIn");
 
-                    b.HasIndex("TravelPackageId");
+                    b.HasIndex("UserId", "CreatedAt");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("RoomId", "CheckIn", "CheckOut");
 
                     b.ToTable("Bookings", t =>
                         {
+                            t.HasCheckConstraint("CK_Bookings_Dates", "\"CheckOut\" > \"CheckIn\"");
+
+                            t.HasCheckConstraint("CK_Bookings_Guests", "\"Guests\" > 0");
+
                             t.HasCheckConstraint("CK_Bookings_RoomOrPackage", "(\"RoomId\" IS NOT NULL AND \"TravelPackageId\" IS NULL) OR (\"RoomId\" IS NULL AND \"TravelPackageId\" IS NOT NULL)");
+
+                            t.HasCheckConstraint("CK_Bookings_TotalPrice", "\"TotalPrice\" >= 0");
                         });
                 });
 
@@ -327,19 +428,32 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
                     b.Property<string>("Country")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
 
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("text");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name", "Country")
+                        .IsUnique();
 
                     b.ToTable("Destinations");
                 });
@@ -354,28 +468,50 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<int>("ApprovalStatus")
+                        .HasColumnType("integer");
 
                     b.Property<string>("City")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Country")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
 
                     b.Property<string>("OwnerId")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ApprovalStatus");
+
+                    b.HasIndex("City");
 
                     b.HasIndex("OwnerId");
 
@@ -390,8 +526,25 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal?>("Budget")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<int?>("ConversationId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DestinationId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("EstimatedCost")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
@@ -399,9 +552,20 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Summary")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("Travelers")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -409,9 +573,18 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ConversationId");
+
+                    b.HasIndex("DestinationId");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("Itineraries");
+                    b.ToTable("Itineraries", t =>
+                        {
+                            t.HasCheckConstraint("CK_Itineraries_Dates", "\"EndDate\" >= \"StartDate\"");
+
+                            t.HasCheckConstraint("CK_Itineraries_Travelers", "\"Travelers\" > 0");
+                        });
                 });
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.ItineraryItem", b =>
@@ -426,7 +599,16 @@ namespace TravelAdvisor.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<decimal?>("EstimatedCost")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("ItemType")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
 
                     b.Property<int>("ItineraryId")
                         .HasColumnType("integer");
@@ -439,13 +621,175 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ItineraryId");
 
                     b.ToTable("ItineraryItems");
+                });
+
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.PackageActivity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("DayNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<int>("TravelPackageId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TravelPackageId");
+
+                    b.ToTable("PackageActivities", t =>
+                        {
+                            t.HasCheckConstraint("CK_PackageActivities_Day", "\"DayNumber\" > 0");
+
+                            t.HasCheckConstraint("CK_PackageActivities_Price", "\"Price\" >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.Payment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<int>("BookingId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)");
+
+                    b.Property<int>("Method")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TransactionReference")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingId");
+
+                    b.HasIndex("TransactionReference")
+                        .IsUnique();
+
+                    b.ToTable("Payments", t =>
+                        {
+                            t.HasCheckConstraint("CK_Payments_Amount", "\"Amount\" > 0");
+                        });
+                });
+
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BookingId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("HotelId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TravelPackageId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingId")
+                        .IsUnique();
+
+                    b.HasIndex("HotelId");
+
+                    b.HasIndex("TravelPackageId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Reviews", t =>
+                        {
+                            t.HasCheckConstraint("CK_Reviews_Rating", "\"Rating\" BETWEEN 1 AND 5");
+
+                            t.HasCheckConstraint("CK_Reviews_Target", "(\"HotelId\" IS NOT NULL AND \"TravelPackageId\" IS NULL) OR (\"HotelId\" IS NULL AND \"TravelPackageId\" IS NOT NULL)");
+                        });
                 });
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.Role", b =>
@@ -458,7 +802,8 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
 
                     b.HasKey("Id");
 
@@ -479,6 +824,9 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.Property<int>("Capacity")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("HotelId")
                         .HasColumnType("integer");
 
@@ -487,20 +835,188 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<decimal>("PricePerNight")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<string>("RoomType")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("HotelId");
+                    b.HasIndex("HotelId", "Name")
+                        .IsUnique();
 
-                    b.ToTable("Rooms");
+                    b.ToTable("Rooms", t =>
+                        {
+                            t.HasCheckConstraint("CK_Rooms_Capacity", "\"Capacity\" > 0");
+
+                            t.HasCheckConstraint("CK_Rooms_Price", "\"PricePerNight\" >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.RoomAvailability", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("IsBlocked")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
+                    b.Property<decimal?>("PriceOverride")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoomId", "Date")
+                        .IsUnique();
+
+                    b.ToTable("RoomAvailability", t =>
+                        {
+                            t.HasCheckConstraint("CK_RoomAvailability_Price", "\"PriceOverride\" IS NULL OR \"PriceOverride\" >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.SystemSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.ToTable("SystemSettings");
+                });
+
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.Transportation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<TimeSpan?>("DepartureTime")
+                        .HasColumnType("interval");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int?>("DestinationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DurationMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("FromLocation")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Mode")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("PricePerPerson")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("ProviderId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ToLocation")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<int?>("TravelPackageId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DestinationId");
+
+                    b.HasIndex("ProviderId");
+
+                    b.HasIndex("TravelPackageId");
+
+                    b.ToTable("Transportation", t =>
+                        {
+                            t.HasCheckConstraint("CK_Transportation_Capacity", "\"Capacity\" > 0");
+
+                            t.HasCheckConstraint("CK_Transportation_Duration", "\"DurationMinutes\" > 0");
+
+                            t.HasCheckConstraint("CK_Transportation_Price", "\"PricePerPerson\" >= 0");
+                        });
                 });
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.TravelPackage", b =>
@@ -515,8 +1031,15 @@ namespace TravelAdvisor.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("ApprovalStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
 
                     b.Property<int>("DestinationId")
                         .HasColumnType("integer");
@@ -524,20 +1047,41 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.Property<int>("DurationDays")
                         .HasColumnType("integer");
 
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("MaxTravelers")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(10);
+
                     b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AgentId");
 
-                    b.HasIndex("DestinationId");
+                    b.HasIndex("DestinationId", "ApprovalStatus");
 
-                    b.ToTable("TravelPackages");
+                    b.ToTable("TravelPackages", t =>
+                        {
+                            t.HasCheckConstraint("CK_TravelPackages_Duration", "\"DurationDays\" > 0");
+
+                            t.HasCheckConstraint("CK_TravelPackages_MaxTravelers", "\"MaxTravelers\" > 0");
+
+                            t.HasCheckConstraint("CK_TravelPackages_Price", "\"Price\" >= 0");
+                        });
                 });
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.TravelPreferences", b =>
@@ -548,17 +1092,35 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AccommodationPreference")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
                     b.Property<decimal?>("BudgetMax")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<decimal?>("BudgetMin")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Interests")
-                        .HasColumnType("text");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("PreferredClimate")
-                        .HasColumnType("text");
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("TransportPreference")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -569,7 +1131,60 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("TravelPreferences");
+                    b.ToTable("TravelPreferences", t =>
+                        {
+                            t.HasCheckConstraint("CK_TravelPreferences_Budget", "\"BudgetMin\" IS NULL OR \"BudgetMax\" IS NULL OR \"BudgetMin\" <= \"BudgetMax\"");
+                        });
+                });
+
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.UserProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AvatarUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Bio")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly?>("DateOfBirth")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Nationality")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("PreferredCurrency")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserProfiles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -634,6 +1249,25 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.AIRecommendation", b =>
+                {
+                    b.HasOne("TravelAdvisor.Core.Entities.AIConversation", "Conversation")
+                        .WithMany("Recommendations")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TravelAdvisor.Core.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TravelAdvisor.Core.Entities.ApplicationUser", b =>
                 {
                     b.HasOne("TravelAdvisor.Core.Entities.Role", "Role")
@@ -649,11 +1283,13 @@ namespace TravelAdvisor.Infrastructure.Migrations
                 {
                     b.HasOne("TravelAdvisor.Core.Entities.Room", "Room")
                         .WithMany("Bookings")
-                        .HasForeignKey("RoomId");
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("TravelAdvisor.Core.Entities.TravelPackage", "TravelPackage")
                         .WithMany("Bookings")
-                        .HasForeignKey("TravelPackageId");
+                        .HasForeignKey("TravelPackageId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("TravelAdvisor.Core.Entities.ApplicationUser", "User")
                         .WithMany("Bookings")
@@ -681,11 +1317,25 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.Itinerary", b =>
                 {
+                    b.HasOne("TravelAdvisor.Core.Entities.AIConversation", "Conversation")
+                        .WithMany()
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TravelAdvisor.Core.Entities.Destination", "Destination")
+                        .WithMany("Itineraries")
+                        .HasForeignKey("DestinationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("TravelAdvisor.Core.Entities.ApplicationUser", "User")
                         .WithMany("Itineraries")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Conversation");
+
+                    b.Navigation("Destination");
 
                     b.Navigation("User");
                 });
@@ -701,6 +1351,61 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.Navigation("Itinerary");
                 });
 
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.PackageActivity", b =>
+                {
+                    b.HasOne("TravelAdvisor.Core.Entities.TravelPackage", "TravelPackage")
+                        .WithMany("Activities")
+                        .HasForeignKey("TravelPackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TravelPackage");
+                });
+
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.Payment", b =>
+                {
+                    b.HasOne("TravelAdvisor.Core.Entities.Booking", "Booking")
+                        .WithMany("Payments")
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+                });
+
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.Review", b =>
+                {
+                    b.HasOne("TravelAdvisor.Core.Entities.Booking", "Booking")
+                        .WithOne("Review")
+                        .HasForeignKey("TravelAdvisor.Core.Entities.Review", "BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TravelAdvisor.Core.Entities.Hotel", "Hotel")
+                        .WithMany("Reviews")
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TravelAdvisor.Core.Entities.TravelPackage", "TravelPackage")
+                        .WithMany("Reviews")
+                        .HasForeignKey("TravelPackageId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TravelAdvisor.Core.Entities.ApplicationUser", "User")
+                        .WithMany("Reviews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+
+                    b.Navigation("Hotel");
+
+                    b.Navigation("TravelPackage");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TravelAdvisor.Core.Entities.Room", b =>
                 {
                     b.HasOne("TravelAdvisor.Core.Entities.Hotel", "Hotel")
@@ -710,6 +1415,42 @@ namespace TravelAdvisor.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Hotel");
+                });
+
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.RoomAvailability", b =>
+                {
+                    b.HasOne("TravelAdvisor.Core.Entities.Room", "Room")
+                        .WithMany("Availability")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.Transportation", b =>
+                {
+                    b.HasOne("TravelAdvisor.Core.Entities.Destination", "Destination")
+                        .WithMany("Transportation")
+                        .HasForeignKey("DestinationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TravelAdvisor.Core.Entities.ApplicationUser", "Provider")
+                        .WithMany()
+                        .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TravelAdvisor.Core.Entities.TravelPackage", "TravelPackage")
+                        .WithMany("Transportation")
+                        .HasForeignKey("TravelPackageId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Destination");
+
+                    b.Navigation("Provider");
+
+                    b.Navigation("TravelPackage");
                 });
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.TravelPackage", b =>
@@ -723,7 +1464,7 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.HasOne("TravelAdvisor.Core.Entities.Destination", "Destination")
                         .WithMany("TravelPackages")
                         .HasForeignKey("DestinationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Agent");
@@ -742,6 +1483,22 @@ namespace TravelAdvisor.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.UserProfile", b =>
+                {
+                    b.HasOne("TravelAdvisor.Core.Entities.ApplicationUser", "User")
+                        .WithOne("Profile")
+                        .HasForeignKey("TravelAdvisor.Core.Entities.UserProfile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.AIConversation", b =>
+                {
+                    b.Navigation("Recommendations");
+                });
+
             modelBuilder.Entity("TravelAdvisor.Core.Entities.ApplicationUser", b =>
                 {
                     b.Navigation("AIConversations");
@@ -752,18 +1509,35 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
                     b.Navigation("OwnedHotels");
 
+                    b.Navigation("Profile");
+
+                    b.Navigation("Reviews");
+
                     b.Navigation("TravelPackages");
 
                     b.Navigation("TravelPreferences");
                 });
 
+            modelBuilder.Entity("TravelAdvisor.Core.Entities.Booking", b =>
+                {
+                    b.Navigation("Payments");
+
+                    b.Navigation("Review");
+                });
+
             modelBuilder.Entity("TravelAdvisor.Core.Entities.Destination", b =>
                 {
+                    b.Navigation("Itineraries");
+
+                    b.Navigation("Transportation");
+
                     b.Navigation("TravelPackages");
                 });
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.Hotel", b =>
                 {
+                    b.Navigation("Reviews");
+
                     b.Navigation("Rooms");
                 });
 
@@ -779,12 +1553,20 @@ namespace TravelAdvisor.Infrastructure.Migrations
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.Room", b =>
                 {
+                    b.Navigation("Availability");
+
                     b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("TravelAdvisor.Core.Entities.TravelPackage", b =>
                 {
+                    b.Navigation("Activities");
+
                     b.Navigation("Bookings");
+
+                    b.Navigation("Reviews");
+
+                    b.Navigation("Transportation");
                 });
 #pragma warning restore 612, 618
         }

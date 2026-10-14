@@ -1,0 +1,47 @@
+@using TravelAdvisor.Core.DTOs.Bookings
+@using TravelAdvisor.Core.Enums
+@model BookingDto
+@{
+    var controller = (string)ViewData["StatusController"]!;
+    var canComplete = DateTime.UtcNow.Date >= Model.CheckIn.Date;
+}
+
+@if (Model.Status == BookingStatus.Pending)
+{
+    <form asp-controller="@controller" asp-action="UpdateBookingStatus" method="post" class="d-inline">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        <input type="hidden" name="status" value="@((int)BookingStatus.Confirmed)" />
+        <button class="btn btn-sm btn-success">Confirm</button>
+    </form>
+    <form asp-controller="@controller" asp-action="UpdateBookingStatus" method="post" class="d-inline">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        <input type="hidden" name="status" value="@((int)BookingStatus.Cancelled)" />
+        <button class="btn btn-sm btn-outline-danger">Cancel</button>
+    </form>
+}
+else if (Model.Status == BookingStatus.Confirmed)
+{
+    @if (canComplete)
+    {
+        <form asp-controller="@controller" asp-action="UpdateBookingStatus" method="post" class="d-inline">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <input type="hidden" name="status" value="@((int)BookingStatus.Completed)" />
+            <button class="btn btn-sm btn-primary">Complete</button>
+        </form>
+    }
+    else
+    {
+        <span class="d-inline-block" tabindex="0" title="Can be completed from @Model.CheckIn.ToString("yyyy-MM-dd")">
+            <button type="button" class="btn btn-sm btn-primary" disabled>Complete</button>
+        </span>
+    }
+    <form asp-controller="@controller" asp-action="UpdateBookingStatus" method="post" class="d-inline">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        <input type="hidden" name="status" value="@((int)BookingStatus.Cancelled)" />
+        <button class="btn btn-sm btn-outline-danger">Cancel</button>
+    </form>
+}

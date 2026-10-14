@@ -1,0 +1,14 @@
+{
+  "name": "travel-advisor-postman",
+  "private": true,
+  "description": "Postman collection for the Travel Advisor API, run with Newman.",
+  "type": "module",
+  "scripts": {
+    "build": "node build-collection.mjs",
+    "test": "node node_modules/newman/bin/newman.js run TravelAdvisor.postman_collection.json -e local.postman_environment.json --reporters cli,junit,htmlextra --reporter-junit-export reports/newman-junit.xml --reporter-htmlextra-export reports/newman-report.html --reporter-htmlextra-skipSensitiveData"
+  },
+  "devDependencies": {
+    "newman": "^6.2.2",
+    "newman-reporter-htmlextra": "^1.23.1"
+  }
+}

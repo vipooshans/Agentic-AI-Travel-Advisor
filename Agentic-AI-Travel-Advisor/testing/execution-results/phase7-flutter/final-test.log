@@ -1,0 +1,69 @@
+﻿# Command: flutter test --reporter expanded (run 2026-10-01 18:51:10 +05:30)
+00:00 +0: loading T:/mobile-app/test/api_service_test.dart
+00:00 +0: T:/mobile-app/test/auth_test.dart: AuthService role gating a traveler signs in and the session is stored
+00:00 +1: T:/mobile-app/test/auth_test.dart: AuthService role gating a traveler signs in and the session is stored
+00:00 +2: T:/mobile-app/test/auth_test.dart: AuthService role gating a traveler signs in and the session is stored
+00:00 +3: T:/mobile-app/test/api_service_test.dart: ApiService.parseErrorMessage prefers the ProblemDetails detail field
+00:00 +4: T:/mobile-app/test/api_service_test.dart: ApiService.parseErrorMessage lists every field error when there is more than one
+00:00 +5: T:/mobile-app/test/auth_test.dart: AuthService role gating HOTEL_OWNER is refused and nothing is stored
+00:00 +6: T:/mobile-app/test/auth_test.dart: AuthService role gating HOTEL_OWNER is refused and nothing is stored
+00:00 +7: T:/mobile-app/test/api_service_test.dart: ApiService.parseErrorMessage uses a friendly message for an empty 403 body
+00:00 +8: T:/mobile-app/test/api_service_test.dart: ApiService.parseErrorMessage uses a friendly message for a non-JSON server error
+00:00 +9: T:/mobile-app/test/auth_test.dart: AuthService role gating TRAVEL_AGENT is refused and nothing is stored
+00:00 +10: T:/mobile-app/test/api_service_test.dart: ApiService requests sends the bearer token once set
+00:00 +11: T:/mobile-app/test/api_service_test.dart: ApiService requests sends the bearer token once set
+00:00 +12: T:/mobile-app/test/auth_test.dart: AuthService role gating a stored staff session is discarded on restore
+00:00 +13: T:/mobile-app/test/api_service_test.dart: ApiService requests reports a 401 on an authenticated request as an expired session
+00:00 +14: T:/mobile-app/test/auth_test.dart: AuthService role gating a valid traveler session is restored
+00:00 +15: T:/mobile-app/test/api_service_test.dart: ApiService requests does not treat a failed sign-in or an anonymous 401 as an expired session
+00:00 +16: T:/mobile-app/test/chat_provider_test.dart: ChatProvider booking flow a booking is only created when the user confirms the latest proposal
+00:00 +17: T:/mobile-app/test/chat_provider_test.dart: ChatProvider booking flow a booking is only created when the user confirms the latest proposal
+00:00 +18: T:/mobile-app/test/chat_provider_test.dart: ChatProvider booking flow a booking is only created when the user confirms the latest proposal
+00:00 +19: T:/mobile-app/test/chat_provider_test.dart: ChatProvider booking flow a booking is only created when the user confirms the latest proposal
+00:00 +20: T:/mobile-app/test/chat_provider_test.dart: ChatProvider booking flow a booking is only created when the user confirms the latest proposal
+00:00 +21: T:/mobile-app/test/chat_provider_test.dart: ChatProvider booking flow a booking is only created when the user confirms the latest proposal
+00:00 +22: T:/mobile-app/test/chat_provider_test.dart: ChatProvider booking flow a booking is only created when the user confirms the latest proposal
+00:00 +23: T:/mobile-app/test/chat_provider_test.dart: ChatProvider booking flow a booking is only created when the user confirms the latest proposal
+00:00 +24: T:/mobile-app/test/api_service_test.dart: ApiService requests allows a longer timeout per request
+00:00 +25: T:/mobile-app/test/api_service_test.dart: ApiService requests allows a longer timeout per request
+00:00 +26: T:/mobile-app/test/api_service_test.dart: ApiService requests allows a longer timeout per request
+00:00 +27: T:/mobile-app/test/api_service_test.dart: ApiService requests allows a longer timeout per request
+00:00 +28: T:/mobile-app/test/api_service_test.dart: ApiService requests allows a longer timeout per request
+00:00 +29: T:/mobile-app/test/models_test.dart: formatMoney formats like the web app
+00:00 +30: T:/mobile-app/test/models_test.dart: formatMoney formats like the web app
+00:00 +31: T:/mobile-app/test/models_test.dart: formatMoney formats like the web app
+00:00 +32: T:/mobile-app/test/models_test.dart: TravelPlan parses the structured plan returned by the assistant
+00:00 +33: T:/mobile-app/test/models_test.dart: TravelPlan maps to an itinerary request the same way as the web app
+00:00 +34: T:/mobile-app/test/models_test.dart: TravelPlan tolerates missing optional sections
+00:00 +35: T:/mobile-app/test/models_test.dart: BookingProposal expires at the time given by the backend
+00:00 +36: T:/mobile-app/test/models_test.dart: ChatMessage reads a booking_created reply with the backend booking
+00:00 +37: T:/mobile-app/test/models_test.dart: ChatMessage reads stored history with a plan and a proposal
+00:00 +38: T:/mobile-app/test/models_test.dart: catalog models booking reads guests and status constants
+00:00 +39: T:/mobile-app/test/models_test.dart: catalog models hotel reads rating and starting price
+00:00 +40: T:/mobile-app/test/models_test.dart: catalog models transport mode numbers map to readable labels
+00:00 +41: T:/mobile-app/test/models_test.dart: Validators email
+00:00 +42: T:/mobile-app/test/models_test.dart: Validators new password follows the API policy
+00:00 +43: T:/mobile-app/test/models_test.dart: Validators guests
+00:00 +44: T:/mobile-app/test/models_test.dart: Validators lengths and prices
+00:00 +45: T:/mobile-app/test/widget_test.dart: empty state shows title and action
+00:01 +46: T:/mobile-app/test/screens_test.dart: Assistant UI the plan card shows costs against budget, stay, package, activities, transport and days
+00:01 +47: T:/mobile-app/test/widget_test.dart: login requires email and password
+00:01 +48: T:/mobile-app/test/widget_test.dart: login requires email and password
+00:01 +49: T:/mobile-app/test/widget_test.dart: login requires email and password
+00:01 +50: T:/mobile-app/test/screens_test.dart: Assistant UI a created booking shows the status returned by the backend
+00:01 +51: T:/mobile-app/test/screens_test.dart: Assistant UI a refusal shows no plan or booking controls
+00:01 +52: T:/mobile-app/test/screens_test.dart: Sign-in and registration login rejects a malformed email before calling the API
+00:01 +53: T:/mobile-app/test/screens_test.dart: Sign-in and registration a staff account sees the travelers-only message
+00:02 +54: T:/mobile-app/test/screens_test.dart: Sign-in and registration after a session expires the sign-in screen says why
+00:02 +55: T:/mobile-app/test/screens_test.dart: Sign-in and registration registration enforces the password policy and confirmation
+00:02 +56: T:/mobile-app/test/screens_test.dart: Reviews the review sheet requires a rating and submits it with the comment
+00:02 +57: T:/mobile-app/test/screens_test.dart: Reviews visible reviews are listed with the average rating
+00:02 +58: T:/mobile-app/test/screens_test.dart: Reviews an unreviewed listing says so
+00:02 +59: T:/mobile-app/test/screens_test.dart: Bookings a room is booked only after a successful availability check
+00:03 +60: T:/mobile-app/test/screens_test.dart: Bookings changing the inputs after a quote requires a new check
+00:03 +61: T:/mobile-app/test/screens_test.dart: Bookings an unavailable room shows the server reason and cannot be booked
+00:03 +62: T:/mobile-app/test/screens_test.dart: Bookings completed bookings can be reviewed once; open bookings can be cancelled
+00:03 +63: T:/mobile-app/test/screens_test.dart: Bookings cancelling refreshes the list with the status from the API
+00:03 +64: T:/mobile-app/test/screens_test.dart: Search keywords and a maximum price are sent to the API
+00:03 +65: All tests passed!
+# exit code: 0

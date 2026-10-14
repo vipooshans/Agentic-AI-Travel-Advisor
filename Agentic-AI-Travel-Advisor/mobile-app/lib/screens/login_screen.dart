@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../utils/validators.dart';
 import '../widgets/auth_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -62,6 +63,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
+                  if (auth.notice != null && auth.error == null) ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        auth.notice!,
+                        style: TextStyle(color: Colors.blue.shade900),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                   if (auth.error != null) ...[
                     Container(
                       padding: const EdgeInsets.all(12),
@@ -80,16 +95,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailController,
                     label: 'Email',
                     keyboardType: TextInputType.emailAddress,
-                    validator: (v) =>
-                        v == null || v.isEmpty ? 'Email is required' : null,
+                    validator: Validators.email,
                   ),
                   const SizedBox(height: 16),
                   AuthTextField(
                     controller: _passwordController,
                     label: 'Password',
                     obscureText: true,
-                    validator: (v) =>
-                        v == null || v.isEmpty ? 'Password is required' : null,
+                    validator: Validators.loginPassword,
                   ),
                   const SizedBox(height: 24),
                   FilledButton(

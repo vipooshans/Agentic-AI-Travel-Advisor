@@ -1,0 +1,41 @@
+﻿# Command: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/traveler_journey_test.dart -d web-server --browser-name=chrome --profile --web-port 4173 --dart-define=API_BASE_URL=http://localhost:5080 (run 2026-10-01 22:25:03 +05:30; API on :5080, Development)
+Resolving dependencies...
+Downloading packages...
+  code_assets 1.2.1 (2.1.0 available)
+  flutter_lints 3.0.2 (6.0.0 available)
+  flutter_secure_storage 9.2.4 (11.2.0 available)
+  flutter_secure_storage_linux 1.2.3 (3.0.3 available)
+  flutter_secure_storage_macos 3.1.3 (4.0.0 available)
+  flutter_secure_storage_platform_interface 1.1.2 (2.1.1 available)
+  flutter_secure_storage_web 1.2.1 (2.1.1 available)
+  flutter_secure_storage_windows 3.1.2 (4.2.2 available)
+  go_router 14.8.1 (18.0.2 available)
+  hooks 2.0.2 (2.2.0 available)
+  js 0.6.7 (0.7.2 available)
+  lints 3.0.0 (6.1.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.3 (1.19.0 available)
+  objective_c 9.5.0 (9.6.2 available)
+  record_use 0.6.0 (1.1.1 available)
+  test_api 0.7.12 (0.7.14 available)
+  vector_math 2.4.0 (2.4.3 available)
+  win32 5.15.0 (6.4.0 available)
+Got dependencies!
+19 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Launching integration_test/traveler_journey_test.dart on Web Server in profile mode...
+flutter : The --pwa-strategy option is deprecated and will be removed in a future Flutter release.
+At C:\Users\LOQ\AppData\Local\Temp\ps-script-59b27548-52a8-46c3-8bd0-a47c1462a176.ps1:89 char:505
++ ...  utf8 $log; flutter drive --driver=test_driver/integration_test.dart  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (The --pwa-strat...lutter release.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+For more information, see: https://github.com/flutter/flutter/issues/156910
+Compiling integration_test/traveler_journey_test.dart for the Web...        13.6s
+√ Built build\web
+integration_test/traveler_journey_test.dart is being served at http://localhost:4173
+The web-server device requires the Dart Debug Chrome extension for debugging. Consider using the Chrome or Edge devices for an improved development workflow.
+All tests passed.
+Application finished.
+EXIT=0

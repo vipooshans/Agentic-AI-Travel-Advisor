@@ -1,82 +1,41 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using TravelAdvisor.Core.DTOs.Destinations;
-using TravelAdvisor.Infrastructure.Data;
+using TravelAdvisor.Core.Interfaces.Services;
+using TravelAdvisor.Infrastructure;
 
 namespace TravelAdvisor.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class DestinationsController : ControllerBase
+public class DestinationsController(IDestinationService destinationService) : ControllerBase
 {
-    private readonly AppDbContext _context;
-
-    public DestinationsController(AppDbContext context)
-    {
-        _context = context;
-    }
-
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<DestinationDto>>> GetAll(
-        [FromQuery] string? search,
-        [FromQuery] string? country)
-    {
-        var query = _context.Destinations
-            .AsNoTracking()
-            .AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            var term = search.Trim().ToLower();
-            query = query.Where(d =>
-                d.Name.ToLower().Contains(term) ||
-                d.Country.ToLower().Contains(term));
-        }
-
-        if (!string.IsNullOrWhiteSpace(country))
-        {
-            var countryName = country.Trim().ToLower();
-            query = query.Where(d => d.Country.ToLower() == countryName);
-        }
-
-        var destinations = await query
-            .OrderBy(d => d.Name)
-            .Select(d => new DestinationDto
-            {
-                Id = d.Id,
-                Name = d.Name,
-                Country = d.Country,
-                Description = d.Description,
-                ImageUrl = d.ImageUrl,
-                PackageCount = d.TravelPackages.Count
-            })
-            .ToListAsync();
-
-        return Ok(destinations);
-    }
+    public async Task<ActionResult<List<DestinationDto>>> GetAll([FromQuery] string? q, CancellationToken cancellationToken) =>
+        Ok(await destinationService.ListAsync(q, cancellationToken));
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<DestinationDto>> GetById(int id)
+    public async Task<ActionResult<DestinationDetailDto>> GetById(int id, CancellationToken cancellationToken) =>
+        Ok(await destinationService.GetAsync(id, cancellationToken));
+
+    [Authorize(Policy = AuthPolicies.RequireAdmin)]
+    [HttpPost]
+    public async Task<ActionResult<DestinationDto>> Create([FromBody] SaveDestinationRequest request, CancellationToken cancellationToken)
     {
-        var destination = await _context.Destinations
-            .AsNoTracking()
-            .Where(d => d.Id == id)
-            .Select(d => new DestinationDto
-            {
-                Id = d.Id,
-                Name = d.Name,
-                Country = d.Country,
-                Description = d.Description,
-                ImageUrl = d.ImageUrl,
-                PackageCount = d.TravelPackages.Count
-            })
-            .FirstOrDefaultAsync();
+        var destination = await destinationService.CreateAsync(request, cancellationToken);
+        return CreatedAtAction(nameof(GetById), new { id = destination.Id }, destination);
+    }
 
-        if (destination is null)
-        {
-            return NotFound(new { message = "Destination not found." });
-        }
+    [Authorize(Policy = AuthPolicies.RequireAdmin)]
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<DestinationDto>> Update(int id, [FromBody] SaveDestinationRequest request, CancellationToken cancellationToken) =>
+        Ok(await destinationService.UpdateAsync(id, request, cancellationToken));
 
-        return Ok(destination);
+    [Authorize(Policy = AuthPolicies.RequireAdmin)]
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+    {
+        await destinationService.DeleteAsync(id, cancellationToken);
+        return NoContent();
     }
 }

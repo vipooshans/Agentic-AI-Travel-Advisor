@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Project facts — Travel Advisor</title>
+<style>
+  @page { size: A4; margin: 14mm 14mm 16mm; }
+  body { font-family: "Segoe UI", sans-serif; color: #1c1915; font-size: 11.5px; line-height: 1.45; }
+  h1 { font-family: Georgia, serif; font-weight: 500; font-size: 26px; margin: 0 0 4px; }
+  h2 { font-family: Georgia, serif; font-weight: 500; font-size: 16px; margin: 16px 0 6px; page-break-after: avoid; }
+  h3 { font-size: 12.5px; margin: 10px 0 4px; page-break-after: avoid; }
+  p, li { margin: 0 0 4px; }
+  ul { margin: 4px 0 8px 18px; padding: 0; }
+  .kicker { letter-spacing: .14em; text-transform: uppercase; font-size: 10px; color: #8a7340; }
+  .answer { font-weight: 650; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 10px; page-break-inside: avoid; }
+  th, td { border: 1px solid #e4ddd2; text-align: left; padding: 4px 6px; vertical-align: top; }
+  th { background: #f7f3ec; font-weight: 600; }
+  code { font-family: Consolas, monospace; font-size: 10.5px; }
+  .note { color: #5c564e; }
+</style>
+</head>
+<body>
+<p class="kicker">Agentic AI Travel Advisor</p>
+<h1>Actual project details</h1>
+<p class="note">Taken from the repository as it is. Nothing below is a planned feature.</p>
+
+<h2>1. Web application</h2>
+<p class="answer">C. Both React and ASP.NET MVC are implemented.</p>
+<ul>
+  <li>React: <code>web-react</code>. React <strong>19.3</strong> (<code>react ^19.3.0</code>), Vite, React Router 7.</li>
+  <li>State management: <strong>React Context</strong> (<code>AuthProvider</code> / <code>AuthContext</code>) plus local component state. Not Redux, Zustand, or a global store.</li>
+  <li>ASP.NET MVC staff portal: <code>web-app</code>, also implemented. It is a second UI for admin, owner, and agent. It does not replace React.</li>
+  <li>React URL if deployed: <strong>Not deployed.</strong> Local only: <code>http://localhost:5173</code> (<code>npm run dev</code>), preview <code>http://localhost:4173</code>.</li>
+</ul>
+<p>Main React pages:</p>
+<ul>
+  <li>Public: Home, Login, Register, Hotel detail, Package detail, Forbidden, Not found.</li>
+  <li>Traveler: Assistant, My bookings, Itineraries, Profile.</li>
+  <li>Hotel owner: Dashboard, Hotels, Rooms, Bookings.</li>
+  <li>Travel agent: Dashboard, Packages, Package activities, Transport, Bookings.</li>
+  <li>Admin: Dashboard, Approvals, Users, Destinations, Bookings, Reviews, Settings.</li>
+</ul>
+
+<h2>2. AI agents</h2>
+<p>Four specialised agents exist. The fourth is already <code>BookingAgent</code>, not a renamed prompt.</p>
+<ul>
+  <li><strong>Agent 1 — TravelPlanningAgent.</strong> Reads the chat and saved preferences. Extracts destination, dates, duration, travelers, budget (LKR), interests, accommodation and transport. Asks a clarifying question if destination or budget is missing.</li>
+  <li><strong>Agent 2 — RecommendationAgent.</strong> Searches the approved catalog, picks a budget-compliant hotel/room/package/transport combination, and checks live availability.</li>
+  <li><strong>Agent 3 — ItineraryAgent.</strong> Turns that selection into the day-by-day plan, cost breakdown, and reply. Validates the plan against <code>TravelPlanSchema</code>.</li>
+  <li><strong>Agent 4 — BookingAgent.</strong> Builds a priced booking proposal. Creates a booking only after the traveler explicitly confirms. The booking stays Pending until the provider confirms it.</li>
+</ul>
+<p class="note">Orchestrator: <code>AgentOrchestrator</code>. Tools: search destinations, hotels, packages, activities, transport, check availability, get preferences, generate itinerary, create booking. OpenAI-compatible tool calling when <code>Ai:ApiKey</code> is set; otherwise the same agents run deterministically.</p>
+
+<h2>3. Human approval</h2>
+<p class="answer">YES.</p>
+<p>AI plan is validated, then two people must agree before a stay is confirmed:</p>
+<ul>
+  <li><strong>Traveler</strong> must confirm the proposal (reply “confirm”, or the confirm id). Nothing is booked before that. The proposal expires (default 15 minutes).</li>
+  <li><strong>Hotel owner</strong> confirms a room booking. <strong>Travel agent</strong> confirms a package booking. An <strong>administrator</strong> can also change booking status.</li>
+</ul>
+<p>Separate from the chat: new and edited hotels and packages stay Pending until an <strong>administrator</strong> approves them. Unapproved listings are hidden from search, the AI tools, and booking.</p>
+<p class="note">There is no extra “admin approves the AI text” step. Approval is the traveler’s confirmation of the proposal, then the provider’s confirmation of the Pending booking.</p>
+
+<h2>4. AI workflow state</h2>
+<p class="answer">PARTIALLY.</p>
+<p>Saved in PostgreSQL:</p>
+<ul>
+  <li><code>AIConversations.Id</code> (conversation id, not a separate workflow-run id)</li>
+  <li>User message (the objective) and assistant reply, inside <code>Messages</code> JSON</li>
+  <li>Plan, status, pending booking proposal, and created booking id, on that JSON message</li>
+  <li><code>AIRecommendations</code>: item, estimated cost, score, reason, conversation id</li>
+  <li>A saved itinerary can store budget, travelers, and the source conversation id</li>
+</ul>
+<p>Not stored as their own columns or tables: agent step log, tool-call results, schema validation result, and errors. Those are returned on the live <code>ChatResponse</code> (<code>agents</code>, <code>toolCalls</code>, <code>status</code>) and are not copied into <code>ChatMessageDto</code>.</p>
+
+<h2>5. Third-party API / service</h2>
+<ul>
+  <li><strong>Third-party service:</strong> OpenAI-compatible chat API. Default <code>https://api.openai.com/v1</code>, model <code>gpt-4o-mini</code>. <code>Ai:BaseUrl</code> can point at another compatible host.</li>
+  <li><strong>Purpose:</strong> LLM tool-calling for the travel assistant. If no API key is set, or the provider fails, the deterministic agents still produce a plan from the catalog.</li>
+  <li><strong>Where integrated:</strong> Backend (<code>OpenAiCompatClient</code> in Infrastructure). React and Flutter only call <code>POST /api/ai/chat</code>.</li>
+</ul>
+<p class="note">Unsplash URLs are static image links in seed data, not an API client. Card payment is a simulated gateway inside the API (test card <code>4000 0000 0000 0002</code> is declined). Card numbers are not stored. There is no Google Maps, weather, email, SMS, or cloud-storage client.</p>
+
+<h2>6. Flutter device feature</h2>
+<p><strong>Date and time selection.</strong> The booking screen uses Flutter <code>showDatePicker</code> for check-in and check-out (<code>create_booking_screen.dart</code>).</p>
+<p class="note">GPS, maps, image picker, QR, push notifications, and file upload are not in the Flutter code.</p>
+<p>Flutter state: the <code>provider</code> package (<code>AuthProvider</code>, <code>ChatProvider</code>, both <code>ChangeNotifier</code>).</p>
+
+<h2>7. Database</h2>
+<table>
+  <tr><th>Item</th><th>Present</th></tr>
+  <tr><td>ER diagram file</td><td>No image or diagram file. Schema is written in <code>documentation/DATABASE.md</code> and in the EF model.</td></tr>
+  <tr><td>EF Core migrations</td><td>Yes. Six: InitialCreate, AddPackageActivity, AddItineraryPlanFields, AddApprovalStatus, AddHotelAndPackageImages, AddDomainModelV2.</td></tr>
+  <tr><td>Seed data</td><td>Yes. <code>DbSeeder</code>: roles, system settings, optional admin, and demo catalog when demo seeding is on.</td></tr>
+  <tr><td>Indexes</td><td>Yes. Examples: hotel <code>ApprovalStatus</code>; package <code>(DestinationId, ApprovalStatus)</code>; unique <code>(Name, Country)</code> on destinations; unique <code>(HotelId, Name)</code> on rooms.</td></tr>
+  <tr><td>Constraints</td><td>Yes. CHECK constraints (price, capacity, dates, rating), foreign keys, unique indexes, and <code>EX_Bookings_Room_NoOverlap</code> (GiST exclusion so one room cannot be double-booked).</td></tr>
+  <tr><td>Transactions</td><td>Yes. <code>UnitOfWork.ExecuteInTransactionAsync</code>. Booking creation locks the room or package row inside a transaction.</td></tr>
+  <tr><td>CreatedAt / UpdatedAt</td><td>Yes, via <code>IAuditable</code> and <code>AuditInterceptor</code>. Not on Identity’s extra tables, <code>Roles</code>, or <code>ItineraryItems</code>.</td></tr>
+</table>
+<h3>Relationships (from the EF model and DATABASE.md)</h3>
+<ul>
+  <li>User → Role. User 1:1 UserProfile. User 1:1 TravelPreferences.</li>
+  <li>Hotel owner (user) 1:N Hotels. Hotel 1:N Rooms. Room 1:N RoomAvailability.</li>
+  <li>Destination 1:N TravelPackages. Travel agent (user) creates packages. Package 1:N PackageActivities.</li>
+  <li>Transportation belongs to an agent, and may point at a package and a destination.</li>
+  <li>Booking belongs to a user and to exactly one of Room or TravelPackage. Booking 1:N Payments. Booking 1:1 Review (completed bookings).</li>
+  <li>Review points at a hotel or a package.</li>
+  <li>User 1:N AIConversations. Conversation 1:N AIRecommendations (hotel, room, package, transport, or destination). User 1:N Itineraries. Itinerary 1:N ItineraryItems. Itinerary may point at a destination and a conversation.</li>
+</ul>
+
+<h2>8. Testing</h2>
+<ul>
+  <li><strong>Backend unit tests:</strong> Yes. <code>tests/TravelAdvisor.UnitTests</code> — about 200 <code>[Fact]</code>/<code>[Theory]</code> methods (booking, catalog, auth, users, AI orchestrator, schema, safety, tools, parser, budget).</li>
+  <li><strong>API integration tests:</strong> Yes. <code>tests/TravelAdvisor.Api.Tests</code> — about 75 test methods (RBAC, bookings, ownership, security, AI). Also a Postman collection run with Newman.</li>
+  <li><strong>PostgreSQL tests:</strong> Yes. <code>DatabaseIntegrityTests</code> uses Testcontainers PostgreSQL (migrations, foreign keys, CHECK, unique, transactions, exclusion constraint).</li>
+  <li><strong>React tests:</strong> Yes. 17 Vitest files (pages, auth, booking panel, API client). 4 Playwright specs: <code>auth</code>, <code>listings</code>, <code>booking</code>, <code>ai-journey</code>.</li>
+  <li><strong>Flutter tests:</strong> Yes. Widget, screen, auth, models, API, chat provider, layout, and app-flow tests, plus <code>integration_test/traveler_journey_test.dart</code> and a live API test file.</li>
+  <li><strong>E2E test:</strong> Yes. Playwright traveler flows, and a recorded full traveler journey checked in PostgreSQL (<code>testing/execution-results</code>).</li>
+  <li><strong>Agentic AI tests:</strong> Yes. Orchestrator, schema, safety, tool registry, <code>AiAgentTests</code>, and <code>AiEvaluationTests</code> (scripted cases plus a live-LLM report under <code>testing/execution-results/phase8-tests/ai-evaluation</code>).</li>
+  <li><strong>Performance test:</strong> Yes. k6 scripts for catalog search, login, booking, and AI chat (<code>testing/performance/k6</code>), with result logs in <code>testing/execution-results/phase9-nfr</code>. OWASP ZAP scans also exist.</li>
+</ul>
+
+<h2>9. GitHub / CI</h2>
+<ul>
+  <li><strong>GitHub repository URL:</strong> https://github.com/vipooshans/Agentic-AI-Travel-Advisor.git</li>
+  <li><strong>GitHub Actions implemented:</strong> NO. There is no <code>.github/workflows</code> file in the repo.</li>
+  <li><strong>Branches used:</strong> YES. <code>main</code>, <code>dev</code>, <code>IT24102892</code>, <code>ajay</code>.</li>
+  <li><strong>Pull requests:</strong> Not verified from this machine (<code>gh</code> is not installed). Do not claim PRs without checking GitHub.</li>
+</ul>
+<p>Recent commits on <code>dev</code> (newest first):</p>
+<ul>
+  <li><code>c4c35ea</code> chore: remove peer dependency flag from undici-types in package-lock.json</li>
+  <li><code>30c5c9b</code> docs: enhance testing documentation for live-LLM evaluation</li>
+  <li><code>b70eb91</code> docs: rewrite README, API and architecture docs</li>
+  <li><code>a0be224</code> test: add the test-case catalogue and final regression runs</li>
+  <li><code>5cbdf5e</code> test(security): OWASP ZAP baseline and OpenAPI scans</li>
+  <li><code>d5b1855</code> test(perf): k6 load tests for search, login, booking and AI chat</li>
+  <li><code>e3369cc</code> test(e2e): full traveler journey verified in PostgreSQL</li>
+</ul>
+<p class="note">No GitHub Actions success screenshot exists, because Actions is not set up.</p>
+
+<h2>10. Deployment</h2>
+<ul>
+  <li><strong>React URL:</strong> Not deployed. Local <code>http://localhost:5173</code>.</li>
+  <li><strong>API URL:</strong> Not deployed. Local <code>http://localhost:5000</code> (launch profile) or <code>http://localhost:5080</code> (README / React proxy).</li>
+  <li><strong>Swagger URL:</strong> Not deployed. Local <code>http://localhost:5000/swagger</code> in Development.</li>
+  <li><strong>PostgreSQL:</strong> Not a hosted database. Docker Compose maps it to <code>localhost:5433</code>. Local dev docs also use port 5432.</li>
+  <li><strong>Flutter APK:</strong> Not in the repository. No <code>.apk</code> file.</li>
+  <li><strong>AI service/setup:</strong> Optional <code>Ai:ApiKey</code>, <code>Ai:BaseUrl</code> (default OpenAI), <code>Ai:Model</code> (<code>gpt-4o-mini</code>). Docker uses <code>AI_API_KEY</code>. Without a key the deterministic planner still runs.</li>
+</ul>
+
+<h2>11. Four students</h2>
+<p class="answer">Not recorded in the repository.</p>
+<p>The only identity evidence in git is:</p>
+<ul>
+  <li>GitHub account: <code>vipooshans</code></li>
+  <li>Branch name: <code>IT24102892</code> (looks like a student ID; no name is stored with it)</li>
+  <li>Branch name: <code>ajay</code> (no student ID stored with it)</li>
+</ul>
+<p>Student 1–4 names, IDs, and owned components are not in the code, README, or commit authors (local history shows only <code>vipooshans</code>). Do not fill the four names from guesswork.</p>
+
+<h2>12. ADRs</h2>
+<p class="answer">NO. There is no ADR folder.</p>
+<ul>
+  <li>React state management: no ADR. Actual choice: React Context.</li>
+  <li>Flutter state management: no ADR. Actual choice: <code>provider</code>.</li>
+  <li>Agentic AI orchestration: no ADR. Actual choice: custom <code>AgentOrchestrator</code> plus four agents and a tool registry. Not Semantic Kernel, LangGraph, or AutoGen.</li>
+  <li>Database / workflow state: no ADR. Actual choice: PostgreSQL 16, EF Core 8, conversation JSON plus <code>AIRecommendations</code>. Not a full workflow-state table.</li>
+  <li>Cloud / deployment: no ADR. Actual choice: Docker Compose for API, MVC portal, and PostgreSQL. React, Flutter, and a public host are not deployed.</li>
+</ul>
+</body>
+</html>

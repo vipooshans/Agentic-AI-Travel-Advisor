@@ -1,23 +1,36 @@
-# .NET build output
 **/bin/
 **/obj/
-.vs/
+**/.vs/
 *.user
-*.suo
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
 
-# Flutter/Dart
+# Flutter
 mobile-app/.dart_tool/
+mobile-app/**/.dart_tool/
 mobile-app/build/
 mobile-app/.flutter-plugins
 mobile-app/.flutter-plugins-dependencies
+mobile-app/*.log
+mobile-app/android/local.properties
+mobile-app/coverage/
+*.apk
+*.aab
+*.jks
+key.properties
 
-# IDE and OS
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
+# Node / React
+web-react/node_modules/
+web-react/dist/
+web-react/coverage/
+web-react/playwright-report/
+web-react/test-results/
+testing/**/node_modules/
 
-# Local environment / secrets
-.env
-.env.*
-**/appsettings.Local.json
+# Test output (raw); curated evidence lives under testing/
+TestResults/
+
+# Automation plan that the ZAP baseline script regenerates in its work folder on every run
+testing/security/zap/zap.yaml

@@ -10,5 +10,9 @@ public class ItineraryItem
     public TimeSpan? StartTime { get; set; }
     public int SortOrder { get; set; }
 
+    /// <summary>hotel, activity, transport, meal or free.</summary>
+    public string? ItemType { get; set; }
+    public decimal? EstimatedCost { get; set; }
+
     public Itinerary Itinerary { get; set; } = null!;
 }

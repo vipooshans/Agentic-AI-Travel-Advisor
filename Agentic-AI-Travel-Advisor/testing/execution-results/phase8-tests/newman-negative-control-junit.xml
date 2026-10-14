@@ -1,0 +1,871 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Travel Advisor API" tests="79" time="2.261">
+  <testsuite name="01 Health and public catalog / Health check" id="35bc1741-0d7f-4976-a4bf-d2be6980252e" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.079">
+    <testcase name="no secrets or stack traces in the response" time="0.079" classname="01HealthAndPublicCatalogHealthCheck"/>
+    <testcase name="responds within 5 s" time="0.079" classname="01HealthAndPublicCatalogHealthCheck"/>
+    <testcase name="status is 200" time="0.079" classname="01HealthAndPublicCatalogHealthCheck"/>
+    <testcase name="API and database are healthy" time="0.079" classname="01HealthAndPublicCatalogHealthCheck"/>
+  </testsuite>
+  <testsuite name="01 Health and public catalog / Public settings" id="759700c1-29b0-4651-9483-b8db5a6a59c2" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.005">
+    <testcase name="no secrets or stack traces in the response" time="0.005" classname="01HealthAndPublicCatalogPublicSettings"/>
+    <testcase name="responds within 5 s" time="0.005" classname="01HealthAndPublicCatalogPublicSettings"/>
+    <testcase name="status is 200" time="0.005" classname="01HealthAndPublicCatalogPublicSettings"/>
+    <testcase name="exposes only public settings" time="0.005" classname="01HealthAndPublicCatalogPublicSettings"/>
+  </testsuite>
+  <testsuite name="01 Health and public catalog / List destinations" id="0ebbf116-1480-4701-86b0-55e97051919a" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.004">
+    <testcase name="no secrets or stack traces in the response" time="0.004" classname="01HealthAndPublicCatalogListDestinations"/>
+    <testcase name="responds within 5 s" time="0.004" classname="01HealthAndPublicCatalogListDestinations"/>
+    <testcase name="status is 200" time="0.004" classname="01HealthAndPublicCatalogListDestinations"/>
+    <testcase name="includes Ella" time="0.004" classname="01HealthAndPublicCatalogListDestinations"/>
+  </testsuite>
+  <testsuite name="01 Health and public catalog / Get destination" id="8c010d74-d4b2-41bc-86fb-48144b83f7e8" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.003">
+    <testcase name="no secrets or stack traces in the response" time="0.003" classname="01HealthAndPublicCatalogGetDestination"/>
+    <testcase name="responds within 5 s" time="0.003" classname="01HealthAndPublicCatalogGetDestination"/>
+    <testcase name="status is 200" time="0.003" classname="01HealthAndPublicCatalogGetDestination"/>
+    <testcase name="returns the requested destination" time="0.003" classname="01HealthAndPublicCatalogGetDestination"/>
+  </testsuite>
+  <testsuite name="01 Health and public catalog / Unknown destination is 404" id="f5e93924-64a6-48a5-b0ea-72d7bc6704a1" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.006">
+    <testcase name="no secrets or stack traces in the response" time="0.006" classname="01HealthAndPublicCatalogUnknownDestinationIs404"/>
+    <testcase name="error body is ProblemDetails" time="0.006" classname="01HealthAndPublicCatalogUnknownDestinationIs404"/>
+    <testcase name="responds within 5 s" time="0.006" classname="01HealthAndPublicCatalogUnknownDestinationIs404"/>
+    <testcase name="status is 404" time="0.006" classname="01HealthAndPublicCatalogUnknownDestinationIs404"/>
+  </testsuite>
+  <testsuite name="01 Health and public catalog / Search hotels lists approved hotels only" id="a9bc1ed3-cd59-4977-b79c-74001ced42a2" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.010">
+    <testcase name="no secrets or stack traces in the response" time="0.010" classname="01HealthAndPublicCatalogSearchHotelsListsApprovedHotelsOnly"/>
+    <testcase name="responds within 5 s" time="0.010" classname="01HealthAndPublicCatalogSearchHotelsListsApprovedHotelsOnly"/>
+    <testcase name="status is 200" time="0.010" classname="01HealthAndPublicCatalogSearchHotelsListsApprovedHotelsOnly"/>
+    <testcase name="every hotel is approved" time="0.010" classname="01HealthAndPublicCatalogSearchHotelsListsApprovedHotelsOnly"/>
+  </testsuite>
+  <testsuite name="01 Health and public catalog / List packages" id="492b0715-98fd-4be6-8a20-b6415c0b025f" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.006">
+    <testcase name="no secrets or stack traces in the response" time="0.006" classname="01HealthAndPublicCatalogListPackages"/>
+    <testcase name="responds within 5 s" time="0.006" classname="01HealthAndPublicCatalogListPackages"/>
+    <testcase name="status is 200" time="0.006" classname="01HealthAndPublicCatalogListPackages"/>
+    <testcase name="returns an array of packages with prices" time="0.006" classname="01HealthAndPublicCatalogListPackages"/>
+  </testsuite>
+  <testsuite name="01 Health and public catalog / List transportation" id="af4902e8-1e81-4326-b845-aecb731a86e4" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.006">
+    <testcase name="no secrets or stack traces in the response" time="0.006" classname="01HealthAndPublicCatalogListTransportation"/>
+    <testcase name="responds within 5 s" time="0.006" classname="01HealthAndPublicCatalogListTransportation"/>
+    <testcase name="status is 200" time="0.006" classname="01HealthAndPublicCatalogListTransportation"/>
+    <testcase name="returns an array" time="0.006" classname="01HealthAndPublicCatalogListTransportation"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Register traveler" id="0a0628ee-ef17-45bb-9083-1ee93f24b765" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.065">
+    <testcase name="no secrets or stack traces in the response" time="0.065" classname="02AuthenticationRegisterTraveler"/>
+    <testcase name="responds within 5 s" time="0.065" classname="02AuthenticationRegisterTraveler"/>
+    <testcase name="status is 200" time="0.065" classname="02AuthenticationRegisterTraveler"/>
+    <testcase name="new account is a USER with a token" time="0.065" classname="02AuthenticationRegisterTraveler"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Register second traveler" id="8eeca0e2-0f81-4219-ad44-06c5221e795d" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.063">
+    <testcase name="no secrets or stack traces in the response" time="0.063" classname="02AuthenticationRegisterSecondTraveler"/>
+    <testcase name="responds within 5 s" time="0.063" classname="02AuthenticationRegisterSecondTraveler"/>
+    <testcase name="status is 200" time="0.063" classname="02AuthenticationRegisterSecondTraveler"/>
+    <testcase name="stores the second token" time="0.063" classname="02AuthenticationRegisterSecondTraveler"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Duplicate email is 409" id="4b3b26f3-21db-439b-8932-237bfb152b50" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="no secrets or stack traces in the response" time="0.008" classname="02AuthenticationDuplicateEmailIs409"/>
+    <testcase name="error body is ProblemDetails" time="0.008" classname="02AuthenticationDuplicateEmailIs409"/>
+    <testcase name="responds within 5 s" time="0.008" classname="02AuthenticationDuplicateEmailIs409"/>
+    <testcase name="status is 409" time="0.008" classname="02AuthenticationDuplicateEmailIs409"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Weak password is 400" id="374d3b4d-a9a2-4c55-bbdb-7c3be905b50b" timestamp="2026-10-01T15:33:58.152Z" tests="5" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="02AuthenticationWeakPasswordIs400"/>
+    <testcase name="error body is ProblemDetails" time="0.002" classname="02AuthenticationWeakPasswordIs400"/>
+    <testcase name="responds within 5 s" time="0.002" classname="02AuthenticationWeakPasswordIs400"/>
+    <testcase name="status is 400" time="0.002" classname="02AuthenticationWeakPasswordIs400"/>
+    <testcase name="names the password field" time="0.002" classname="02AuthenticationWeakPasswordIs400"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Registration cannot pick a role" id="b9d1ff88-8b7e-469d-80e8-f0ec992b4818" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="0" errors="0" time="0.059">
+    <testcase name="no secrets or stack traces in the response" time="0.059" classname="02AuthenticationRegistrationCannotPickARole"/>
+    <testcase name="responds within 5 s" time="0.059" classname="02AuthenticationRegistrationCannotPickARole"/>
+    <testcase name="role is ignored or rejected" time="0.059" classname="02AuthenticationRegistrationCannotPickARole"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Wrong password is 401" id="0b3ae5b0-1146-4ddf-b0d0-23142b790269" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.068">
+    <testcase name="no secrets or stack traces in the response" time="0.068" classname="02AuthenticationWrongPasswordIs401"/>
+    <testcase name="responds within 5 s" time="0.068" classname="02AuthenticationWrongPasswordIs401"/>
+    <testcase name="status is 401" time="0.068" classname="02AuthenticationWrongPasswordIs401"/>
+    <testcase name="does not return a token" time="0.068" classname="02AuthenticationWrongPasswordIs401"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Log in as owner" id="9302c452-87e1-4efe-9709-040cd15811b7" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="2" errors="0" time="0.059">
+    <testcase name="no secrets or stack traces in the response" time="0.059" classname="02AuthenticationLogInAsOwner"/>
+    <testcase name="responds within 5 s" time="0.059" classname="02AuthenticationLogInAsOwner"/>
+    <testcase name="status is 200" time="0.059" classname="02AuthenticationLogInAsOwner">
+      <failure type="AssertionFailure" message="expected response to have status code 200 but got 401">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 02 Authentication / Log in as owner.]]>
+        <![CDATA[Test description: status is 200.]]>
+        <![CDATA[Error message: expected response to have status code 200 but got 401.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 200 but got 401
+   at Object.eval sandbox-script.js:1:15).]]>
+      </failure>
+    </testcase>
+    <testcase name="returns a token for the owner" time="0.059" classname="02AuthenticationLogInAsOwner">
+      <failure type="AssertionFailure" message="expected undefined to be a string">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 02 Authentication / Log in as owner.]]>
+        <![CDATA[Test description: returns a token for the owner.]]>
+        <![CDATA[Error message: expected undefined to be a string.]]>
+        <![CDATA[Stacktrace: AssertionError: expected undefined to be a string
+   at Object.eval sandbox-script.js:2:15).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="02 Authentication / Log in as agent" id="859f8a1b-74f3-468a-a92d-8b084c933e6f" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.067">
+    <testcase name="no secrets or stack traces in the response" time="0.067" classname="02AuthenticationLogInAsAgent"/>
+    <testcase name="responds within 5 s" time="0.067" classname="02AuthenticationLogInAsAgent"/>
+    <testcase name="status is 200" time="0.067" classname="02AuthenticationLogInAsAgent"/>
+    <testcase name="returns a token for the agent" time="0.067" classname="02AuthenticationLogInAsAgent"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Log in as admin" id="1e4f54b3-5a8e-4eee-a508-a8de9c2db292" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.052">
+    <testcase name="no secrets or stack traces in the response" time="0.052" classname="02AuthenticationLogInAsAdmin"/>
+    <testcase name="responds within 5 s" time="0.052" classname="02AuthenticationLogInAsAdmin"/>
+    <testcase name="status is 200" time="0.052" classname="02AuthenticationLogInAsAdmin"/>
+    <testcase name="returns a token for the admin" time="0.052" classname="02AuthenticationLogInAsAdmin"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Current user" id="31e0c91c-4d85-4561-86d4-b43ac95a6158" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.005">
+    <testcase name="no secrets or stack traces in the response" time="0.005" classname="02AuthenticationCurrentUser"/>
+    <testcase name="responds within 5 s" time="0.005" classname="02AuthenticationCurrentUser"/>
+    <testcase name="status is 200" time="0.005" classname="02AuthenticationCurrentUser"/>
+    <testcase name="returns the signed-in traveler" time="0.005" classname="02AuthenticationCurrentUser"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Tampered token is 401" id="46d4b28e-85f1-4763-980e-b93610d2350c" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="02AuthenticationTamperedTokenIs401"/>
+    <testcase name="responds within 5 s" time="0.002" classname="02AuthenticationTamperedTokenIs401"/>
+    <testcase name="token claims were really altered" time="0.002" classname="02AuthenticationTamperedTokenIs401"/>
+    <testcase name="status is 401" time="0.002" classname="02AuthenticationTamperedTokenIs401"/>
+  </testsuite>
+  <testsuite name="02 Authentication / Missing token is 401" id="72329062-4e4a-4948-80af-0f0cba85342c" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="0" errors="0" time="0.004">
+    <testcase name="no secrets or stack traces in the response" time="0.004" classname="02AuthenticationMissingTokenIs401"/>
+    <testcase name="responds within 5 s" time="0.004" classname="02AuthenticationMissingTokenIs401"/>
+    <testcase name="status is 401" time="0.004" classname="02AuthenticationMissingTokenIs401"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / USER cannot list users" id="11df51ed-cacd-41ee-8153-54d8f52af245" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="03RoleBasedAccessUserCannotListUsers"/>
+    <testcase name="error body is ProblemDetails" time="0.002" classname="03RoleBasedAccessUserCannotListUsers"/>
+    <testcase name="responds within 5 s" time="0.002" classname="03RoleBasedAccessUserCannotListUsers"/>
+    <testcase name="status is 403" time="0.002" classname="03RoleBasedAccessUserCannotListUsers"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / USER cannot read settings" id="95fb0cfc-b8f4-4e28-b3aa-5bfe151bbb7f" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="03RoleBasedAccessUserCannotReadSettings"/>
+    <testcase name="error body is ProblemDetails" time="0.002" classname="03RoleBasedAccessUserCannotReadSettings"/>
+    <testcase name="responds within 5 s" time="0.002" classname="03RoleBasedAccessUserCannotReadSettings"/>
+    <testcase name="status is 403" time="0.002" classname="03RoleBasedAccessUserCannotReadSettings"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / USER cannot create hotels" id="98d6ca95-3eab-4dbf-a17b-96c213619d33" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="03RoleBasedAccessUserCannotCreateHotels"/>
+    <testcase name="error body is ProblemDetails" time="0.002" classname="03RoleBasedAccessUserCannotCreateHotels"/>
+    <testcase name="responds within 5 s" time="0.002" classname="03RoleBasedAccessUserCannotCreateHotels"/>
+    <testcase name="status is 403" time="0.002" classname="03RoleBasedAccessUserCannotCreateHotels"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / HOTEL_OWNER cannot list users" id="b16d4630-4d39-4a8b-9ef2-160b85c16cb0" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="1" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="03RoleBasedAccessHotelOwnerCannotListUsers"/>
+    <testcase name="responds within 5 s" time="0.002" classname="03RoleBasedAccessHotelOwnerCannotListUsers"/>
+    <testcase name="status is 403" time="0.002" classname="03RoleBasedAccessHotelOwnerCannotListUsers">
+      <failure type="AssertionFailure" message="expected response to have status code 403 but got 401">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 03 Role-based access / HOTEL_OWNER cannot list users.]]>
+        <![CDATA[Test description: status is 403.]]>
+        <![CDATA[Error message: expected response to have status code 403 but got 401.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 403 but got 401
+   at Object.eval sandbox-script.js:1:24).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="03 Role-based access / HOTEL_OWNER cannot create packages" id="e888d80e-681e-47c9-b18e-c9e47105a4b5" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="1" errors="0" time="0.004">
+    <testcase name="no secrets or stack traces in the response" time="0.004" classname="03RoleBasedAccessHotelOwnerCannotCreatePackages"/>
+    <testcase name="responds within 5 s" time="0.004" classname="03RoleBasedAccessHotelOwnerCannotCreatePackages"/>
+    <testcase name="status is 403" time="0.004" classname="03RoleBasedAccessHotelOwnerCannotCreatePackages">
+      <failure type="AssertionFailure" message="expected response to have status code 403 but got 401">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 03 Role-based access / HOTEL_OWNER cannot create packages.]]>
+        <![CDATA[Test description: status is 403.]]>
+        <![CDATA[Error message: expected response to have status code 403 but got 401.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 403 but got 401
+   at Object.eval sandbox-script.js:1:25).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="03 Role-based access / TRAVEL_AGENT cannot approve hotels" id="95b3e763-11df-4f5f-bfeb-abbdfe77927b" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="03RoleBasedAccessTravelAgentCannotApproveHotels"/>
+    <testcase name="error body is ProblemDetails" time="0.002" classname="03RoleBasedAccessTravelAgentCannotApproveHotels"/>
+    <testcase name="responds within 5 s" time="0.002" classname="03RoleBasedAccessTravelAgentCannotApproveHotels"/>
+    <testcase name="status is 403" time="0.002" classname="03RoleBasedAccessTravelAgentCannotApproveHotels"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / TRAVEL_AGENT cannot use the AI booking assistant" id="afbeaab7-f447-4d01-9768-ed917dfe0b55" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="03RoleBasedAccessTravelAgentCannotUseTheAiBookingAssistant"/>
+    <testcase name="error body is ProblemDetails" time="0.002" classname="03RoleBasedAccessTravelAgentCannotUseTheAiBookingAssistant"/>
+    <testcase name="responds within 5 s" time="0.002" classname="03RoleBasedAccessTravelAgentCannotUseTheAiBookingAssistant"/>
+    <testcase name="status is 403" time="0.002" classname="03RoleBasedAccessTravelAgentCannotUseTheAiBookingAssistant"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / Anonymous cannot list bookings" id="001c632a-895f-49bb-9c78-b6a55d0ed0ad" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="03RoleBasedAccessAnonymousCannotListBookings"/>
+    <testcase name="responds within 5 s" time="0.002" classname="03RoleBasedAccessAnonymousCannotListBookings"/>
+    <testcase name="status is 401" time="0.002" classname="03RoleBasedAccessAnonymousCannotListBookings"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / ADMIN can list users" id="f20b8628-250f-4f7e-8b25-4c9216869295" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.005">
+    <testcase name="no secrets or stack traces in the response" time="0.005" classname="03RoleBasedAccessAdminCanListUsers"/>
+    <testcase name="responds within 5 s" time="0.005" classname="03RoleBasedAccessAdminCanListUsers"/>
+    <testcase name="status is 200" time="0.005" classname="03RoleBasedAccessAdminCanListUsers"/>
+    <testcase name="no password hashes in the user list" time="0.005" classname="03RoleBasedAccessAdminCanListUsers"/>
+  </testsuite>
+  <testsuite name="03 Role-based access / ADMIN can read platform statistics" id="e9e4f2bc-301a-4817-9e3b-4bef3d784042" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="0" errors="0" time="0.005">
+    <testcase name="no secrets or stack traces in the response" time="0.005" classname="03RoleBasedAccessAdminCanReadPlatformStatistics"/>
+    <testcase name="responds within 5 s" time="0.005" classname="03RoleBasedAccessAdminCanReadPlatformStatistics"/>
+    <testcase name="status is 200" time="0.005" classname="03RoleBasedAccessAdminCanReadPlatformStatistics"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Owner creates a hotel (pending)" id="ea843517-2898-4d54-87ab-dcc992df5c2e" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="2" errors="0" time="0.001">
+    <testcase name="no secrets or stack traces in the response" time="0.001" classname="04ProviderListingsAndApprovalOwnerCreatesAHotelPending"/>
+    <testcase name="responds within 5 s" time="0.001" classname="04ProviderListingsAndApprovalOwnerCreatesAHotelPending"/>
+    <testcase name="status is 201" time="0.001" classname="04ProviderListingsAndApprovalOwnerCreatesAHotelPending">
+      <failure type="AssertionFailure" message="expected response to have status code 201 but got 401">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 04 Provider listings and approval / Owner creates a hotel (pending).]]>
+        <![CDATA[Test description: status is 201.]]>
+        <![CDATA[Error message: expected response to have status code 201 but got 401.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 201 but got 401
+   at Object.eval sandbox-script.js:1:31).]]>
+      </failure>
+    </testcase>
+    <testcase name="new hotel waits for approval" time="0.001" classname="04ProviderListingsAndApprovalOwnerCreatesAHotelPending">
+      <failure type="AssertionFailure" message="expected undefined to equal +0">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 04 Provider listings and approval / Owner creates a hotel (pending).]]>
+        <![CDATA[Test description: new hotel waits for approval.]]>
+        <![CDATA[Error message: expected undefined to equal +0.]]>
+        <![CDATA[Stacktrace: AssertionError: expected undefined to equal +0
+   at Object.eval sandbox-script.js:2:31).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Owner adds a room" id="7fdbb52c-a70f-4f5a-96cd-fa9aecec6184" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="2" errors="0" time="0.007">
+    <testcase name="no secrets or stack traces in the response" time="0.007" classname="04ProviderListingsAndApprovalOwnerAddsARoom"/>
+    <testcase name="responds within 5 s" time="0.007" classname="04ProviderListingsAndApprovalOwnerAddsARoom"/>
+    <testcase name="status is 201" time="0.007" classname="04ProviderListingsAndApprovalOwnerAddsARoom">
+      <failure type="AssertionFailure" message="expected response to have status code 201 but got 404">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 04 Provider listings and approval / Owner adds a room.]]>
+        <![CDATA[Test description: status is 201.]]>
+        <![CDATA[Error message: expected response to have status code 201 but got 404.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 201 but got 404
+   at Object.eval sandbox-script.js:1:32).]]>
+      </failure>
+    </testcase>
+    <testcase name="room is stored with its price" time="0.007" classname="04ProviderListingsAndApprovalOwnerAddsARoom">
+      <failure type="AssertionFailure" message="No data, empty input at 1:1&#xA;&#xA;^">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 04 Provider listings and approval / Owner adds a room.]]>
+        <![CDATA[Test description: room is stored with its price.]]>
+        <![CDATA[Error message: No data, empty input at 1:1
+
+^.]]>
+        <![CDATA[Stacktrace: JSONError: No data, empty input at 1:1
+
+^
+   at Object.eval sandbox-script.js:2:32).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Room with zero price is 400" id="97ab8846-2a2a-44b2-b2bb-26cec5355f65" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="1" errors="0" time="0.003">
+    <testcase name="no secrets or stack traces in the response" time="0.003" classname="04ProviderListingsAndApprovalRoomWithZeroPriceIs400"/>
+    <testcase name="responds within 5 s" time="0.003" classname="04ProviderListingsAndApprovalRoomWithZeroPriceIs400"/>
+    <testcase name="status is 400" time="0.003" classname="04ProviderListingsAndApprovalRoomWithZeroPriceIs400">
+      <failure type="AssertionFailure" message="expected response to have status code 400 but got 404">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 04 Provider listings and approval / Room with zero price is 400.]]>
+        <![CDATA[Test description: status is 400.]]>
+        <![CDATA[Error message: expected response to have status code 400 but got 404.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 400 but got 404
+   at Object.eval sandbox-script.js:1:33).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Pending hotel is hidden from the public" id="a1cc3559-f11b-4315-9e46-08064cb1fc42" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="0" errors="0" time="0.003">
+    <testcase name="no secrets or stack traces in the response" time="0.003" classname="04ProviderListingsAndApprovalPendingHotelIsHiddenFromThePublic"/>
+    <testcase name="responds within 5 s" time="0.003" classname="04ProviderListingsAndApprovalPendingHotelIsHiddenFromThePublic"/>
+    <testcase name="status is 404" time="0.003" classname="04ProviderListingsAndApprovalPendingHotelIsHiddenFromThePublic"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Another provider cannot edit the hotel" id="29b62104-0782-432a-95d2-14a98e5e6ac1" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="1" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="04ProviderListingsAndApprovalAnotherProviderCannotEditTheHotel"/>
+    <testcase name="responds within 5 s" time="0.002" classname="04ProviderListingsAndApprovalAnotherProviderCannotEditTheHotel"/>
+    <testcase name="status is 403" time="0.002" classname="04ProviderListingsAndApprovalAnotherProviderCannotEditTheHotel">
+      <failure type="AssertionFailure" message="expected response to have status code 403 but got 404">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 04 Provider listings and approval / Another provider cannot edit the hotel.]]>
+        <![CDATA[Test description: status is 403.]]>
+        <![CDATA[Error message: expected response to have status code 403 but got 404.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 403 but got 404
+   at Object.eval sandbox-script.js:1:35).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Owner cannot approve their own hotel" id="554053c2-8408-468e-910f-e989841b97fa" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="1" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="04ProviderListingsAndApprovalOwnerCannotApproveTheirOwnHotel"/>
+    <testcase name="responds within 5 s" time="0.002" classname="04ProviderListingsAndApprovalOwnerCannotApproveTheirOwnHotel"/>
+    <testcase name="status is 403" time="0.002" classname="04ProviderListingsAndApprovalOwnerCannotApproveTheirOwnHotel">
+      <failure type="AssertionFailure" message="expected response to have status code 403 but got 404">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 04 Provider listings and approval / Owner cannot approve their own hotel.]]>
+        <![CDATA[Test description: status is 403.]]>
+        <![CDATA[Error message: expected response to have status code 403 but got 404.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 403 but got 404
+   at Object.eval sandbox-script.js:1:36).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Booking a pending hotel is refused" id="345b2daa-82c3-4336-835e-ec9714979227" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.015">
+    <testcase name="no secrets or stack traces in the response" time="0.015" classname="04ProviderListingsAndApprovalBookingAPendingHotelIsRefused"/>
+    <testcase name="error body is ProblemDetails" time="0.015" classname="04ProviderListingsAndApprovalBookingAPendingHotelIsRefused"/>
+    <testcase name="responds within 5 s" time="0.015" classname="04ProviderListingsAndApprovalBookingAPendingHotelIsRefused"/>
+    <testcase name="status is 400" time="0.015" classname="04ProviderListingsAndApprovalBookingAPendingHotelIsRefused"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Admin approves the hotel" id="869f77b7-d407-4182-8f93-eb52fa25f4b6" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="2" errors="0" time="0.004">
+    <testcase name="no secrets or stack traces in the response" time="0.004" classname="04ProviderListingsAndApprovalAdminApprovesTheHotel"/>
+    <testcase name="responds within 5 s" time="0.004" classname="04ProviderListingsAndApprovalAdminApprovesTheHotel"/>
+    <testcase name="status is 200" time="0.004" classname="04ProviderListingsAndApprovalAdminApprovesTheHotel">
+      <failure type="AssertionFailure" message="expected response to have status code 200 but got 404">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 04 Provider listings and approval / Admin approves the hotel.]]>
+        <![CDATA[Test description: status is 200.]]>
+        <![CDATA[Error message: expected response to have status code 200 but got 404.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 200 but got 404
+   at Object.eval sandbox-script.js:1:38).]]>
+      </failure>
+    </testcase>
+    <testcase name="hotel is approved" time="0.004" classname="04ProviderListingsAndApprovalAdminApprovesTheHotel">
+      <failure type="AssertionFailure" message="No data, empty input at 1:1&#xA;&#xA;^">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 04 Provider listings and approval / Admin approves the hotel.]]>
+        <![CDATA[Test description: hotel is approved.]]>
+        <![CDATA[Error message: No data, empty input at 1:1
+
+^.]]>
+        <![CDATA[Stacktrace: JSONError: No data, empty input at 1:1
+
+^
+   at Object.eval sandbox-script.js:2:38).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Approved hotel is public" id="88cbbe14-e540-46cc-99f7-0035a495f49f" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="2" errors="0" time="0.003">
+    <testcase name="no secrets or stack traces in the response" time="0.003" classname="04ProviderListingsAndApprovalApprovedHotelIsPublic"/>
+    <testcase name="responds within 5 s" time="0.003" classname="04ProviderListingsAndApprovalApprovedHotelIsPublic"/>
+    <testcase name="status is 200" time="0.003" classname="04ProviderListingsAndApprovalApprovedHotelIsPublic">
+      <failure type="AssertionFailure" message="expected response to have status code 200 but got 404">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 04 Provider listings and approval / Approved hotel is public.]]>
+        <![CDATA[Test description: status is 200.]]>
+        <![CDATA[Error message: expected response to have status code 200 but got 404.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 200 but got 404
+   at Object.eval sandbox-script.js:1:39).]]>
+      </failure>
+    </testcase>
+    <testcase name="shows the new room" time="0.003" classname="04ProviderListingsAndApprovalApprovedHotelIsPublic">
+      <failure type="AssertionFailure" message="No data, empty input at 1:1&#xA;&#xA;^">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 04 Provider listings and approval / Approved hotel is public.]]>
+        <![CDATA[Test description: shows the new room.]]>
+        <![CDATA[Error message: No data, empty input at 1:1
+
+^.]]>
+        <![CDATA[Stacktrace: JSONError: No data, empty input at 1:1
+
+^
+   at Object.eval sandbox-script.js:2:39).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Agent creates a package (pending)" id="0824fd66-ef5e-481e-ab15-a368b1ec6371" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.009">
+    <testcase name="no secrets or stack traces in the response" time="0.009" classname="04ProviderListingsAndApprovalAgentCreatesAPackagePending"/>
+    <testcase name="responds within 5 s" time="0.009" classname="04ProviderListingsAndApprovalAgentCreatesAPackagePending"/>
+    <testcase name="status is 201" time="0.009" classname="04ProviderListingsAndApprovalAgentCreatesAPackagePending"/>
+    <testcase name="new package waits for approval" time="0.009" classname="04ProviderListingsAndApprovalAgentCreatesAPackagePending"/>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Owner cannot edit the agent's package" id="79c48051-249e-4176-99cb-7247b3b23de5" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="1" errors="0" time="0.003">
+    <testcase name="no secrets or stack traces in the response" time="0.003" classname="04ProviderListingsAndApprovalOwnerCannotEditTheAgentsPackage"/>
+    <testcase name="responds within 5 s" time="0.003" classname="04ProviderListingsAndApprovalOwnerCannotEditTheAgentsPackage"/>
+    <testcase name="status is 403" time="0.003" classname="04ProviderListingsAndApprovalOwnerCannotEditTheAgentsPackage">
+      <failure type="AssertionFailure" message="expected response to have status code 403 but got 401">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 04 Provider listings and approval / Owner cannot edit the agent's package.]]>
+        <![CDATA[Test description: status is 403.]]>
+        <![CDATA[Error message: expected response to have status code 403 but got 401.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 403 but got 401
+   at Object.eval sandbox-script.js:1:41).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="04 Provider listings and approval / Admin rejects the package" id="e032987d-e48f-4e20-9be2-3dbc71851ee6" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="no secrets or stack traces in the response" time="0.008" classname="04ProviderListingsAndApprovalAdminRejectsThePackage"/>
+    <testcase name="responds within 5 s" time="0.008" classname="04ProviderListingsAndApprovalAdminRejectsThePackage"/>
+    <testcase name="status is 200" time="0.008" classname="04ProviderListingsAndApprovalAdminRejectsThePackage"/>
+    <testcase name="package is rejected" time="0.008" classname="04ProviderListingsAndApprovalAdminRejectsThePackage"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Availability quote" id="d4b5b1dc-bc82-4c8b-b2dd-34d8d2514ff1" timestamp="2026-10-01T15:33:58.152Z" tests="5" failures="2" errors="0" time="0.007">
+    <testcase name="no secrets or stack traces in the response" time="0.007" classname="05BookingWorkflowAvailabilityQuote"/>
+    <testcase name="error body is ProblemDetails" time="0.007" classname="05BookingWorkflowAvailabilityQuote"/>
+    <testcase name="responds within 5 s" time="0.007" classname="05BookingWorkflowAvailabilityQuote"/>
+    <testcase name="status is 200" time="0.007" classname="05BookingWorkflowAvailabilityQuote">
+      <failure type="AssertionFailure" message="expected response to have status code 200 but got 400">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Availability quote.]]>
+        <![CDATA[Test description: status is 200.]]>
+        <![CDATA[Error message: expected response to have status code 200 but got 400.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 200 but got 400
+   at Object.eval sandbox-script.js:1:43).]]>
+      </failure>
+    </testcase>
+    <testcase name="room is free and priced by the server" time="0.007" classname="05BookingWorkflowAvailabilityQuote">
+      <failure type="AssertionFailure" message="expected undefined to equal true">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Availability quote.]]>
+        <![CDATA[Test description: room is free and priced by the server.]]>
+        <![CDATA[Error message: expected undefined to equal true.]]>
+        <![CDATA[Stacktrace: AssertionError: expected undefined to equal true
+   at Object.eval sandbox-script.js:2:43).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Too many guests is 400" id="e24b4cbe-95b4-49c3-a2ee-ae83eb4a55ad" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.017">
+    <testcase name="no secrets or stack traces in the response" time="0.017" classname="05BookingWorkflowTooManyGuestsIs400"/>
+    <testcase name="error body is ProblemDetails" time="0.017" classname="05BookingWorkflowTooManyGuestsIs400"/>
+    <testcase name="responds within 5 s" time="0.017" classname="05BookingWorkflowTooManyGuestsIs400"/>
+    <testcase name="status is 400" time="0.017" classname="05BookingWorkflowTooManyGuestsIs400"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Check-out before check-in is 400" id="e83cc540-4a84-4b72-9f18-e00f09076f2d" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.004">
+    <testcase name="no secrets or stack traces in the response" time="0.004" classname="05BookingWorkflowCheckOutBeforeCheckInIs400"/>
+    <testcase name="error body is ProblemDetails" time="0.004" classname="05BookingWorkflowCheckOutBeforeCheckInIs400"/>
+    <testcase name="responds within 5 s" time="0.004" classname="05BookingWorkflowCheckOutBeforeCheckInIs400"/>
+    <testcase name="status is 400" time="0.004" classname="05BookingWorkflowCheckOutBeforeCheckInIs400"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Check-in in the past is 400" id="7b6b86bd-da81-479d-b8ba-7afed41bfde6" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.004">
+    <testcase name="no secrets or stack traces in the response" time="0.004" classname="05BookingWorkflowCheckInInThePastIs400"/>
+    <testcase name="error body is ProblemDetails" time="0.004" classname="05BookingWorkflowCheckInInThePastIs400"/>
+    <testcase name="responds within 5 s" time="0.004" classname="05BookingWorkflowCheckInInThePastIs400"/>
+    <testcase name="status is 400" time="0.004" classname="05BookingWorkflowCheckInInThePastIs400"/>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Traveler books the room" id="84e31ed2-cbb5-4c97-a6db-59a5473a88f5" timestamp="2026-10-01T15:33:58.152Z" tests="5" failures="2" errors="0" time="0.003">
+    <testcase name="no secrets or stack traces in the response" time="0.003" classname="05BookingWorkflowTravelerBooksTheRoom"/>
+    <testcase name="error body is ProblemDetails" time="0.003" classname="05BookingWorkflowTravelerBooksTheRoom"/>
+    <testcase name="responds within 5 s" time="0.003" classname="05BookingWorkflowTravelerBooksTheRoom"/>
+    <testcase name="status is 201" time="0.003" classname="05BookingWorkflowTravelerBooksTheRoom">
+      <failure type="AssertionFailure" message="expected response to have status code 201 but got 400">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Traveler books the room.]]>
+        <![CDATA[Test description: status is 201.]]>
+        <![CDATA[Error message: expected response to have status code 201 but got 400.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 201 but got 400
+   at Object.eval sandbox-script.js:1:47).]]>
+      </failure>
+    </testcase>
+    <testcase name="booking starts Pending at the server price" time="0.003" classname="05BookingWorkflowTravelerBooksTheRoom">
+      <failure type="AssertionFailure" message="expected 400 to equal +0">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Traveler books the room.]]>
+        <![CDATA[Test description: booking starts Pending at the server price.]]>
+        <![CDATA[Error message: expected 400 to equal +0.]]>
+        <![CDATA[Stacktrace: AssertionError: expected 400 to equal +0
+   at Object.eval sandbox-script.js:2:47).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Overlapping booking is 409" id="f5663dfc-dff3-467c-ae88-d535ce224d9a" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="1" errors="0" time="0.004">
+    <testcase name="no secrets or stack traces in the response" time="0.004" classname="05BookingWorkflowOverlappingBookingIs409"/>
+    <testcase name="error body is ProblemDetails" time="0.004" classname="05BookingWorkflowOverlappingBookingIs409"/>
+    <testcase name="responds within 5 s" time="0.004" classname="05BookingWorkflowOverlappingBookingIs409"/>
+    <testcase name="status is 409" time="0.004" classname="05BookingWorkflowOverlappingBookingIs409">
+      <failure type="AssertionFailure" message="expected response to have status code 409 but got 400">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Overlapping booking is 409.]]>
+        <![CDATA[Test description: status is 409.]]>
+        <![CDATA[Error message: expected response to have status code 409 but got 400.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 409 but got 400
+   at Object.eval sandbox-script.js:1:48).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Another traveler cannot read the booking" id="e50891ef-c7d2-42da-9197-dff15b1e186c" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="1" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="05BookingWorkflowAnotherTravelerCannotReadTheBooking"/>
+    <testcase name="responds within 5 s" time="0.002" classname="05BookingWorkflowAnotherTravelerCannotReadTheBooking"/>
+    <testcase name="status is 403" time="0.002" classname="05BookingWorkflowAnotherTravelerCannotReadTheBooking">
+      <failure type="AssertionFailure" message="expected response to have status code 403 but got 404">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Another traveler cannot read the booking.]]>
+        <![CDATA[Test description: status is 403.]]>
+        <![CDATA[Error message: expected response to have status code 403 but got 404.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 403 but got 404
+   at Object.eval sandbox-script.js:1:49).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Another provider cannot confirm the booking" id="4128beed-fe9d-4418-8cff-23aa9e43b84a" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="1" errors="0" time="0.003">
+    <testcase name="no secrets or stack traces in the response" time="0.003" classname="05BookingWorkflowAnotherProviderCannotConfirmTheBooking"/>
+    <testcase name="responds within 5 s" time="0.003" classname="05BookingWorkflowAnotherProviderCannotConfirmTheBooking"/>
+    <testcase name="status is 403" time="0.003" classname="05BookingWorkflowAnotherProviderCannotConfirmTheBooking">
+      <failure type="AssertionFailure" message="expected response to have status code 403 but got 404">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Another provider cannot confirm the booking.]]>
+        <![CDATA[Test description: status is 403.]]>
+        <![CDATA[Error message: expected response to have status code 403 but got 404.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 403 but got 404
+   at Object.eval sandbox-script.js:1:50).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Traveler cannot confirm their own booking" id="22223589-01d9-49c8-9913-f24429578e63" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="1" errors="0" time="0.003">
+    <testcase name="no secrets or stack traces in the response" time="0.003" classname="05BookingWorkflowTravelerCannotConfirmTheirOwnBooking"/>
+    <testcase name="responds within 5 s" time="0.003" classname="05BookingWorkflowTravelerCannotConfirmTheirOwnBooking"/>
+    <testcase name="refused" time="0.003" classname="05BookingWorkflowTravelerCannotConfirmTheirOwnBooking">
+      <failure type="AssertionFailure" message="expected 404 to be one of [ 400, 403 ]">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Traveler cannot confirm their own booking.]]>
+        <![CDATA[Test description: refused.]]>
+        <![CDATA[Error message: expected 404 to be one of [ 400, 403 ].]]>
+        <![CDATA[Stacktrace: AssertionError: expected 404 to be one of [ 400, 403 ]
+   at Object.eval sandbox-script.js:1:51).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Owner sees the booking" id="87bc746e-1ca4-4e65-8d36-508628897baa" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="2" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="05BookingWorkflowOwnerSeesTheBooking"/>
+    <testcase name="responds within 5 s" time="0.002" classname="05BookingWorkflowOwnerSeesTheBooking"/>
+    <testcase name="status is 200" time="0.002" classname="05BookingWorkflowOwnerSeesTheBooking">
+      <failure type="AssertionFailure" message="expected response to have status code 200 but got 401">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Owner sees the booking.]]>
+        <![CDATA[Test description: status is 200.]]>
+        <![CDATA[Error message: expected response to have status code 200 but got 401.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 200 but got 401
+   at Object.eval sandbox-script.js:1:52).]]>
+      </failure>
+    </testcase>
+    <testcase name="booking for the owner's room is listed" time="0.002" classname="05BookingWorkflowOwnerSeesTheBooking">
+      <failure type="AssertionFailure" message="pm.response.json(...).map is not a function">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Owner sees the booking.]]>
+        <![CDATA[Test description: booking for the owner's room is listed.]]>
+        <![CDATA[Error message: pm.response.json(...).map is not a function.]]>
+        <![CDATA[Stacktrace: TypeError: pm.response.json(...).map is not a function
+   at Object.eval sandbox-script.js:2:52).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Owner confirms the booking" id="8c350d50-fb8b-4559-845b-f330ebd2cd81" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="2" errors="0" time="0.001">
+    <testcase name="no secrets or stack traces in the response" time="0.001" classname="05BookingWorkflowOwnerConfirmsTheBooking"/>
+    <testcase name="responds within 5 s" time="0.001" classname="05BookingWorkflowOwnerConfirmsTheBooking"/>
+    <testcase name="status is 200" time="0.001" classname="05BookingWorkflowOwnerConfirmsTheBooking">
+      <failure type="AssertionFailure" message="expected response to have status code 200 but got 404">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Owner confirms the booking.]]>
+        <![CDATA[Test description: status is 200.]]>
+        <![CDATA[Error message: expected response to have status code 200 but got 404.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 200 but got 404
+   at Object.eval sandbox-script.js:1:53).]]>
+      </failure>
+    </testcase>
+    <testcase name="booking is Confirmed" time="0.001" classname="05BookingWorkflowOwnerConfirmsTheBooking">
+      <failure type="AssertionFailure" message="No data, empty input at 1:1&#xA;&#xA;^">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Owner confirms the booking.]]>
+        <![CDATA[Test description: booking is Confirmed.]]>
+        <![CDATA[Error message: No data, empty input at 1:1
+
+^.]]>
+        <![CDATA[Stacktrace: JSONError: No data, empty input at 1:1
+
+^
+   at Object.eval sandbox-script.js:2:53).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Confirmed booking cannot go back to Pending" id="0d40f50a-525e-434e-81df-4304f776574b" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="1" errors="0" time="0.003">
+    <testcase name="no secrets or stack traces in the response" time="0.003" classname="05BookingWorkflowConfirmedBookingCannotGoBackToPending"/>
+    <testcase name="responds within 5 s" time="0.003" classname="05BookingWorkflowConfirmedBookingCannotGoBackToPending"/>
+    <testcase name="status is 400" time="0.003" classname="05BookingWorkflowConfirmedBookingCannotGoBackToPending">
+      <failure type="AssertionFailure" message="expected response to have status code 400 but got 404">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Confirmed booking cannot go back to Pending.]]>
+        <![CDATA[Test description: status is 400.]]>
+        <![CDATA[Error message: expected response to have status code 400 but got 404.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 400 but got 404
+   at Object.eval sandbox-script.js:1:54).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Completing before check-in is 400" id="94f61576-f0e6-40b5-9cf2-ac75c238762c" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="1" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="05BookingWorkflowCompletingBeforeCheckInIs400"/>
+    <testcase name="responds within 5 s" time="0.002" classname="05BookingWorkflowCompletingBeforeCheckInIs400"/>
+    <testcase name="status is 400" time="0.002" classname="05BookingWorkflowCompletingBeforeCheckInIs400">
+      <failure type="AssertionFailure" message="expected response to have status code 400 but got 404">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Completing before check-in is 400.]]>
+        <![CDATA[Test description: status is 400.]]>
+        <![CDATA[Error message: expected response to have status code 400 but got 404.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 400 but got 404
+   at Object.eval sandbox-script.js:1:55).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Traveler sees the confirmation" id="a5dbf0c6-8935-4125-9efe-9ff68e08b18f" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="2" errors="0" time="0.003">
+    <testcase name="no secrets or stack traces in the response" time="0.003" classname="05BookingWorkflowTravelerSeesTheConfirmation"/>
+    <testcase name="responds within 5 s" time="0.003" classname="05BookingWorkflowTravelerSeesTheConfirmation"/>
+    <testcase name="status is 200" time="0.003" classname="05BookingWorkflowTravelerSeesTheConfirmation">
+      <failure type="AssertionFailure" message="expected response to have status code 200 but got 404">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Traveler sees the confirmation.]]>
+        <![CDATA[Test description: status is 200.]]>
+        <![CDATA[Error message: expected response to have status code 200 but got 404.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 200 but got 404
+   at Object.eval sandbox-script.js:1:56).]]>
+      </failure>
+    </testcase>
+    <testcase name="booking is Confirmed for the traveler" time="0.003" classname="05BookingWorkflowTravelerSeesTheConfirmation">
+      <failure type="AssertionFailure" message="No data, empty input at 1:1&#xA;&#xA;^">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Traveler sees the confirmation.]]>
+        <![CDATA[Test description: booking is Confirmed for the traveler.]]>
+        <![CDATA[Error message: No data, empty input at 1:1
+
+^.]]>
+        <![CDATA[Stacktrace: JSONError: No data, empty input at 1:1
+
+^
+   at Object.eval sandbox-script.js:2:56).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="05 Booking workflow / Room is no longer available for those dates" id="8d46559c-2be6-4c78-9b9a-17c70f133878" timestamp="2026-10-01T15:33:58.152Z" tests="5" failures="2" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="05BookingWorkflowRoomIsNoLongerAvailableForThoseDates"/>
+    <testcase name="error body is ProblemDetails" time="0.002" classname="05BookingWorkflowRoomIsNoLongerAvailableForThoseDates"/>
+    <testcase name="responds within 5 s" time="0.002" classname="05BookingWorkflowRoomIsNoLongerAvailableForThoseDates"/>
+    <testcase name="status is 200" time="0.002" classname="05BookingWorkflowRoomIsNoLongerAvailableForThoseDates">
+      <failure type="AssertionFailure" message="expected response to have status code 200 but got 400">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Room is no longer available for those dates.]]>
+        <![CDATA[Test description: status is 200.]]>
+        <![CDATA[Error message: expected response to have status code 200 but got 400.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 200 but got 400
+   at Object.eval sandbox-script.js:1:57).]]>
+      </failure>
+    </testcase>
+    <testcase name="quote reports the room as taken" time="0.002" classname="05BookingWorkflowRoomIsNoLongerAvailableForThoseDates">
+      <failure type="AssertionFailure" message="expected undefined to equal false">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 05 Booking workflow / Room is no longer available for those dates.]]>
+        <![CDATA[Test description: quote reports the room as taken.]]>
+        <![CDATA[Error message: expected undefined to equal false.]]>
+        <![CDATA[Stacktrace: AssertionError: expected undefined to equal false
+   at Object.eval sandbox-script.js:2:57).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Plan a trip" id="1919b680-e2d5-4173-8008-80b7214bce1a" timestamp="2026-10-01T15:33:58.152Z" tests="6" failures="0" errors="0" time="0.495">
+    <testcase name="no secrets or stack traces in the response" time="0.495" classname="06AgenticAiPlanATrip"/>
+    <testcase name="responds within 5 s" time="0.495" classname="06AgenticAiPlanATrip"/>
+    <testcase name="status is 200" time="0.495" classname="06AgenticAiPlanATrip"/>
+    <testcase name="returns a structured plan within budget" time="0.495" classname="06AgenticAiPlanATrip"/>
+    <testcase name="the selected hotel came from an availability check" time="0.495" classname="06AgenticAiPlanATrip"/>
+    <testcase name="the plan was built with backend tools" time="0.495" classname="06AgenticAiPlanATrip"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Ask to book: proposal only" id="3a56c24d-87fe-440f-88ef-ce60a0219d06" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.479">
+    <testcase name="no secrets or stack traces in the response" time="0.479" classname="06AgenticAiAskToBookProposalOnly"/>
+    <testcase name="responds within 5 s" time="0.479" classname="06AgenticAiAskToBookProposalOnly"/>
+    <testcase name="status is 200" time="0.479" classname="06AgenticAiAskToBookProposalOnly"/>
+    <testcase name="returns a proposal, not a booking" time="0.479" classname="06AgenticAiAskToBookProposalOnly"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Proposal created no booking" id="e9c9bac5-7bcd-4ca4-9cec-fd2c35e0d16b" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.005">
+    <testcase name="no secrets or stack traces in the response" time="0.005" classname="06AgenticAiProposalCreatedNoBooking"/>
+    <testcase name="responds within 5 s" time="0.005" classname="06AgenticAiProposalCreatedNoBooking"/>
+    <testcase name="status is 200" time="0.005" classname="06AgenticAiProposalCreatedNoBooking"/>
+    <testcase name="no booking exists for the proposed room and dates yet" time="0.005" classname="06AgenticAiProposalCreatedNoBooking"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Confirm the proposal" id="4d053f6c-7c60-4f7c-b2e8-de6455d7336d" timestamp="2026-10-01T15:33:58.152Z" tests="5" failures="0" errors="0" time="0.014">
+    <testcase name="no secrets or stack traces in the response" time="0.014" classname="06AgenticAiConfirmTheProposal"/>
+    <testcase name="responds within 5 s" time="0.014" classname="06AgenticAiConfirmTheProposal"/>
+    <testcase name="status is 200" time="0.014" classname="06AgenticAiConfirmTheProposal"/>
+    <testcase name="backend created a Pending booking at the quoted price" time="0.014" classname="06AgenticAiConfirmTheProposal"/>
+    <testcase name="reply does not claim the booking is confirmed" time="0.014" classname="06AgenticAiConfirmTheProposal"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Confirming the same proposal again books nothing" id="3576ac53-bbcd-4241-8ff5-996b6a9abb70" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="no secrets or stack traces in the response" time="0.008" classname="06AgenticAiConfirmingTheSameProposalAgainBooksNothing"/>
+    <testcase name="responds within 5 s" time="0.008" classname="06AgenticAiConfirmingTheSameProposalAgainBooksNothing"/>
+    <testcase name="status is 200" time="0.008" classname="06AgenticAiConfirmingTheSameProposalAgainBooksNothing"/>
+    <testcase name="no second booking" time="0.008" classname="06AgenticAiConfirmingTheSameProposalAgainBooksNothing"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / AI booking is stored as Pending" id="999b09f3-1525-41b1-ba73-a0a2e3a334ee" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.005">
+    <testcase name="no secrets or stack traces in the response" time="0.005" classname="06AgenticAiAiBookingIsStoredAsPending"/>
+    <testcase name="responds within 5 s" time="0.005" classname="06AgenticAiAiBookingIsStoredAsPending"/>
+    <testcase name="status is 200" time="0.005" classname="06AgenticAiAiBookingIsStoredAsPending"/>
+    <testcase name="status is Pending until the provider confirms" time="0.005" classname="06AgenticAiAiBookingIsStoredAsPending"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Prompt injection is refused" id="7575c90f-cf75-4111-8728-a1e042046890" timestamp="2026-10-01T15:33:58.152Z" tests="5" failures="0" errors="0" time="0.006">
+    <testcase name="no secrets or stack traces in the response" time="0.006" classname="06AgenticAiPromptInjectionIsRefused"/>
+    <testcase name="responds within 5 s" time="0.006" classname="06AgenticAiPromptInjectionIsRefused"/>
+    <testcase name="status is 200" time="0.006" classname="06AgenticAiPromptInjectionIsRefused"/>
+    <testcase name="assistant refuses" time="0.006" classname="06AgenticAiPromptInjectionIsRefused"/>
+    <testcase name="no internal details in the reply" time="0.006" classname="06AgenticAiPromptInjectionIsRefused"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Booking for another user is refused" id="3f8940a2-b20b-4327-9b85-4d95baf8a436" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.451">
+    <testcase name="no secrets or stack traces in the response" time="0.451" classname="06AgenticAiBookingForAnotherUserIsRefused"/>
+    <testcase name="responds within 5 s" time="0.451" classname="06AgenticAiBookingForAnotherUserIsRefused"/>
+    <testcase name="status is 200" time="0.451" classname="06AgenticAiBookingForAnotherUserIsRefused"/>
+    <testcase name="no booking and no other user's data" time="0.451" classname="06AgenticAiBookingForAnotherUserIsRefused"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Anonymous cannot chat" id="38a5a8ad-e757-41b4-803b-89a301cb37ae" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="0" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="06AgenticAiAnonymousCannotChat"/>
+    <testcase name="responds within 5 s" time="0.002" classname="06AgenticAiAnonymousCannotChat"/>
+    <testcase name="status is 401" time="0.002" classname="06AgenticAiAnonymousCannotChat"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Conversation list includes the chat" id="ed493f50-6cd3-40e8-8c06-425da23b1515" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.005">
+    <testcase name="no secrets or stack traces in the response" time="0.005" classname="06AgenticAiConversationListIncludesTheChat"/>
+    <testcase name="responds within 5 s" time="0.005" classname="06AgenticAiConversationListIncludesTheChat"/>
+    <testcase name="status is 200" time="0.005" classname="06AgenticAiConversationListIncludesTheChat"/>
+    <testcase name="conversation is listed" time="0.005" classname="06AgenticAiConversationListIncludesTheChat"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Another traveler cannot read the conversation" id="3a4b24cf-44a6-4da7-9e8e-c7bda0c4858b" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.006">
+    <testcase name="no secrets or stack traces in the response" time="0.006" classname="06AgenticAiAnotherTravelerCannotReadTheConversation"/>
+    <testcase name="error body is ProblemDetails" time="0.006" classname="06AgenticAiAnotherTravelerCannotReadTheConversation"/>
+    <testcase name="responds within 5 s" time="0.006" classname="06AgenticAiAnotherTravelerCannotReadTheConversation"/>
+    <testcase name="status is 404" time="0.006" classname="06AgenticAiAnotherTravelerCannotReadTheConversation"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Recommendations come from the plan" id="6e108805-0b29-4cfd-9b29-2e56e292743a" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.004">
+    <testcase name="no secrets or stack traces in the response" time="0.004" classname="06AgenticAiRecommendationsComeFromThePlan"/>
+    <testcase name="responds within 5 s" time="0.004" classname="06AgenticAiRecommendationsComeFromThePlan"/>
+    <testcase name="status is 200" time="0.004" classname="06AgenticAiRecommendationsComeFromThePlan"/>
+    <testcase name="recommendations belong to this conversation" time="0.004" classname="06AgenticAiRecommendationsComeFromThePlan"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Traveler cancels the AI booking" id="6d1d4c42-a7ec-4776-aee3-7f1f46bb9103" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.008">
+    <testcase name="no secrets or stack traces in the response" time="0.008" classname="06AgenticAiTravelerCancelsTheAiBooking"/>
+    <testcase name="responds within 5 s" time="0.008" classname="06AgenticAiTravelerCancelsTheAiBooking"/>
+    <testcase name="status is 200" time="0.008" classname="06AgenticAiTravelerCancelsTheAiBooking"/>
+    <testcase name="booking is Cancelled" time="0.008" classname="06AgenticAiTravelerCancelsTheAiBooking"/>
+  </testsuite>
+  <testsuite name="06 Agentic AI / Cancelling twice is 400" id="b226ade5-fc1a-4fb4-9ac6-872a1ac787ad" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.005">
+    <testcase name="no secrets or stack traces in the response" time="0.005" classname="06AgenticAiCancellingTwiceIs400"/>
+    <testcase name="error body is ProblemDetails" time="0.005" classname="06AgenticAiCancellingTwiceIs400"/>
+    <testcase name="responds within 5 s" time="0.005" classname="06AgenticAiCancellingTwiceIs400"/>
+    <testcase name="status is 400" time="0.005" classname="06AgenticAiCancellingTwiceIs400"/>
+  </testsuite>
+  <testsuite name="07 Itineraries / Save the plan as an itinerary" id="f4c4616e-9b51-410a-a433-13e5db78c8d7" timestamp="2026-10-01T15:33:58.152Z" tests="5" failures="0" errors="0" time="0.012">
+    <testcase name="no secrets or stack traces in the response" time="0.012" classname="07ItinerariesSaveThePlanAsAnItinerary"/>
+    <testcase name="responds within 5 s" time="0.012" classname="07ItinerariesSaveThePlanAsAnItinerary"/>
+    <testcase name="status is 201" time="0.012" classname="07ItinerariesSaveThePlanAsAnItinerary"/>
+    <testcase name="keeps travelers, budget and conversation" time="0.012" classname="07ItinerariesSaveThePlanAsAnItinerary"/>
+    <testcase name="items are ordered by day, then by the given order" time="0.012" classname="07ItinerariesSaveThePlanAsAnItinerary"/>
+  </testsuite>
+  <testsuite name="07 Itineraries / Zero travelers is 400" id="8293cc05-7020-4e10-9117-081f6c3309ae" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.003">
+    <testcase name="no secrets or stack traces in the response" time="0.003" classname="07ItinerariesZeroTravelersIs400"/>
+    <testcase name="error body is ProblemDetails" time="0.003" classname="07ItinerariesZeroTravelersIs400"/>
+    <testcase name="responds within 5 s" time="0.003" classname="07ItinerariesZeroTravelersIs400"/>
+    <testcase name="status is 400" time="0.003" classname="07ItinerariesZeroTravelersIs400"/>
+  </testsuite>
+  <testsuite name="07 Itineraries / Another traveler cannot attach this conversation" id="580d7d78-ca72-43e3-862c-f39e08d6fc11" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.005">
+    <testcase name="no secrets or stack traces in the response" time="0.005" classname="07ItinerariesAnotherTravelerCannotAttachThisConversation"/>
+    <testcase name="error body is ProblemDetails" time="0.005" classname="07ItinerariesAnotherTravelerCannotAttachThisConversation"/>
+    <testcase name="responds within 5 s" time="0.005" classname="07ItinerariesAnotherTravelerCannotAttachThisConversation"/>
+    <testcase name="status is 400" time="0.005" classname="07ItinerariesAnotherTravelerCannotAttachThisConversation"/>
+  </testsuite>
+  <testsuite name="07 Itineraries / Another traveler cannot read the itinerary" id="435bb7d1-118f-4aed-8a45-2cf30dc48cb2" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.006">
+    <testcase name="no secrets or stack traces in the response" time="0.006" classname="07ItinerariesAnotherTravelerCannotReadTheItinerary"/>
+    <testcase name="error body is ProblemDetails" time="0.006" classname="07ItinerariesAnotherTravelerCannotReadTheItinerary"/>
+    <testcase name="responds within 5 s" time="0.006" classname="07ItinerariesAnotherTravelerCannotReadTheItinerary"/>
+    <testcase name="hidden from other users" time="0.006" classname="07ItinerariesAnotherTravelerCannotReadTheItinerary"/>
+  </testsuite>
+  <testsuite name="07 Itineraries / Owner of the itinerary deletes it" id="6c594acc-9c3d-406c-8dff-cb26f42edee7" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="0" errors="0" time="0.007">
+    <testcase name="no secrets or stack traces in the response" time="0.007" classname="07ItinerariesOwnerOfTheItineraryDeletesIt"/>
+    <testcase name="responds within 5 s" time="0.007" classname="07ItinerariesOwnerOfTheItineraryDeletesIt"/>
+    <testcase name="status is 204" time="0.007" classname="07ItinerariesOwnerOfTheItineraryDeletesIt"/>
+  </testsuite>
+  <testsuite name="07 Itineraries / Deleted itinerary is 404" id="5e9ddddf-fb3d-4c05-94c1-1b75cd17228e" timestamp="2026-10-01T15:33:58.152Z" tests="4" failures="0" errors="0" time="0.004">
+    <testcase name="no secrets or stack traces in the response" time="0.004" classname="07ItinerariesDeletedItineraryIs404"/>
+    <testcase name="error body is ProblemDetails" time="0.004" classname="07ItinerariesDeletedItineraryIs404"/>
+    <testcase name="responds within 5 s" time="0.004" classname="07ItinerariesDeletedItineraryIs404"/>
+    <testcase name="status is 404" time="0.004" classname="07ItinerariesDeletedItineraryIs404"/>
+  </testsuite>
+  <testsuite name="08 Cleanup / Hotel with bookings cannot be deleted" id="aadaf403-d7ed-4ebf-80da-3c7f98818541" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="1" errors="0" time="0.002">
+    <testcase name="no secrets or stack traces in the response" time="0.002" classname="08CleanupHotelWithBookingsCannotBeDeleted"/>
+    <testcase name="responds within 5 s" time="0.002" classname="08CleanupHotelWithBookingsCannotBeDeleted"/>
+    <testcase name="status is 409" time="0.002" classname="08CleanupHotelWithBookingsCannotBeDeleted">
+      <failure type="AssertionFailure" message="expected response to have status code 409 but got 404">
+        <![CDATA[Failed 1 times.]]>
+        <![CDATA[Collection JSON ID: deec3c4a-24b8-4112-ac40-0606bb72641d.]]>
+        <![CDATA[Collection name: Travel Advisor API.]]>
+        <![CDATA[Request name: 08 Cleanup / Hotel with bookings cannot be deleted.]]>
+        <![CDATA[Test description: status is 409.]]>
+        <![CDATA[Error message: expected response to have status code 409 but got 404.]]>
+        <![CDATA[Stacktrace: AssertionError: expected response to have status code 409 but got 404
+   at Object.eval sandbox-script.js:1:78).]]>
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="08 Cleanup / Agent deletes the rejected package" id="639d5f0b-d1ad-4da7-ba60-46700d02979e" timestamp="2026-10-01T15:33:58.152Z" tests="3" failures="0" errors="0" time="0.008">
+    <testcase name="no secrets or stack traces in the response" time="0.008" classname="08CleanupAgentDeletesTheRejectedPackage"/>
+    <testcase name="responds within 5 s" time="0.008" classname="08CleanupAgentDeletesTheRejectedPackage"/>
+    <testcase name="status is 204" time="0.008" classname="08CleanupAgentDeletesTheRejectedPackage"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,10 @@
+﻿Browser console (Runtime.consoleAPICalled) for run 8, captured by chromedriver --verbose.
+Command: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/traveler_journey_test.dart -d web-server --browser-name=chrome --profile --web-port 4173 --dart-define=API_BASE_URL=http://localhost:5080
+API: http://localhost:5080 (Development, PostgreSQL)
+
+00:00 +0: (setUpAll)
+00:00 +1: a new traveler registers, finds the hotel and books a room; the API stores it as Pending
+00:08 +2: the assistant plans a trip, the plan is saved, and a booking exists only after Confirm
+00:22 +3: after the owner confirms, the app shows Confirmed; signing out ends the session and staff are refused
+00:26 +4: (tearDownAll)
+00:26 +5: All tests passed!

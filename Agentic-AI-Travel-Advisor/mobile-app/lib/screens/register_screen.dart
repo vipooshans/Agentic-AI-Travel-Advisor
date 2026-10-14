@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../utils/validators.dart';
 import '../widgets/auth_text_field.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -18,6 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmController = TextEditingController();
 
   @override
   void dispose() {
@@ -25,6 +27,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _lastNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmController.dispose();
     super.dispose();
   }
 
@@ -77,34 +80,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 AuthTextField(
                   controller: _firstNameController,
                   label: 'First Name',
-                  validator: (v) =>
-                      v == null || v.isEmpty ? 'First name is required' : null,
+                  validator: Validators.personName('First name'),
                 ),
                 const SizedBox(height: 16),
                 AuthTextField(
                   controller: _lastNameController,
                   label: 'Last Name',
-                  validator: (v) =>
-                      v == null || v.isEmpty ? 'Last name is required' : null,
+                  validator: Validators.personName('Last name'),
                 ),
                 const SizedBox(height: 16),
                 AuthTextField(
                   controller: _emailController,
                   label: 'Email',
                   keyboardType: TextInputType.emailAddress,
-                  validator: (v) =>
-                      v == null || v.isEmpty ? 'Email is required' : null,
+                  validator: Validators.email,
                 ),
                 const SizedBox(height: 16),
                 AuthTextField(
                   controller: _passwordController,
                   label: 'Password',
                   obscureText: true,
-                  validator: (v) {
-                    if (v == null || v.isEmpty) return 'Password is required';
-                    if (v.length < 6) return 'Minimum 6 characters';
-                    return null;
-                  },
+                  validator: Validators.newPassword,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'At least 6 characters with an uppercase letter, a lowercase letter, a number and a symbol.',
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                ),
+                const SizedBox(height: 16),
+                AuthTextField(
+                  controller: _confirmController,
+                  label: 'Confirm Password',
+                  obscureText: true,
+                  validator: (v) => v != _passwordController.text ? 'Passwords do not match' : null,
                 ),
                 const SizedBox(height: 24),
                 FilledButton(

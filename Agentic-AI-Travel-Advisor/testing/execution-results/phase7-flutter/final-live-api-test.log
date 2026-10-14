@@ -1,0 +1,15 @@
+﻿# Command: flutter test test_live --reporter expanded --dart-define=API_BASE_URL=http://localhost:5080 (run 2026-10-01 18:51:37 +05:30; API on :5080, Development, seeded DB)
+00:00 +0: loading T:/mobile-app/test_live/live_api_test.dart
+00:00 +0: (setUpAll)
+00:00 +0: a hotel owner is refused by the mobile app and nothing is stored
+00:00 +1: wrong credentials show the API message
+00:00 +2: a traveler signs in and is told when the token stops working
+00:00 +3: a traveler calling an admin API gets the permission message
+00:00 +4: hotel search filters by keyword and price
+00:00 +5: package search filters by the per-person price shown in the app
+00:00 +6: reviews, transport and the traveler's own data parse from the API
+00:00 +7: availability check, booking with guests, and cancellation
+00:00 +8: the assistant returns a structured plan that the app can read
+00:02 +9: (tearDownAll)
+00:02 +9: All tests passed!
+# exit code: 0
