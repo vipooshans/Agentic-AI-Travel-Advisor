@@ -12,82 +12,84 @@
     <title>@ViewData["Title"] - Travel Advisor</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="bg-light d-flex flex-column min-vh-100">
-    <header class="border-bottom bg-white sticky-top shadow-sm">
-        <nav class="navbar navbar-expand-lg navbar-light container py-2">
-            <a class="navbar-brand fw-bold text-primary d-flex align-items-center" asp-controller="Home" asp-action="Index">
-                <span class="badge bg-primary me-2 px-2 py-1">TA</span> Travel Advisor
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navMenu">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark fw-medium" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark fw-medium" asp-controller="Home" asp-action="Index" asp-route-tab="hotels">Hotels</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark fw-medium" asp-controller="Home" asp-action="Index" asp-route-tab="packages">Packages</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark fw-medium" asp-controller="Home" asp-action="Destinations">Destinations</a>
-                    </li>
-                    @if (isAuthenticated && role == RoleNames.User)
-                    {
+<body class="d-flex flex-column min-vh-100">
+    <header class="sticky-top">
+        <nav class="navbar navbar-expand-lg public-navbar">
+            <div class="container">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <span class="brand-badge">TA</span>
+                    <span>Travel Advisor</span>
+                </a>
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navMenu">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
                         <li class="nav-item">
-                            <a class="nav-link text-primary fw-semibold" asp-controller="Customer" asp-action="Bookings">My Bookings</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                    }
-                </ul>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index" asp-route-tab="hotels">Hotels &amp; Stays</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index" asp-route-tab="packages">Tour Packages</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Destinations">Destinations</a>
+                        </li>
+                        @if (isAuthenticated && role == RoleNames.User)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-primary fw-semibold" asp-controller="Customer" asp-action="Bookings">My Bookings</a>
+                            </li>
+                        }
+                    </ul>
 
-                <div class="d-flex align-items-center gap-2">
-                    @if (!isAuthenticated)
-                    {
-                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary btn-sm px-3">Sign in</a>
-                        <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-sm px-3">Register</a>
-                    }
-                    else
-                    {
-                        @if (role == RoleNames.Admin)
+                    <div class="d-flex align-items-center gap-3">
+                        @if (!isAuthenticated)
                         {
-                            <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-dark btn-sm">Admin Portal</a>
+                            <a asp-controller="Account" asp-action="Login" class="btn-sign-in">Sign in</a>
+                            <a asp-controller="Account" asp-action="Register" class="btn-register-pill">Register</a>
                         }
-                        else if (role == RoleNames.HotelOwner)
+                        else
                         {
-                            <a asp-controller="Owner" asp-action="Dashboard" class="btn btn-outline-dark btn-sm">Owner Portal</a>
-                        }
-                        else if (role == RoleNames.TravelAgent)
-                        {
-                            <a asp-controller="Agent" asp-action="Dashboard" class="btn btn-outline-dark btn-sm">Agent Portal</a>
-                        }
-                        else if (role == RoleNames.User)
-                        {
-                            <a asp-controller="Customer" asp-action="Dashboard" class="btn btn-primary btn-sm">My Dashboard</a>
-                        }
+                            @if (role == RoleNames.Admin)
+                            {
+                                <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-semibold">Admin Portal</a>
+                            }
+                            else if (role == RoleNames.HotelOwner)
+                            {
+                                <a asp-controller="Owner" asp-action="Dashboard" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-semibold">Owner Portal</a>
+                            }
+                            else if (role == RoleNames.TravelAgent)
+                            {
+                                <a asp-controller="Agent" asp-action="Dashboard" class="btn btn-outline-dark btn-sm rounded-pill px-3 fw-semibold">Agent Portal</a>
+                            }
+                            else if (role == RoleNames.User)
+                            {
+                                <a asp-controller="Customer" asp-action="Dashboard" class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold">My Dashboard</a>
+                            }
 
-                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-outline-secondary btn-sm">Sign out</button>
-                        </form>
-                    }
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline m-0">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3">Sign out</button>
+                            </form>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
 
-    <main class="py-4 flex-grow-1">
+    <main class="flex-grow-1">
         @if (TempData["Success"] != null)
         {
-            <div class="container mb-3">
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <div class="container mt-3 mb-0">
+                <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0" role="alert">
                     @TempData["Success"]
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
@@ -95,8 +97,8 @@
         }
         @if (TempData["Error"] != null)
         {
-            <div class="container mb-3">
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="container mt-3 mb-0">
+                <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0" role="alert">
                     @TempData["Error"]
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
@@ -105,9 +107,42 @@
         @RenderBody()
     </main>
 
-    <footer class="border-top py-4 bg-white mt-auto">
-        <div class="container text-center text-muted small">
-            &copy; 2026 Travel Advisor. All rights reserved.
+    <footer class="public-footer">
+        <div class="container">
+            <div class="row g-4 justify-content-between">
+                <div class="col-md-5">
+                    <div class="footer-brand">
+                        <span class="brand-badge">TA</span>
+                        <span>Travel Advisor</span>
+                    </div>
+                    <p class="small text-muted mb-0" style="max-width: 380px;">
+                        Handcrafted Sri Lankan journeys, verified boutique hotels, and seamless bookings for travelers worldwide.
+                    </p>
+                </div>
+                <div class="col-md-6 col-lg-5">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <h6 class="text-white fw-bold mb-3 small text-uppercase">Explore</h6>
+                            <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
+                                <li><a asp-controller="Home" asp-action="Index">Discover Stays</a></li>
+                                <li><a asp-controller="Home" asp-action="Index" asp-route-tab="packages">Tour Packages</a></li>
+                                <li><a asp-controller="Home" asp-action="Destinations">Destinations</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="text-white fw-bold mb-3 small text-uppercase">Account</h6>
+                            <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
+                                <li><a asp-controller="Account" asp-action="Login">Sign In</a></li>
+                                <li><a asp-controller="Account" asp-action="Register">Create Account</a></li>
+                                <li><a asp-controller="Customer" asp-action="Bookings">My Bookings</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2026 Travel Advisor. All rights reserved. Built for modern travel exploration and bookings.
+            </div>
         </div>
     </footer>
 
