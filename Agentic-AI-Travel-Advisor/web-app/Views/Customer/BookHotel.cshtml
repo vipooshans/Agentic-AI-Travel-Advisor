@@ -7,22 +7,22 @@
     var room = ViewBag.Room as RoomDto;
 }
 
-<div class="mb-4">
+<div class="mb-3">
     @if (hotel != null)
     {
-        <a asp-action="Hotel" asp-route-id="@hotel.Id" class="text-decoration-none small text-muted">&larr; Back to @hotel.Name</a>
+        <a asp-action="Hotel" asp-route-id="@hotel.Id" class="btn btn-sm btn-outline-secondary">&larr; Back to @hotel.Name</a>
     }
     else
     {
-        <a asp-action="Hotels" class="text-decoration-none small text-muted">&larr; Back to hotels</a>
+        <a asp-action="Hotels" class="btn btn-sm btn-outline-secondary">&larr; Back to hotels</a>
     }
 </div>
 
 <div class="row g-4">
     <div class="col-lg-7">
-        <div class="card border-0 shadow-sm rounded-4 p-4">
+        <section class="panel-card p-4">
             <h5 class="fw-bold mb-1">Reserve Your Stay</h5>
-            <p class="text-muted small mb-4">Complete the form below to submit your booking request. Bookings start in Pending status until the hotel owner confirms.</p>
+            <p class="text-muted small mb-4">Complete the form below to submit your booking request. Bookings start in Pending status until confirmed by the hotel owner.</p>
 
             <form asp-action="BookHotel" asp-route-hotelId="@(hotel?.Id ?? 0)" method="post">
                 @Html.AntiForgeryToken()
@@ -54,13 +54,14 @@
                     <textarea asp-for="Notes" class="form-control" rows="3" placeholder="e.g. late check-in, dietary preferences, extra pillows"></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 py-2">Submit Booking Request</button>
+                <button type="submit" class="btn btn-primary">Submit Booking Request</button>
+                <a asp-action="Hotels" class="btn btn-link">Cancel</a>
             </form>
-        </div>
+        </section>
     </div>
 
     <div class="col-lg-5">
-        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <section class="panel-card p-4">
             <h6 class="fw-bold mb-3">Stay Summary</h6>
             @if (hotel != null && room != null)
             {
@@ -84,9 +85,9 @@
                 </div>
 
                 <div class="alert alert-light border small text-muted mb-0">
-                    <i class="bi bi-info-circle me-1"></i> Your booking will be reviewed and confirmed by the hotel. No charges are incurred immediately.
+                    Your booking will be reviewed and confirmed by the hotel. No charges are incurred immediately.
                 </div>
             }
-        </div>
+        </section>
     </div>
 </div>

@@ -51,14 +51,14 @@ public class AccountController : Controller
     }
 
     [HttpGet]
-    public IActionResult Register()
+    public IActionResult Register(string? returnUrl = null)
     {
         if (User.Identity?.IsAuthenticated == true)
         {
             return RedirectToRoleDashboard();
         }
 
-        return View(new RegisterViewModel());
+        return View(new RegisterViewModel { ReturnUrl = returnUrl });
     }
 
     [HttpPost]
@@ -75,6 +75,11 @@ public class AccountController : Controller
         {
             ModelState.AddModelError(string.Empty, error ?? "Registration failed.");
             return View(model);
+        }
+
+        if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+        {
+            return Redirect(model.ReturnUrl);
         }
 
         return RedirectToRoleDashboard(role);

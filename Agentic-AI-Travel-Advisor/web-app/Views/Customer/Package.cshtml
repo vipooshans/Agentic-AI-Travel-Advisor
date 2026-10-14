@@ -4,11 +4,11 @@
     Layout = "_AdminLayout";
 }
 
-<div class="mb-4">
-    <a asp-action="Packages" class="text-decoration-none small text-muted">&larr; Back to all tour packages</a>
+<div class="mb-3">
+    <a asp-action="Packages" class="btn btn-sm btn-outline-secondary">&larr; Back to all tour packages</a>
 </div>
 
-<div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+<section class="panel-card p-4 mb-4">
     <div class="row g-4 align-items-center">
         @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
         {
@@ -34,15 +34,15 @@
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<h5 class="fw-bold mb-3">Included Activities</h5>
+<p class="section-title">Included Activities</p>
 
-@if (Model.Activities.Count == 0)
+@if (!Model.Activities.Any())
 {
-    <div class="card p-4 text-center border-0 shadow-sm rounded-3">
-        <p class="text-muted mb-0">No specific activities are scheduled for this tour.</p>
-    </div>
+    ViewData["EmptyTitle"] = "No activities listed";
+    ViewData["EmptyMessage"] = "No specific activities are scheduled for this tour.";
+    @await Html.PartialAsync("_EmptyState")
 }
 else
 {
@@ -50,9 +50,9 @@ else
         @foreach (var a in Model.Activities)
         {
             <div class="col-md-6">
-                <div class="card border-0 shadow-sm rounded-3 p-3">
+                <section class="panel-card p-3 h-100">
                     <div class="d-flex justify-content-between align-items-start mb-1">
-                        <h6 class="fw-bold mb-0">Day @a.DayNumber: @a.Name</h6>
+                        <h6 class="fw-bold mb-0">Day @a.DayNumber: @a.Title</h6>
                         @if (a.Price > 0)
                         {
                             <span class="badge bg-light text-dark border">+ LKR @a.Price.ToString("N0")</span>
@@ -62,7 +62,7 @@ else
                     {
                         <p class="text-muted small mb-0">@a.Description</p>
                     }
-                </div>
+                </section>
             </div>
         }
     </div>

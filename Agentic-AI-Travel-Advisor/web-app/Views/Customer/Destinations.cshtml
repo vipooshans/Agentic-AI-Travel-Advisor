@@ -4,32 +4,31 @@
     Layout = "_AdminLayout";
 }
 
-<div class="mb-4">
-    <h5 class="mb-1">Destinations</h5>
-    <p class="text-muted small mb-0">Explore breathtaking cultural, coastal, and hill-country destinations across Sri Lanka.</p>
+<div class="mb-3">
+    <p class="text-muted mb-0">Explore breathtaking cultural, coastal, and hill-country destinations across Sri Lanka.</p>
 </div>
 
-@if (Model.Count == 0)
+@if (!Model.Any())
 {
-    <div class="card p-5 text-center border-0 shadow-sm rounded-4">
-        <p class="text-muted mb-0">No destinations are currently listed.</p>
-    </div>
+    ViewData["EmptyTitle"] = "No destinations listed";
+    ViewData["EmptyMessage"] = "No destinations are currently available.";
+    @await Html.PartialAsync("_EmptyState")
 }
 else
 {
-    <div class="row g-4">
+    <div class="row g-3">
         @foreach (var d in Model)
         {
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm rounded-4 p-4">
+                <section class="panel-card h-100 p-4 d-flex flex-column">
                     <span class="badge bg-primary-subtle text-primary mb-2 align-self-start">@d.Country</span>
                     <h5 class="fw-bold mb-2">@d.Name</h5>
                     <p class="text-secondary small mb-3 flex-grow-1">@d.Description</p>
-                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                    <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-auto">
                         <a asp-action="Hotels" asp-route-q="@d.Name" class="btn btn-outline-primary btn-sm">Find Stays</a>
                         <a asp-action="Packages" asp-route-q="@d.Name" class="btn btn-outline-secondary btn-sm">Find Tours</a>
                     </div>
-                </div>
+                </section>
             </div>
         }
     </div>

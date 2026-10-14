@@ -6,20 +6,20 @@
     var package = ViewBag.Package as TravelPackageDetailDto;
 }
 
-<div class="mb-4">
+<div class="mb-3">
     @if (package != null)
     {
-        <a asp-action="Package" asp-route-id="@package.Id" class="text-decoration-none small text-muted">&larr; Back to @package.Title</a>
+        <a asp-action="Package" asp-route-id="@package.Id" class="btn btn-sm btn-outline-secondary">&larr; Back to @package.Title</a>
     }
     else
     {
-        <a asp-action="Packages" class="text-decoration-none small text-muted">&larr; Back to packages</a>
+        <a asp-action="Packages" class="btn btn-sm btn-outline-secondary">&larr; Back to packages</a>
     }
 </div>
 
 <div class="row g-4">
     <div class="col-lg-7">
-        <div class="card border-0 shadow-sm rounded-4 p-4">
+        <section class="panel-card p-4">
             <h5 class="fw-bold mb-1">Book Tour Package</h5>
             <p class="text-muted small mb-4">Complete the form below to submit your tour reservation. The package provider will confirm your booking.</p>
 
@@ -46,13 +46,14 @@
                     <textarea asp-for="Notes" class="form-control" rows="3" placeholder="e.g. pickup location, dietary needs, language preferences"></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 py-2">Submit Tour Booking Request</button>
+                <button type="submit" class="btn btn-primary">Submit Tour Booking Request</button>
+                <a asp-action="Packages" class="btn btn-link">Cancel</a>
             </form>
-        </div>
+        </section>
     </div>
 
     <div class="col-lg-5">
-        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+        <section class="panel-card p-4">
             <h6 class="fw-bold mb-3">Tour Summary</h6>
             @if (package != null)
             {
@@ -75,9 +76,9 @@
                 </div>
 
                 <div class="alert alert-light border small text-muted mb-0">
-                    <i class="bi bi-info-circle me-1"></i> Final total includes activities and scales with party size. The request will be reviewed by the travel agent.
+                    Final total includes activities and scales with party size. The request will be reviewed by the travel agent.
                 </div>
             }
-        </div>
+        </section>
     </div>
 </div>

@@ -3,99 +3,132 @@
 @model List<BookingDto>
 @{
     Layout = "_AdminLayout";
+    var pendingCount = (int)(ViewBag.PendingBookings ?? 0);
+    var confirmedCount = (int)(ViewBag.ConfirmedBookings ?? 0);
+    var completedCount = (int)(ViewBag.CompletedBookings ?? 0);
+    var totalCount = (int)(ViewBag.TotalBookings ?? 0);
+    var totalSpent = (decimal)(ViewBag.TotalSpent ?? 0);
 }
 
-<div class="row g-4">
+<section class="dashboard-hero">
+    <div>
+        <p class="eyebrow">Traveler overview</p>
+        <h2>Your journey, quietly held</h2>
+        <p>Track your room reservations, tour package requests, and upcoming stays across Sri Lanka.</p>
+    </div>
+    <div class="hero-actions">
+        <span class="hero-chip">@pendingCount pending confirmation</span>
+        <a asp-action="Hotels" class="btn btn-light">Explore stays</a>
+        <a asp-action="Packages" class="btn btn-outline-light">Tour packages</a>
+    </div>
+</section>
+
+<p class="dash-section-label">Bookings &amp; spend</p>
+<div class="row g-3">
     <div class="col-md-3">
         <div class="stat-card">
-            <h6>Total Bookings</h6>
-            <p class="stat-value">@ViewBag.TotalBookings</p>
+            <div class="stat-head">
+                <h6>Total Bookings</h6>
+                <span class="stat-icon stat-icon-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>
+                </span>
+            </div>
+            <p class="stat-value">@totalCount</p>
         </div>
     </div>
     <div class="col-md-3">
         <div class="stat-card">
-            <h6>Pending Confirmation</h6>
-            <p class="stat-value">@ViewBag.PendingBookings</p>
+            <div class="stat-head">
+                <h6>Pending Confirmation</h6>
+                <span class="stat-icon stat-icon-orange" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                </span>
+            </div>
+            <p class="stat-value">@pendingCount</p>
         </div>
     </div>
     <div class="col-md-3">
         <div class="stat-card">
-            <h6>Confirmed Trips</h6>
-            <p class="stat-value">@ViewBag.ConfirmedBookings</p>
+            <div class="stat-head">
+                <h6>Confirmed Trips</h6>
+                <span class="stat-icon stat-icon-green" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </span>
+            </div>
+            <p class="stat-value">@confirmedCount</p>
         </div>
     </div>
     <div class="col-md-3">
         <div class="stat-card stat-card-accent">
-            <h6>Total Spent</h6>
-            <p class="stat-value">LKR @(((decimal)(ViewBag.TotalSpent ?? 0)).ToString("N0"))</p>
+            <div class="stat-head">
+                <h6>Total Spent</h6>
+                <span class="stat-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6.5 9.5h.01M17.5 14.5h.01"/></svg>
+                </span>
+            </div>
+            <p class="stat-value">LKR @totalSpent.ToString("N0")</p>
         </div>
     </div>
 </div>
 
-<section class="insight-card my-4">
-    <div>
-        <p class="eyebrow">Discover Sri Lanka</p>
-        <h2>Ready for your next adventure?</h2>
-        <p>Explore hand-picked boutique hotels, beachfront villas, and guided island travel packages across Sri Lanka.</p>
-    </div>
-    <div class="insight-actions">
-        <a asp-action="Hotels" class="btn btn-primary">Explore Hotels</a>
-        <a asp-action="Packages" class="btn btn-outline-primary">Tour Packages</a>
-    </div>
-</section>
-
-<div class="d-flex justify-content-between align-items-center mb-3 mt-4">
-    <h5 class="mb-0">Recent Bookings</h5>
-    <a asp-action="Bookings" class="btn btn-sm btn-outline-secondary">View all bookings &rarr;</a>
-</div>
-
-@if (Model.Count == 0)
-{
-    <div class="card p-4 text-center border-0 shadow-sm rounded-3">
-        <p class="text-muted mb-3">You don't have any reservations yet.</p>
+<p class="dash-section-label mt-4">Recent reservations</p>
+<section class="panel-card">
+    <div class="panel-head">
         <div>
-            <a asp-action="Hotels" class="btn btn-primary btn-sm me-2">Browse Hotels</a>
-            <a asp-action="Packages" class="btn btn-outline-primary btn-sm">Explore Packages</a>
+            <h3>Recent activity</h3>
+            <p>Your latest room and tour package reservations.</p>
+        </div>
+        <div class="panel-total">
+            <a asp-action="Bookings" class="btn btn-sm btn-outline-secondary">View all bookings &rarr;</a>
         </div>
     </div>
-}
-else
-{
-    <div class="table-responsive">
-        <table class="table table-striped align-middle">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Listing</th>
-                    <th>Dates</th>
-                    <th>Guests</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var b in Model)
-                {
+
+    @if (!Model.Any())
+    {
+        ViewData["EmptyTitle"] = "No bookings yet";
+        ViewData["EmptyMessage"] = "You don't have any reservations. Explore hotels and tour packages to get started.";
+        @await Html.PartialAsync("_EmptyState")
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+                <thead>
                     <tr>
-                        <td><strong>#@b.Id</strong></td>
-                        <td>@(b.HotelName != null ? $"{b.HotelName} · {b.RoomName}" : b.PackageTitle)</td>
-                        <td>@b.CheckIn.ToString("yyyy-MM-dd") &rarr; @b.CheckOut.ToString("yyyy-MM-dd")</td>
-                        <td>@b.Guests guest@(b.Guests == 1 ? "" : "s")</td>
-                        <td><strong>LKR @b.TotalPrice.ToString("N0")</strong></td>
-                        <td>@await Html.PartialAsync("_BookingStatusBadge", b.Status)</td>
-                        <td class="text-end">
-                            @if (b.Status is BookingStatus.Pending or BookingStatus.Confirmed)
-                            {
-                                <form asp-action="CancelBooking" asp-route-id="@b.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel booking #@b.Id?');">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
-                                </form>
-                            }
-                        </td>
+                        <th>#</th>
+                        <th>Listing</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Guests</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th></th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-}
+                </thead>
+                <tbody>
+                    @foreach (var b in Model)
+                    {
+                        <tr class="@(b.Status == BookingStatus.Pending ? "table-warning" : null)">
+                            <td><strong>#@b.Id</strong></td>
+                            <td>@(b.HotelName != null ? $"{b.HotelName} · {b.RoomName}" : b.PackageTitle)</td>
+                            <td>@b.CheckIn.ToString("yyyy-MM-dd")</td>
+                            <td>@b.CheckOut.ToString("yyyy-MM-dd")</td>
+                            <td>@b.Guests guest@(b.Guests == 1 ? "" : "s")</td>
+                            <td><strong>LKR @b.TotalPrice.ToString("N0")</strong></td>
+                            <td>@await Html.PartialAsync("_BookingStatusBadge", b.Status)</td>
+                            <td class="text-end">
+                                @if (b.Status is BookingStatus.Pending or BookingStatus.Confirmed)
+                                {
+                                    <form asp-action="CancelBooking" asp-route-id="@b.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel booking #@b.Id?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

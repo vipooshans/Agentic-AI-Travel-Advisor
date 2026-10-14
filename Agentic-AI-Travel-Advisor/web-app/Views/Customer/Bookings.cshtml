@@ -6,30 +6,22 @@
     var activeFilter = ViewBag.ActiveFilter as string ?? "All";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h5 class="mb-1">My Reservations</h5>
-        <p class="text-muted small mb-0">Follow your room bookings and tour package requests in real-time.</p>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <p class="text-muted mb-0">Track and manage your room reservations and island tour packages.</p>
     <div class="btn-group btn-group-sm" role="group">
-        <a asp-action="Bookings" class="btn @(activeFilter == "All" ? "btn-primary" : "btn-outline-secondary")">All</a>
-        <a asp-action="Bookings" asp-route-status="Pending" class="btn @(activeFilter == "Pending" ? "btn-primary" : "btn-outline-secondary")">Pending</a>
-        <a asp-action="Bookings" asp-route-status="Confirmed" class="btn @(activeFilter == "Confirmed" ? "btn-primary" : "btn-outline-secondary")">Confirmed</a>
-        <a asp-action="Bookings" asp-route-status="Completed" class="btn @(activeFilter == "Completed" ? "btn-primary" : "btn-outline-secondary")">Completed</a>
-        <a asp-action="Bookings" asp-route-status="Cancelled" class="btn @(activeFilter == "Cancelled" ? "btn-primary" : "btn-outline-secondary")">Cancelled</a>
+        <a asp-action="Bookings" class="btn btn-sm @(activeFilter == "All" ? "btn-secondary" : "btn-outline-secondary")">All</a>
+        <a asp-action="Bookings" asp-route-status="Pending" class="btn btn-sm @(activeFilter == "Pending" ? "btn-secondary" : "btn-outline-secondary")">Pending</a>
+        <a asp-action="Bookings" asp-route-status="Confirmed" class="btn btn-sm @(activeFilter == "Confirmed" ? "btn-secondary" : "btn-outline-secondary")">Confirmed</a>
+        <a asp-action="Bookings" asp-route-status="Completed" class="btn btn-sm @(activeFilter == "Completed" ? "btn-secondary" : "btn-outline-secondary")">Completed</a>
+        <a asp-action="Bookings" asp-route-status="Cancelled" class="btn btn-sm @(activeFilter == "Cancelled" ? "btn-secondary" : "btn-outline-secondary")">Cancelled</a>
     </div>
 </div>
 
-@if (Model.Count == 0)
+@if (!Model.Any())
 {
-    <div class="card p-5 text-center border-0 shadow-sm rounded-4">
-        <h6 class="fw-bold mb-2">No @(activeFilter == "All" ? "" : activeFilter.ToLower()) bookings found</h6>
-        <p class="text-muted small mb-3">You do not have any bookings in this view.</p>
-        <div>
-            <a asp-action="Hotels" class="btn btn-primary btn-sm me-2">Explore Hotels</a>
-            <a asp-action="Packages" class="btn btn-outline-primary btn-sm">Explore Packages</a>
-        </div>
-    </div>
+    ViewData["EmptyTitle"] = "No bookings found";
+    ViewData["EmptyMessage"] = activeFilter == "All" ? "You have not placed any bookings yet. Browse hotels and tour packages to get started." : $"No {activeFilter.ToLower()} bookings found.";
+    @await Html.PartialAsync("_EmptyState")
 }
 else
 {
@@ -42,9 +34,9 @@ else
                     <th>Check-in</th>
                     <th>Check-out</th>
                     <th>Guests</th>
-                    <th>Total Price</th>
+                    <th>Total</th>
                     <th>Status</th>
-                    <th>Action</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -64,7 +56,7 @@ else
                         <td>@b.Guests guest@(b.Guests == 1 ? "" : "s")</td>
                         <td><strong>LKR @b.TotalPrice.ToString("N0")</strong></td>
                         <td>@await Html.PartialAsync("_BookingStatusBadge", b.Status)</td>
-                        <td>
+                        <td class="text-end">
                             @if (b.Status is BookingStatus.Pending or BookingStatus.Confirmed)
                             {
                                 <form asp-action="CancelBooking" asp-route-id="@b.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel booking #@b.Id?');">

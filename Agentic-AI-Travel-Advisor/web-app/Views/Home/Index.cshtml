@@ -1,8 +1,188 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@using TravelAdvisor.Core.DTOs.Destinations
+@using TravelAdvisor.Core.DTOs.Hotels
+@using TravelAdvisor.Core.DTOs.Packages
+@{
+    ViewData["Title"] = "Discover Extraordinary Journeys";
+    var destinations = ViewBag.Destinations as List<DestinationDto> ?? new();
+    var hotels = ViewBag.Hotels as List<HotelDto> ?? new();
+    var packages = ViewBag.Packages as List<TravelPackageDto> ?? new();
+    var tab = ViewBag.ActiveTab as string ?? "hotels";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core and keep having fun</a>.</p>
+<div class="container mb-5">
+    <div class="hero-section py-5 px-4 mb-5 rounded-4 text-white text-center shadow-sm" style="background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);">
+        <h1 class="display-4 fw-bold mb-3">Explore Sri Lanka &amp; Beyond</h1>
+        <p class="lead mb-4 text-light opacity-75">Curated stays, boutique villas, and handcrafted island tour packages.</p>
+
+        <div class="card p-3 shadow-lg border-0 mx-auto" style="max-width: 900px; background: rgba(255,255,255,0.98);">
+            <form method="get" asp-action="Index" class="row g-2 align-items-center">
+                <input type="hidden" name="tab" value="@tab" />
+                <div class="col-md-4 text-start">
+                    <label class="form-label small fw-semibold text-secondary mb-1">Search Keyword</label>
+                    <input type="text" name="q" value="@ViewBag.Query" class="form-control" placeholder="Destination, hotel, or tour" />
+                </div>
+                <div class="col-md-3 text-start">
+                    <label class="form-label small fw-semibold text-secondary mb-1">City / Region</label>
+                    <input type="text" name="city" value="@ViewBag.City" class="form-control" placeholder="e.g. Ella, Kandy, Galle" />
+                </div>
+                <div class="col-md-3 text-start">
+                    <label class="form-label small fw-semibold text-secondary mb-1">Max Budget (LKR)</label>
+                    <input type="number" name="maxPrice" value="@ViewBag.MaxPrice" class="form-control" placeholder="e.g. 50000" />
+                </div>
+                <div class="col-md-2 d-grid mt-auto">
+                    <button type="submit" class="btn btn-primary py-2 mt-4 fw-semibold">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-1">Featured Destinations</h3>
+            <p class="text-muted small mb-0">Discover popular highlights across the island</p>
+        </div>
+        <a asp-action="Destinations" class="btn btn-outline-secondary btn-sm">View all destinations &rarr;</a>
+    </div>
+
+    <div class="row g-3">
+        @foreach (var d in destinations.Take(4))
+        {
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm rounded-3 p-3">
+                    <span class="badge bg-primary-subtle text-primary mb-2 align-self-start">@d.Country</span>
+                    <h5 class="fw-bold mb-1">@d.Name</h5>
+                    <p class="text-secondary small mb-3 flex-grow-1 text-truncate">@d.Description</p>
+                    <a asp-action="Index" asp-route-q="@d.Name" class="btn btn-sm btn-outline-primary mt-auto">Explore Stays</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <ul class="nav nav-pills" id="catalogTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link @(tab == "hotels" ? "active" : "") fw-semibold" asp-action="Index" asp-route-tab="hotels">
+                    Hotels &amp; Accommodations (@hotels.Count)
+                </a>
+            </li>
+            <li class="nav-item ms-2">
+                <a class="nav-link @(tab == "packages" ? "active" : "") fw-semibold" asp-action="Index" asp-route-tab="packages">
+                    Travel Packages &amp; Tours (@packages.Count)
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    @if (tab == "hotels")
+    {
+        @if (hotels.Count == 0)
+        {
+            <div class="alert alert-light text-center py-5 border rounded-4">
+                <p class="mb-0 text-muted">No approved hotels match your search criteria.</p>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var h in hotels)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                            @if (!string.IsNullOrWhiteSpace(h.ImageUrl))
+                            {
+                                <img src="@h.ImageUrl" class="card-img-top" style="height: 200px; object-fit: cover;" alt="@h.Name" />
+                            }
+                            else
+                            {
+                                <div class="bg-secondary-subtle d-flex align-items-center justify-content-center text-muted" style="height: 200px;">
+                                    <span>No image available</span>
+                                </div>
+                            }
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title fw-bold mb-0">@h.Name</h5>
+                                    @if (h.AverageRating.HasValue)
+                                    {
+                                        <span class="badge bg-warning text-dark">&#9733; @h.AverageRating.Value.ToString("0.0")</span>
+                                    }
+                                </div>
+                                <p class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> @h.City, @h.Country</p>
+                                <p class="card-text text-secondary small flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                    @h.Description
+                                </p>
+                                <hr class="my-3 opacity-25" />
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <small class="text-muted d-block">Starting from</small>
+                                        @if (h.MinPricePerNight.HasValue)
+                                        {
+                                            <strong class="text-primary fs-5">LKR @h.MinPricePerNight.Value.ToString("N0")</strong> <span class="small text-muted">/ night</span>
+                                        }
+                                        else
+                                        {
+                                            <strong class="text-muted">Price unavailable</strong>
+                                        }
+                                    </div>
+                                    <a asp-action="Hotel" asp-route-id="@h.Id" class="btn btn-outline-primary btn-sm px-3">View Rooms</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        @if (packages.Count == 0)
+        {
+            <div class="alert alert-light text-center py-5 border rounded-4">
+                <p class="mb-0 text-muted">No approved tour packages match your search criteria.</p>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var p in packages)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                            @if (!string.IsNullOrWhiteSpace(p.ImageUrl))
+                            {
+                                <img src="@p.ImageUrl" class="card-img-top" style="height: 200px; object-fit: cover;" alt="@p.Title" />
+                            }
+                            else
+                            {
+                                <div class="bg-secondary-subtle d-flex align-items-center justify-content-center text-muted" style="height: 200px;">
+                                    <span>No image available</span>
+                                </div>
+                            }
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title fw-bold mb-0">@p.Title</h5>
+                                    <span class="badge bg-info-subtle text-info">@p.DurationDays Days</span>
+                                </div>
+                                <p class="card-text text-secondary small flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                    @p.Description
+                                </p>
+                                <div class="text-muted small mb-2">Max party: @p.MaxTravelers travelers</div>
+                                <hr class="my-3 opacity-25" />
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <small class="text-muted d-block">Total price</small>
+                                        <strong class="text-primary fs-5">LKR @p.Price.ToString("N0")</strong>
+                                    </div>
+                                    <a asp-action="Package" asp-route-id="@p.Id" class="btn btn-outline-primary btn-sm px-3">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
 </div>

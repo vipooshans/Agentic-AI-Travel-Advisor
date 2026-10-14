@@ -76,14 +76,17 @@
                 }
                 else if (portal == "Customer")
                 {
+                    <p class="nav-group-label">Overview</p>
                     <a class="@NavClass("Customer", "Dashboard")" asp-controller="Customer" asp-action="Dashboard">
                         <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
                         Dashboard
                     </a>
+                    <p class="nav-group-label">My Trips</p>
                     <a class="@NavClass("Customer", "Bookings")" asp-controller="Customer" asp-action="Bookings">
                         <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>
                         My Bookings
                     </a>
+                    <p class="nav-group-label">Explore Catalog</p>
                     <a class="@NavClass("Customer", "Hotels")" asp-controller="Customer" asp-action="Hotels">
                         <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V8l8-4 8 4v12"/><path d="M9 20v-6h6v6"/></svg>
                         Hotels &amp; Stays
@@ -96,6 +99,7 @@
                         <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
                         Destinations
                     </a>
+                    <p class="nav-group-label">Account</p>
                     <a class="@NavClass("Customer", "Profile")" asp-controller="Customer" asp-action="Profile">
                         <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                         My Profile
@@ -137,7 +141,7 @@
                     </a>
                 }
             </nav>
-            <div class="sidebar-foot">Private desk</div>
+            <div class="sidebar-foot">@(portal == "Customer" ? "Traveler desk" : "Private desk")</div>
         </aside>
         <div class="admin-main">
             <header class="admin-header">

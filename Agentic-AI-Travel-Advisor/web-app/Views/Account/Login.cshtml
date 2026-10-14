@@ -57,7 +57,7 @@
 
                 <div class="mt-3 text-center">
                     <span class="text-muted small">New traveler?</span>
-                    <a asp-action="Register" class="small fw-semibold ms-1">Create an account</a>
+                    <a asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl" class="small fw-semibold ms-1">Create an account</a>
                 </div>
 
                 <div class="demo-keys">
