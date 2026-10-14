@@ -8,12 +8,105 @@ Travel advisory and booking platform with an agentic AI assistant:
   through schema-validated backend tools. It uses an OpenAI-compatible model with function calling when
   `Ai:ApiKey` is set, and a deterministic planner otherwise.
 - **React web app** (`web-react`) — all four roles.
-- **MVC portal** (`web-app`) — hotel owners, travel agents and admins.
+- **MVC portal** (`web-app`) — travelers, hotel owners, travel agents and admins.
 - **Flutter app** (`mobile-app`) — travelers.
 
 Booking workflow: `PENDING → CONFIRMED → COMPLETED`, with `CANCELLED` reachable from Pending and Confirmed.
 The AI can propose a booking, but a booking is only created after the traveler confirms it, and it starts as
 Pending until the provider confirms it.
+
+## Booking & Reservation Module
+
+### Purpose
+The Booking & Reservation module is the central transactional engine of the platform. It handles real-time room and tour package availability, price calculations, reservation lifecycles, cancellation enforcement, and payment reconciliation across all client applications.
+
+### Main Features
+- **Hotel Room Bookings**: Reservation by check-in / check-out dates, room capacity validation, and automated nightly rate summation.
+- **Tour Package Bookings**: Multi-day guided tour reservations with participant count limits and scheduled start dates.
+- **Status Lifecycle Management**: Strict state transitions from initial pending state to provider confirmation or completion.
+- **Cancellation Policy Enforcement**: Date-driven cancellation validation checking advance cut-off windows before releasing inventory.
+- **Simulated Payment Gateway Integration**: Automated payment transaction creation (`Pending` → `Completed`) linked to reservations.
+- **Multi-Role Access Control**:
+  - **Travelers**: Create bookings, view personal trip history, and cancel eligible reservations.
+  - **Hotel Owners**: View incoming room reservations and update status for their own properties.
+  - **Travel Agents**: Monitor package bookings and traveler counts for their tour listings.
+  - **Admins**: System-wide oversight, search, filtering, and manual status adjustments.
+
+### Booking Status Lifecycle
+```
+  ┌─────────┐        Provider Confirms        ┌───────────┐        Trip Concludes        ┌───────────┐
+  │ PENDING │ ──────────────────────────────> │ CONFIRMED │ ───────────────────────────> │ COMPLETED │
+  └─────────┘                                 └───────────┘                              └───────────┘
+       │                                            │
+       │ Traveler / Provider Cancels                │ Traveler Cancels (Before Cut-off)
+       v                                            v
+  ┌───────────────────────────────────────────────────────┐
+  │                       CANCELLED                       │
+  └───────────────────────────────────────────────────────┘
+```
+- **`PENDING`**: Reservation created by the traveler; room/package held awaiting provider confirmation or payment.
+- **`CONFIRMED`**: Provider accepts the booking or payment succeeds; dates and inventory locked.
+- **`COMPLETED`**: Check-out date has passed or tour itinerary is finished.
+- **`CANCELLED`**: Cancelled by traveler or provider; inventory released.
+
+### Key Entities
+- **`Booking`**: Holds `UserId`, `BookingType` (`Hotel` or `Package`), `HotelId`, `RoomId`, `PackageId`, `CheckInDate`, `CheckOutDate`, `StartDate`, `NumberOfGuests`, `TotalPrice`, `Status`, `CreatedAt`, and `UpdatedAt`.
+- **`Payment`**: Holds `BookingId`, `Amount`, `Status` (`Pending`, `Completed`, `Failed`, `Refunded`), `PaymentMethod` (`CreditCard`, `DebitCard`, `BankTransfer`, `Cash`), `TransactionId`, and `PaidAt`.
+
+### API Endpoints
+| Method | Route | Auth / Role | Purpose |
+|---|---|---|---|
+| `POST` | `/api/bookings` | `USER` | Create a new hotel room or tour package booking |
+| `GET` | `/api/bookings/my-bookings` | `USER` | List all bookings belonging to the authenticated traveler |
+| `GET` | `/api/bookings/{id}` | `USER`, `ADMIN` | Get full details and payment record for a single booking |
+| `POST` | `/api/bookings/{id}/cancel` | `USER`, `ADMIN` | Cancel an eligible reservation before the cut-off date |
+| `GET` | `/api/bookings/owner` | `HOTEL_OWNER` | List reservations for properties owned by the authenticated owner |
+| `GET` | `/api/bookings/agent` | `TRAVEL_AGENT` | List bookings for packages managed by the authenticated agent |
+| `GET` | `/api/bookings/admin` | `ADMIN` | Search, filter, and audit all bookings across the platform |
+| `PUT` | `/api/bookings/{id}/status` | `HOTEL_OWNER`, `TRAVEL_AGENT`, `ADMIN` | Update booking status (`Confirmed`, `Completed`, `Cancelled`) |
+
+### Frontends Consuming the Booking Module
+- **React Web App (`web-react`)**: Traveler booking flows, checkout forms, trip list, hotel owner reservation table, and admin booking manager.
+- **MVC Portal (`web-app`)**: Public catalog browsing, customer dashboard, hotel/package booking wizards, traveler reservation list with cancellation actions, and owner/agent/admin management desks.
+- **Flutter Mobile App (`mobile-app`)**: Mobile booking flows, interactive date pickers, ticket/voucher display, and self-service cancellation.
+
+## Booking AI Agent
+
+### Overview
+The Booking AI Agent enables travelers to inspect, create, and manage reservations via natural language conversation. It wraps existing domain services through schema-validated tool calling, prevents double-booking, and guarantees server-side security by taking the user identity directly from verified JWT claims rather than model-generated parameters.
+
+### Tool Calling Functions
+The agent interacts with the backend strictly through the following schema-validated tools:
+1. `search_hotel_rooms(hotelId, checkIn, checkOut, guests)`: Checks availability and returns nightly rates and room types.
+2. `search_packages(query, destination, maxPrice)`: Searches available tour packages matching traveler preferences.
+3. `propose_booking(bookingType, referenceId, startDate, endDate, guests)`: Validates inputs, calculates total cost, and creates an in-memory, time-limited booking proposal requiring confirmation.
+4. `confirm_booking(proposalId)`: Finalizes the booking by delegating to `IBookingService.CreateBookingAsync`, generating a `PENDING` booking.
+5. `get_my_bookings(statusFilter)`: Retrieves the authenticated user's reservations via `IBookingService.GetUserBookingsAsync`.
+6. `cancel_booking(bookingId, reason)`: Validates ownership, checks the cancellation cut-off window, and invokes `IBookingService.CancelBookingAsync`.
+
+### Flow: From User Message to Booking Action
+1. **User Message**: Traveler types: *"Book a Deluxe Room at Ella Grand Resort from Nov 10 to 14 for 2 guests"*.
+2. **Context & Identity**: API controller extracts `UserId` from the verified JWT token (`User.FindFirstValue(ClaimTypes.NameIdentifier)`).
+3. **Availability Tool Call**: The agent invokes `search_hotel_rooms`, verifying dates and room capacity against the database.
+4. **Proposal & Confirmation Request**: The agent formulates a proposal (Dates, Total Price, Nights) and explicitly asks: *"Would you like me to confirm this booking for LKR 45,000?"*.
+5. **User Confirmation**: The user replies *"Yes, please confirm"*.
+6. **Execution**: The agent invokes `confirm_booking`, persisting the reservation with `Pending` status.
+7. **Response**: A structured confirmation with booking ID, check-in details, and cancellation policies is returned to the client.
+
+### Deterministic Fallback Behavior
+If the LLM provider fails, times out, rate limits, or if `Ai:ApiKey` is not configured:
+- The system automatically delegates to the **deterministic rule-based planner**.
+- Uses regex and intent recognition to handle common commands (e.g., `"my bookings"`, `"show reservations"`, `"cancel booking 14"`, `"book hotel [id]"`).
+- Directly queries backend services without hallucinating or failing ungracefully.
+
+### Configuration
+| Key / Environment Variable | Default | Purpose |
+|---|---|---|
+| `Ai:ApiKey` / `AI_API_KEY` | *(empty)* | OpenAI/Gemini/Anthropic API key for Chat Completions |
+| `Ai:BaseUrl` / `AI_BASE_URL` | `https://api.openai.com/v1` | LLM endpoint URL |
+| `Ai:Model` / `AI_MODEL` | `gpt-4o-mini` | LLM model identifier |
+| `Ai:BookingProposalMinutes` | `15` | Expiration window (minutes) for unconfirmed booking proposals |
+| `RateLimiting:AiPermitsPerMinute` | `20` | Maximum chat requests allowed per authenticated traveler per minute |
 
 ## Documentation
 
