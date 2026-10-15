@@ -1,0 +1,65 @@
+@using TravelAdvisor.Core.DTOs.Destinations
+@model List<DestinationDto>
+@{
+    ViewData["Title"] = "Destinations";
+
+    string GetDestinationImage(string name)
+    {
+        var lower = (name ?? "").ToLowerInvariant();
+        if (lower.Contains("ella")) return "https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=800&q=80";
+        if (lower.Contains("galle")) return "https://images.unsplash.com/photo-1588598198321-9735fd52455b?auto=format&fit=crop&w=800&q=80";
+        if (lower.Contains("kandy")) return "https://images.unsplash.com/photo-1586500036706-41963de24d8b?auto=format&fit=crop&w=800&q=80";
+        if (lower.Contains("sigiriya")) return "https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?auto=format&fit=crop&w=800&q=80";
+        if (lower.Contains("mirissa")) return "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80";
+        if (lower.Contains("bali")) return "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80";
+        if (lower.Contains("colombo")) return "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80";
+        return "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80";
+    }
+}
+
+<div class="container py-5">
+    <div class="mb-5 text-center">
+        <span class="hero-pill-badge text-dark bg-light border">Island Highlights</span>
+        <h1 class="fw-bold mt-2 mb-3">Explore Sri Lankan Destinations</h1>
+        <p class="text-muted mx-auto" style="max-width: 620px;">
+            From mist-covered tea plantations in Nuwara Eliya to golden surf beaches in Mirissa and ancient citadel fortresses in Sigiriya.
+        </p>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="card p-5 text-center border-0 shadow-sm rounded-4">
+            <h5 class="fw-bold mb-2">No destinations found</h5>
+            <p class="text-muted mb-0">No destinations are currently cataloged in the system.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var d in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="dest-card" style="height: 280px;">
+                        <img src="@GetDestinationImage(d.Name)" class="dest-card-bg" alt="@d.Name" />
+                        <div class="dest-card-overlay"></div>
+                        <div class="dest-card-content">
+                            <span class="dest-card-country">@d.Country</span>
+                            <h3 class="dest-card-title fs-4">@d.Name</h3>
+                            <p class="dest-card-desc mb-3" style="white-space: normal; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical;">
+                                @d.Description
+                            </p>
+                            <div class="d-flex gap-2">
+                                <a asp-action="Index" asp-route-tab="hotels" asp-route-q="@d.Name" class="btn btn-sm btn-light rounded-pill px-3 fw-semibold">
+                                    Stays
+                                </a>
+                                <a asp-action="Index" asp-route-tab="packages" asp-route-q="@d.Name" class="btn btn-sm btn-outline-light rounded-pill px-3 fw-semibold">
+                                    Tours
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

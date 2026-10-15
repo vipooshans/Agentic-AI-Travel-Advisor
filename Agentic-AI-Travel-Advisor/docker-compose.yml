@@ -36,8 +36,8 @@ services:
       Cors__AllowedOrigins__2: http://localhost:5000
       Cors__AllowedOrigins__3: http://localhost:3000
       Ai__ApiKey: ${AI_API_KEY:-}
-      Ai__BaseUrl: ${AI_BASE_URL:-https://api.openai.com/v1}
-      Ai__Model: ${AI_MODEL:-gpt-4o-mini}
+      Ai__BaseUrl: ${AI_BASE_URL:-https://generativelanguage.googleapis.com/v1beta/openai/}
+      Ai__Model: ${AI_MODEL:-gemini-3.8-flash}
       Seed__DemoUsers: ${SEED_DEMO_USERS:-false}
       Swagger__Enabled: ${SWAGGER_ENABLED:-true}
     depends_on:
@@ -54,8 +54,11 @@ services:
       ASPNETCORE_URLS: http://+:8080
       ASPNETCORE_ENVIRONMENT: Production
       ApiSettings__BaseUrl: http://api:8080
+    volumes:
+      - webkeys:/var/aspnet/DataProtection-Keys
     depends_on:
       - api
 
 volumes:
   pgdata:
+  webkeys:

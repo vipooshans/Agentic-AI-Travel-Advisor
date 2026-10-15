@@ -6,6 +6,7 @@ using TravelAdvisor.Core.DTOs.Destinations;
 using TravelAdvisor.Core.DTOs.Hotels;
 using TravelAdvisor.Core.DTOs.Packages;
 using TravelAdvisor.Core.DTOs.Reports;
+using TravelAdvisor.Core.DTOs.Users;
 using TravelAdvisor.Core.Enums;
 
 namespace TravelAdvisor.Web.Services;
@@ -157,4 +158,31 @@ public class TravelApiClient
 
     public async Task<bool> SetUserActiveAsync(string id, bool isActive)
         => Succeeded(await Client.PatchAsJsonAsync($"/api/users/{id}/active", new UpdateUserActiveRequest { IsActive = isActive }));
+
+    public async Task<BookingDto?> CreateBookingAsync(CreateBookingRequest request)
+        => await ReadIfSuccessAsync<BookingDto>(await Client.PostAsJsonAsync("/api/bookings", request));
+
+    public async Task<(bool Succeeded, string? Error)> CancelBookingAsync(int id)
+        => await ResultAsync(await Client.PatchAsJsonAsync($"/api/bookings/{id}/status", new UpdateBookingStatusRequest { Status = BookingStatus.Cancelled }));
+
+    public Task<UserProfileDto?> GetMyProfileAsync()
+        => GetAsync<UserProfileDto>("/api/users/me/profile");
+
+    public async Task<bool> UpdateMyProfileAsync(UserProfileDto request)
+        => Succeeded(await Client.PutAsJsonAsync("/api/users/me/profile", request));
+
+    public async Task<BookingAgentPromptResponse?> ProcessBookingPromptAsync(string prompt)
+        => await ProcessBookingPromptAsync(new BookingAgentPromptRequest { Prompt = prompt });
+
+    public async Task<BookingAgentPromptResponse?> ProcessBookingPromptAsync(BookingAgentPromptRequest request)
+        => await ReadIfSuccessAsync<BookingAgentPromptResponse>(await Client.PostAsJsonAsync("/api/booking-agent/prompt", request));
+
+    public async Task<BookingDto?> ConfirmBookingProposalAsync(ConfirmBookingAgentRequest request)
+        => await ReadIfSuccessAsync<BookingDto>(await Client.PostAsJsonAsync("/api/booking-agent/confirm", request));
+
+    public Task<List<BookingInsightDto>> GetBookingInsightsAsync()
+        => GetListAsync<BookingInsightDto>("/api/booking-agent/insights");
+
+    public Task<BookingAgentPromptResponse?> GetBookingAgentHistoryAsync()
+        => GetAsync<BookingAgentPromptResponse>("/api/booking-agent/history");
 }

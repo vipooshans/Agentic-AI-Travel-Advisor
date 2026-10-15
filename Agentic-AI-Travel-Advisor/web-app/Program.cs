@@ -1,10 +1,16 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using TravelAdvisor.Web.Middleware;
 using TravelAdvisor.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddDataProtection()
+    .SetApplicationName("TravelAdvisor.Web")
+    .PersistKeysToFileSystem(new DirectoryInfo("/var/aspnet/DataProtection-Keys"));
+
 builder.Services.AddControllersWithViews(options => options.Filters.Add<ApiAuthExceptionFilter>());
+builder.Services.AddAntiforgery(options => options.HeaderName = "RequestVerificationToken");
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ApiAuthService>();
 builder.Services.AddScoped<TravelApiClient>();

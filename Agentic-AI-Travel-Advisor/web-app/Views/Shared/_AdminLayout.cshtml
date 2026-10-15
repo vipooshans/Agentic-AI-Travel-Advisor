@@ -27,13 +27,13 @@
     <div class="admin-wrapper">
         <aside class="admin-sidebar">
             <div class="sidebar-brand">
-                <div class="brand-lockup">
+                <a asp-controller="Home" asp-action="Index" class="brand-lockup text-decoration-none" title="Back to Travel Advisor Website">
                     <span class="brand-mark" aria-hidden="true">TA</span>
                     <div>
                         <h4>Travel Advisor</h4>
-                        <small>@ViewData["Role"]</small>
+                        <small>@ViewData["Role"] &bull; Back to Home &rarr;</small>
                     </div>
-                </div>
+                </a>
             </div>
             <nav class="sidebar-nav">
                 @if (portal == "Owner")
@@ -74,6 +74,37 @@
                         Bookings
                     </a>
                 }
+                else if (portal == "Customer")
+                {
+                    <p class="nav-group-label">Overview</p>
+                    <a class="@NavClass("Customer", "Dashboard")" asp-controller="Customer" asp-action="Dashboard">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                        Dashboard
+                    </a>
+                    <p class="nav-group-label">My Trips</p>
+                    <a class="@NavClass("Customer", "Bookings")" asp-controller="Customer" asp-action="Bookings">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>
+                        My Bookings
+                    </a>
+                    <p class="nav-group-label">Explore Catalog</p>
+                    <a class="@NavClass("Customer", "Hotels")" asp-controller="Customer" asp-action="Hotels">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V8l8-4 8 4v12"/><path d="M9 20v-6h6v6"/></svg>
+                        Hotels &amp; Stays
+                    </a>
+                    <a class="@NavClass("Customer", "Packages")" asp-controller="Customer" asp-action="Packages">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v11H4z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg>
+                        Tour Packages
+                    </a>
+                    <a class="@NavClass("Customer", "Destinations")" asp-controller="Customer" asp-action="Destinations">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+                        Destinations
+                    </a>
+                    <p class="nav-group-label">Account</p>
+                    <a class="@NavClass("Customer", "Profile")" asp-controller="Customer" asp-action="Profile">
+                        <svg class="nav-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        My Profile
+                    </a>
+                }
                 else
                 {
                     <p class="nav-group-label">Overview</p>
@@ -110,7 +141,7 @@
                     </a>
                 }
             </nav>
-            <div class="sidebar-foot">Private desk</div>
+            <div class="sidebar-foot">@(portal == "Customer" ? "Traveler desk" : "Private desk")</div>
         </aside>
         <div class="admin-main">
             <header class="admin-header">
@@ -124,8 +155,18 @@
                     </div>
                 </div>
                 <div class="header-user">
-                    <span class="avatar" aria-hidden="true">@initial</span>
-                    <span class="user-email">@displayName</span>
+                    @if (portal == "Customer")
+                    {
+                        <a asp-controller="Customer" asp-action="Profile" class="d-flex align-items-center gap-2 text-decoration-none" title="View Profile">
+                            <span class="avatar" aria-hidden="true" style="cursor: pointer; transition: transform 0.15s ease;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">@initial</span>
+                            <span class="user-email text-dark">@displayName</span>
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="avatar" aria-hidden="true">@initial</span>
+                        <span class="user-email">@displayName</span>
+                    }
                     <form asp-controller="Account" asp-action="Logout" method="post">
                         @Html.AntiForgeryToken()
                         <button type="submit" class="btn btn-outline-secondary btn-sm">Sign out</button>

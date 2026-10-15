@@ -55,11 +55,17 @@
                     <button type="submit" class="btn btn-primary w-100 py-2">Enter the desk</button>
                 </form>
 
+                <div class="mt-3 text-center">
+                    <span class="text-muted small">New traveler?</span>
+                    <a asp-action="Register" asp-route-returnUrl="@Model.ReturnUrl" class="small fw-semibold ms-1">Create an account</a>
+                </div>
+
                 <div class="demo-keys">
                     <p class="eyebrow">House keys</p>
                     <p>Admin · admin@traveladvisor.com / Admin@123</p>
                     <p>Owner · owner@traveladvisor.com / Owner@123</p>
                     <p>Agent · agent@traveladvisor.com / Agent@123</p>
+                    <p>Traveler · Use registration or registered account</p>
                 </div>
             </div>
         </section>

@@ -1,0 +1,551 @@
+@using TravelAdvisor.Core.DTOs.Bookings
+@using TravelAdvisor.Core.Enums
+@model List<BookingDto>
+@{
+    Layout = "_Layout";
+    var pendingCount = (int)(ViewBag.PendingBookings ?? 0);
+    var confirmedCount = (int)(ViewBag.ConfirmedBookings ?? 0);
+    var completedCount = (int)(ViewBag.CompletedBookings ?? 0);
+    var totalCount = (int)(ViewBag.TotalBookings ?? 0);
+    var totalSpent = (decimal)(ViewBag.TotalSpent ?? 0);
+    var promptResponse = ViewBag.PromptResponse as BookingAgentPromptResponse;
+    var insights = ViewBag.Insights as List<BookingInsightDto> ?? new();
+    var conversationHistory = ViewBag.ConversationHistory as List<BookingAgentMessageDto> ?? new();
+    var conversationId = (long)(ViewBag.ConversationId ?? 0);
+}
+
+<div class="container py-4">
+    <section class="dashboard-hero">
+        <div>
+            <p class="eyebrow">Traveler overview</p>
+            <h2>Your journey, quietly held</h2>
+            <p>Track your room reservations, tour package requests, and upcoming stays across Sri Lanka.</p>
+        </div>
+        <div class="hero-actions">
+            <span class="hero-chip">@pendingCount pending confirmation</span>
+            <a asp-controller="Home" asp-action="Index" asp-route-tab="hotels" class="btn btn-light">Explore stays</a>
+            <a asp-controller="Home" asp-action="Index" asp-route-tab="packages" class="btn btn-outline-light">Tour packages</a>
+        </div>
+    </section>
+
+<!-- Conversational AI Travel Agent (ChatGPT Style) -->
+<section id="bookingAssistant" class="panel-card mt-4 mb-4" style="border: 1px solid #E2E8F0; background: #FFFFFF; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);">
+    <div id="antiforgeryTokenTemplate" hidden>@Html.AntiForgeryToken()</div>
+
+    <!-- Professional AI Header -->
+    <div class="px-4 py-3 d-flex justify-content-between align-items-center" style="background: #F8FAFC; border-bottom: 1px solid #E2E8F0;">
+        <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 38px; height: 38px; background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%); box-shadow: 0 2px 4px rgba(37,99,235,0.25);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            </div>
+            <div>
+                <div class="d-flex align-items-center gap-2">
+                    <h4 class="mb-0 fs-6 fw-bold text-dark">AI Travel Booking Assistant</h4>
+                    <span class="d-inline-flex align-items-center gap-1 badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5" style="font-size: 0.7rem; font-weight: 500;">
+                        <span class="rounded-circle bg-success d-inline-block" style="width: 6px; height: 6px;"></span> Active Concierge
+                    </span>
+                </div>
+                <p class="text-muted small mb-0" style="font-size: 0.8rem;">Natural conversation &bull; Real-time inventory &bull; Instant reservations</p>
+            </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 d-flex align-items-center gap-1.5" style="font-size: 0.8rem;" onclick="resetChat()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+            New Chat
+        </button>
+    </div>
+
+    <!-- Live Chat Stream -->
+    <div id="bookingChatStream" class="d-flex flex-column gap-3 p-4" style="min-height: 280px; max-height: 480px; overflow-y: auto; background: #F8FAFC;">
+        @if (conversationHistory.Any())
+        {
+            foreach (var msg in conversationHistory)
+            {
+                if (msg.Role == "user")
+                {
+                    <div class="chat-message user-message d-flex justify-content-end">
+                        <div class="chat-bubble px-3 py-2.5 rounded-4 bg-primary text-white shadow-sm" style="max-width: 78%; font-size: 0.93rem; line-height: 1.5; white-space: pre-wrap; border-bottom-right-radius: 4px !important;">@msg.Content</div>
+                    </div>
+                }
+                else
+                {
+                    <div class="chat-message ai-message d-flex gap-2.5">
+                        <div class="chat-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 text-white" style="width: 32px; height: 32px; font-size: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">
+                            AI
+                        </div>
+                        <div class="chat-bubble p-3 rounded-4 bg-white text-dark shadow-sm border" style="max-width: 85%; font-size: 0.93rem; line-height: 1.55; border-bottom-left-radius: 4px !important;">
+                            <div style="white-space: pre-wrap;">@msg.Content</div>
+
+                            @if (msg.Proposal != null)
+                            {
+                                var p = msg.Proposal;
+                                <div class="card border-primary shadow-sm rounded-3 mt-3 bg-white">
+                                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-2 px-3">
+                                        <span class="fw-semibold small">✦ AI Proposal Generated</span>
+                                        <span class="badge bg-light text-primary">Valid for 15 mins</span>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <h5 class="fw-bold text-dark mb-1" style="font-size: 1.05rem;">
+                                                    @(p.Kind == "hotel" ? $"{p.HotelName} — {p.RoomName}" : p.PackageTitle)
+                                                </h5>
+                                                <p class="text-muted small mb-0">
+                                                    @p.CheckIn.ToString("MMM dd, yyyy") @(p.CheckOut.HasValue ? $"→ {p.CheckOut.Value:MMM dd, yyyy} ({p.Nights} nights)" : "") &bull; @p.Guests guest(s)
+                                                </p>
+                                            </div>
+                                            <div class="text-end">
+                                                <small class="text-muted d-block" style="font-size: 0.75rem;">Quoted Total</small>
+                                                <span class="fs-5 fw-bold text-primary">LKR @p.TotalPrice.ToString("N0")</span>
+                                            </div>
+                                        </div>
+                                        <form asp-action="ConfirmProposal" method="post" class="mt-3 text-end">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="ProposalToken" value="@p.ProposalToken" />
+                                            <input type="hidden" name="ProposalTitle" value="@(p.Kind == "hotel" ? $"{p.HotelName} — {p.RoomName}" : p.PackageTitle)" />
+                                            <input type="hidden" name="QuotedTotal" value="@p.TotalPrice" />
+                                            <input type="hidden" name="RoomId" value="@p.RoomId" />
+                                            <input type="hidden" name="TravelPackageId" value="@p.TravelPackageId" />
+                                            <input type="hidden" name="CheckIn" value="@p.CheckIn.ToString("O")" />
+                                            <input type="hidden" name="CheckOut" value="@(p.CheckOut?.ToString("O"))" />
+                                            <input type="hidden" name="Guests" value="@p.Guests" />
+                                            <button type="submit" class="btn btn-success btn-sm px-4 fw-semibold shadow-sm">
+                                                ✓ Review &amp; Reserve
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            }
+
+                            @if (msg.Cancellation != null)
+                            {
+                                var c = msg.Cancellation;
+                                <div class="card border-danger shadow-sm rounded-3 mt-3 bg-white p-3">
+                                    <h6 class="fw-bold text-danger mb-1">Confirm Cancellation: Booking #@c.BookingId</h6>
+                                    <p class="small text-muted mb-2">@c.ListingName &bull; Value: LKR @c.TotalPrice.ToString("N0")</p>
+                                    <p class="small mb-3">@c.Message</p>
+                                    @if (c.CanCancel)
+                                    {
+                                        <form asp-action="CancelBooking" asp-route-id="@c.BookingId" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-danger btn-sm px-3 fw-semibold">
+                                                Yes, Cancel Booking #@c.BookingId
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        }
+        else
+        {
+            <!-- Initial AI greeting (No suggestions on top, purely conversational) -->
+            <div class="chat-message ai-message d-flex gap-2.5">
+                <div class="chat-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 text-white" style="width: 32px; height: 32px; font-size: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">
+                    AI
+                </div>
+                <div class="chat-bubble p-3.5 rounded-4 bg-white text-dark shadow-sm border" style="max-width: 85%; font-size: 0.93rem; line-height: 1.55; border-bottom-left-radius: 4px !important;">
+                    <p class="mb-0">Hello! I am your AI Travel Assistant. Where are you planning to travel, or how can I assist you with your bookings today?</p>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Professional Chat Input Bar -->
+    <div class="p-3 bg-white border-top">
+        <form id="quickPromptForm" onsubmit="handleChatSubmit(event)" class="d-flex align-items-center gap-2">
+            <div class="input-group rounded-pill overflow-hidden border shadow-sm" style="border-color: #CBD5E1 !important;">
+                <span class="input-group-text bg-white border-0 text-muted ps-3.5 pe-2">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </span>
+                <input type="text" id="chatInputText" class="form-control border-0 py-2.5 px-2" placeholder="Message your AI Travel Assistant (e.g., I want to book a stay in Galle next weekend)..." required autocomplete="off" style="font-size: 0.93rem; outline: none; box-shadow: none;" />
+                <button type="submit" id="chatSubmitBtn" class="btn btn-primary rounded-pill px-4 m-1 fw-semibold d-flex align-items-center gap-1.5 shadow-sm" style="font-size: 0.9rem;">
+                    <span>Send</span>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- AI Booking Insights & Concierge Widget -->
+@if (insights.Any())
+{
+    <p class="dash-section-label">AI Trip Concierge &amp; Deadlines</p>
+    <div class="row g-3 mb-4">
+        @foreach (var item in insights)
+        {
+            var badgeClass = item.Type switch
+            {
+                "urgent" => "bg-danger text-white",
+                "advisory" => "bg-warning text-dark",
+                "tip" => "bg-info-subtle text-info",
+                _ => "bg-light text-dark"
+            };
+
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm rounded-3 p-3 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge @badgeClass rounded-pill px-2.5 py-1">@item.Title</span>
+                            <small class="text-muted">#@item.BookingId</small>
+                        </div>
+                        <p class="small text-secondary mb-3">@item.Message</p>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(item.ActionUrl) && !string.IsNullOrWhiteSpace(item.ActionLabel))
+                    {
+                        <div class="pt-2 border-top">
+                            <a href="@item.ActionUrl" class="text-primary small fw-semibold text-decoration-none">
+                                @item.ActionLabel &rarr;
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<p class="dash-section-label">Bookings &amp; spend</p>
+<div class="row g-3">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-head">
+                <h6>Total Bookings</h6>
+                <span class="stat-icon stat-icon-blue" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>
+                </span>
+            </div>
+            <p class="stat-value">@totalCount</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-head">
+                <h6>Pending Confirmation</h6>
+                <span class="stat-icon stat-icon-orange" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                </span>
+            </div>
+            <p class="stat-value">@pendingCount</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-head">
+                <h6>Confirmed Trips</h6>
+                <span class="stat-icon stat-icon-green" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </span>
+            </div>
+            <p class="stat-value">@confirmedCount</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-card-accent">
+            <div class="stat-head">
+                <h6>Total Spent</h6>
+                <span class="stat-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6.5 9.5h.01M17.5 14.5h.01"/></svg>
+                </span>
+            </div>
+            <p class="stat-value">LKR @totalSpent.ToString("N0")</p>
+        </div>
+    </div>
+</div>
+
+<p class="dash-section-label mt-4">Recent reservations</p>
+<section class="panel-card">
+    <div class="panel-head">
+        <div>
+            <h3>Recent activity</h3>
+            <p>Your latest room and tour package reservations.</p>
+        </div>
+        <div class="panel-total">
+            <a asp-action="Bookings" class="btn btn-sm btn-outline-secondary">View all bookings &rarr;</a>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        ViewData["EmptyTitle"] = "No bookings yet";
+        ViewData["EmptyMessage"] = "You don't have any reservations. Explore hotels and tour packages to get started.";
+        @await Html.PartialAsync("_EmptyState")
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Listing</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Guests</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in Model)
+                    {
+                        <tr class="@(b.Status == BookingStatus.Pending ? "table-warning" : null)">
+                            <td><strong>#@b.Id</strong></td>
+                            <td>@(b.HotelName != null ? $"{b.HotelName} · {b.RoomName}" : b.PackageTitle)</td>
+                            <td>@b.CheckIn.ToString("yyyy-MM-dd")</td>
+                            <td>@b.CheckOut.ToString("yyyy-MM-dd")</td>
+                            <td>@b.Guests guest@(b.Guests == 1 ? "" : "s")</td>
+                            <td><strong>LKR @b.TotalPrice.ToString("N0")</strong></td>
+                            <td>@await Html.PartialAsync("_BookingStatusBadge", b.Status)</td>
+                            <td class="text-end">
+                                @if (b.Status is BookingStatus.Pending or BookingStatus.Confirmed)
+                                {
+                                    <form asp-action="CancelBooking" asp-route-id="@b.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel booking #@b.Id?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
+</div>
+
+<script>
+    var currentConversationId = @(conversationId);
+
+    window.addEventListener('DOMContentLoaded', function() {
+        var stream = document.getElementById('bookingChatStream');
+        if (stream) {
+            stream.scrollTop = stream.scrollHeight;
+        }
+    });
+
+    function handleChatSubmit(e) {
+        e.preventDefault();
+        var input = document.getElementById('chatInputText');
+        var text = (input ? input.value : '').trim();
+        if (text) {
+            input.value = '';
+            sendPrompt(text);
+        }
+    }
+
+    function sendPrompt(text) {
+        var stream = document.getElementById('bookingChatStream');
+        if (!stream) return;
+
+        var input = document.getElementById('chatInputText');
+        var submitBtn = document.getElementById('chatSubmitBtn');
+        if (input) input.disabled = true;
+        if (submitBtn) submitBtn.disabled = true;
+
+        // Append user bubble
+        var userHtml = `
+            <div class="chat-message user-message d-flex justify-content-end">
+                <div class="chat-bubble px-3 py-2.5 rounded-4 bg-primary text-white shadow-sm" style="max-width: 78%; font-size: 0.93rem; line-height: 1.5; white-space: pre-wrap; border-bottom-right-radius: 4px !important;">
+                    ${escapeHtml(text)}
+                </div>
+            </div>`;
+        stream.insertAdjacentHTML('beforeend', userHtml);
+
+        // Append typing indicator
+        var loadingId = 'loading_' + Date.now();
+        var loadingHtml = `
+            <div id="${loadingId}" class="chat-message ai-message d-flex gap-2.5">
+                <div class="chat-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 text-white" style="width: 32px; height: 32px; font-size: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">AI</div>
+                <div class="chat-bubble p-3 rounded-4 bg-white text-muted shadow-sm border d-flex align-items-center gap-2" style="max-width: 85%; font-size: 0.9rem; border-bottom-left-radius: 4px !important;">
+                    <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+                    <span>AI Concierge is typing...</span>
+                </div>
+            </div>`;
+        stream.insertAdjacentHTML('beforeend', loadingHtml);
+        stream.scrollTop = stream.scrollHeight;
+
+        function enableControls() {
+            if (input) {
+                input.disabled = false;
+                input.focus();
+            }
+            if (submitBtn) submitBtn.disabled = false;
+        }
+
+        // Send JSON request with DB conversation ID
+        fetch('/Customer/QuickPromptJson', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt: text, conversationId: currentConversationId })
+        })
+        .then(function(res) {
+            if (!res.ok) throw new Error('Request failed with status ' + res.status);
+            return res.json();
+        })
+        .then(function(data) {
+            enableControls();
+            var el = document.getElementById(loadingId);
+            if (el) el.remove();
+            if (data && data.conversationId) {
+                currentConversationId = data.conversationId;
+            }
+            renderAiResponse(data);
+        })
+        .catch(function(err) {
+            enableControls();
+            var el = document.getElementById(loadingId);
+            if (el) el.remove();
+            var errHtml = `
+                <div class="chat-message ai-message d-flex gap-2.5">
+                    <div class="chat-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 text-white" style="width: 32px; height: 32px; font-size: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);">!</div>
+                    <div class="chat-bubble p-3 rounded-4 bg-white text-danger shadow-sm border" style="max-width: 85%; font-size: 0.9rem; border-bottom-left-radius: 4px !important;">
+                        Sorry, I encountered an issue processing that request. Please try again.
+                    </div>
+                </div>`;
+            stream.insertAdjacentHTML('beforeend', errHtml);
+            stream.scrollTop = stream.scrollHeight;
+        });
+    }
+
+    function renderAiResponse(data) {
+        var stream = document.getElementById('bookingChatStream');
+        if (!stream || !data) return;
+
+        var formattedText = formatMarkdown(data.message || '');
+        var innerContent = `<div style="line-height: 1.55;">${formattedText}</div>`;
+
+        // Proposal Card
+        if (data.actionType === 'proposal' && data.proposal) {
+            var p = data.proposal;
+            var title = p.kind === 'hotel' ? (p.hotelName + ' — ' + p.roomName) : p.packageTitle;
+            var inDate = new Date(p.checkIn).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            var outDate = p.checkOut ? new Date(p.checkOut).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+
+            var tokenInput = document.querySelector('#antiforgeryTokenTemplate input[name="__RequestVerificationToken"]');
+            var tokenVal = tokenInput ? tokenInput.value : '';
+
+            innerContent += `
+                <div class="card border-primary shadow-sm rounded-3 mt-3 bg-white">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-2 px-3">
+                        <span class="fw-semibold small">✦ AI Proposal Generated</span>
+                        <span class="badge bg-light text-primary">Valid for 15 mins</span>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h5 class="fw-bold text-dark mb-1" style="font-size: 1.05rem;">${escapeHtml(title)}</h5>
+                                <p class="text-muted small mb-0">
+                                    ${inDate} ${outDate ? '→ ' + outDate + ' (' + p.nights + ' nights)' : ''} &bull; ${p.guests} guest(s)
+                                </p>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block" style="font-size: 0.75rem;">Quoted Total</small>
+                                <span class="fs-5 fw-bold text-primary">LKR ${Number(p.totalPrice).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <form action="/Customer/ConfirmProposal" method="post" class="mt-3 text-end">
+                            <input type="hidden" name="__RequestVerificationToken" value="${escapeHtml(tokenVal)}" />
+                            <input type="hidden" name="ProposalToken" value="${escapeHtml(p.proposalToken)}" />
+                            <input type="hidden" name="ProposalTitle" value="${escapeHtml(title)}" />
+                            <input type="hidden" name="QuotedTotal" value="${Number(p.totalPrice)}" />
+                            <input type="hidden" name="RoomId" value="${p.roomId || ''}" />
+                            <input type="hidden" name="TravelPackageId" value="${p.travelPackageId || ''}" />
+                            <input type="hidden" name="CheckIn" value="${escapeHtml(p.checkIn)}" />
+                            <input type="hidden" name="CheckOut" value="${escapeHtml(p.checkOut || '')}" />
+                            <input type="hidden" name="Guests" value="${p.guests}" />
+                            <button type="submit" class="btn btn-success btn-sm px-4 fw-semibold shadow-sm">
+                                ✓ Review &amp; Reserve
+                            </button>
+                        </form>
+                    </div>
+                </div>`;
+        }
+
+        // Cancellation Preview
+        if (data.actionType === 'cancellation' && data.cancellation) {
+            var c = data.cancellation;
+            var tokenInput = document.querySelector('#antiforgeryTokenTemplate input[name="__RequestVerificationToken"]');
+            var tokenVal = tokenInput ? tokenInput.value : '';
+
+            innerContent += `
+                <div class="card border-danger shadow-sm rounded-3 mt-3 bg-white p-3">
+                    <h6 class="fw-bold text-danger mb-1">Confirm Cancellation: Booking #${c.bookingId}</h6>
+                    <p class="small text-muted mb-2">${escapeHtml(c.listingName)} &bull; Value: LKR ${Number(c.totalPrice).toLocaleString()}</p>
+                    <p class="small mb-3">${escapeHtml(c.message)}</p>
+                    ${c.canCancel ? `
+                        <form action="/Customer/CancelBooking/${c.bookingId}" method="post">
+                            <input type="hidden" name="__RequestVerificationToken" value="${escapeHtml(tokenVal)}" />
+                            <button type="submit" class="btn btn-danger btn-sm px-3 fw-semibold shadow-sm">
+                                Yes, Cancel Booking #${c.bookingId}
+                            </button>
+                        </form>` : ''}
+                </div>`;
+        }
+
+        // Suggestions adjustment buttons below the proposal
+        if (data.suggestions && data.suggestions.length > 0) {
+            innerContent += `
+                <div class="mt-2.5 pt-2 border-top">
+                    <small class="text-muted d-block fw-semibold mb-1" style="font-size: 0.78rem;">Quick adjustments:</small>
+                    <div class="d-flex flex-wrap gap-2">`;
+            data.suggestions.forEach(function(s) {
+                var btnClass = s.type === 'budget_down' ? 'btn-outline-success' :
+                               (s.type === 'budget_up' ? 'btn-outline-warning text-dark' :
+                               (s.type === 'place_change' ? 'btn-outline-info text-dark' : 'btn-outline-secondary'));
+                innerContent += `
+                    <button type="button" class="btn btn-sm ${btnClass} rounded-pill py-1 px-3" style="font-size: 0.8rem;" onclick="sendPrompt('${escapeHtml(s.prompt)}')">
+                        ${escapeHtml(s.label)}
+                    </button>`;
+            });
+            innerContent += `</div></div>`;
+        }
+
+        var aiHtml = `
+            <div class="chat-message ai-message d-flex gap-2.5">
+                <div class="chat-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 text-white" style="width: 32px; height: 32px; font-size: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">
+                    AI
+                </div>
+                <div class="chat-bubble p-3 rounded-4 bg-white text-dark shadow-sm border" style="max-width: 85%; font-size: 0.93rem; line-height: 1.55; border-bottom-left-radius: 4px !important;">
+                    ${innerContent}
+                </div>
+            </div>`;
+
+        stream.insertAdjacentHTML('beforeend', aiHtml);
+        stream.scrollTop = stream.scrollHeight;
+    }
+
+    function resetChat() {
+        currentConversationId = 0;
+        var stream = document.getElementById('bookingChatStream');
+        if (stream) {
+            stream.innerHTML = `
+                <div class="chat-message ai-message d-flex gap-2.5">
+                    <div class="chat-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 text-white" style="width: 32px; height: 32px; font-size: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">AI</div>
+                    <div class="chat-bubble p-3.5 rounded-4 bg-white text-dark shadow-sm border" style="max-width: 85%; font-size: 0.93rem; line-height: 1.55; border-bottom-left-radius: 4px !important;">
+                        <p class="mb-0">Started a new conversation! Where are you planning to travel, or how can I assist you with your bookings today?</p>
+                    </div>
+                </div>`;
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    function formatMarkdown(text) {
+        if (!text) return '';
+        var escaped = escapeHtml(text);
+        escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        escaped = escaped.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        return escaped.replace(/\n/g, '<br/>');
+    }
+</script>
