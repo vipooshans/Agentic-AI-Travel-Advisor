@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TravelAdvisor.Core.DTOs.Bookings;
 using TravelAdvisor.Core.DTOs.Users;
 using TravelAdvisor.Core.Enums;
+using TravelAdvisor.Web.Models;
 using TravelAdvisor.Web.Services;
 
 namespace TravelAdvisor.Web.Controllers;
@@ -33,8 +34,121 @@ public class CustomerController : Controller
             .Where(b => b.Status is BookingStatus.Confirmed or BookingStatus.Completed)
             .Sum(b => b.TotalPrice);
 
+        if (TempData["PromptResponseJson"] is string json)
+        {
+            try
+            {
+                ViewBag.PromptResponse = System.Text.Json.JsonSerializer.Deserialize<BookingAgentPromptResponse>(json);
+            }
+            catch { }
+        }
+
+        try
+        {
+            ViewBag.Insights = await _api.GetBookingInsightsAsync();
+        }
+        catch
+        {
+            ViewBag.Insights = new List<BookingInsightDto>();
+        }
+
+        try
+        {
+            var historyResponse = await _api.GetBookingAgentHistoryAsync();
+            ViewBag.ConversationHistory = historyResponse?.History ?? [];
+            ViewBag.ConversationId = historyResponse?.ConversationId ?? 0;
+        }
+        catch
+        {
+            ViewBag.ConversationHistory = new List<BookingAgentMessageDto>();
+            ViewBag.ConversationId = 0;
+        }
+
         var recentBookings = bookings.OrderByDescending(b => b.CreatedAt).Take(5).ToList();
         return View(recentBookings);
+    }
+
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> QuickPromptJson([FromBody] BookingAgentPromptRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request?.Prompt))
+            return BadRequest(new { message = "Prompt cannot be empty" });
+
+        request.PreviousPrompts = (request.PreviousPrompts ?? [])
+            .Where(prompt => !string.IsNullOrWhiteSpace(prompt))
+            .TakeLast(10)
+            .ToList();
+        var response = await _api.ProcessBookingPromptAsync(request);
+        return Json(response);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> QuickPrompt(string prompt)
+    {
+        if (string.IsNullOrWhiteSpace(prompt))
+        {
+            TempData["Error"] = "Please enter a booking or cancellation prompt.";
+            return RedirectToAction(nameof(Dashboard));
+        }
+
+        var response = await _api.ProcessBookingPromptAsync(prompt);
+        if (response != null)
+        {
+            TempData["PromptResponseJson"] = System.Text.Json.JsonSerializer.Serialize(response);
+        }
+        else
+        {
+            TempData["Error"] = "The AI booking assistant could not process your request at this time.";
+        }
+
+        return RedirectToAction(nameof(Dashboard));
+    }
+
+    [HttpGet]
+    public IActionResult ConfirmProposal()
+    {
+        TempData["Error"] = "Open your AI Concierge conversation and choose Review & Reserve on a current proposal.";
+        return RedirectToAction(nameof(Dashboard));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ConfirmProposal(BookingProposalReviewViewModel request)
+    {
+        if (string.IsNullOrWhiteSpace(request.ProposalToken))
+        {
+            TempData["Error"] = "That proposal is missing or expired. Ask the AI Concierge for a fresh quote.";
+            return RedirectToAction(nameof(Dashboard));
+        }
+
+        await PopulateCustomerDetailsAsync(request);
+        return View(request);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SubmitProposal(BookingProposalReviewViewModel request)
+    {
+        var booking = await _api.ConfirmBookingProposalAsync(request);
+        if (booking != null)
+        {
+            TempData["Success"] = $"Your reservation #{booking.Id} has been successfully submitted! It is currently Pending confirmation.";
+            return RedirectToAction(nameof(Bookings));
+        }
+
+        request.ErrorMessage = "The reservation could not be submitted. The quote may have expired or availability may have changed. Return to the AI Concierge for an updated quote.";
+        await PopulateCustomerDetailsAsync(request);
+        return View("ConfirmProposal", request);
+    }
+
+    private async Task PopulateCustomerDetailsAsync(BookingProposalReviewViewModel model)
+    {
+        model.CustomerName = User.Identity?.Name ?? string.Empty;
+        model.CustomerEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? string.Empty;
+        var profile = await _api.GetMyProfileAsync();
+        model.PhoneNumber = profile?.PhoneNumber;
     }
 
     public async Task<IActionResult> Bookings(string? status)

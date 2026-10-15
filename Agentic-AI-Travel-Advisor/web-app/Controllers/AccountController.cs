@@ -109,7 +109,7 @@ public class AccountController : Controller
             RoleNames.Admin => RedirectToAction("Dashboard", "Admin"),
             RoleNames.HotelOwner => RedirectToAction("Dashboard", "Owner"),
             RoleNames.TravelAgent => RedirectToAction("Dashboard", "Agent"),
-            RoleNames.User => RedirectToAction("Dashboard", "Customer"),
+            RoleNames.User => RedirectToAction("Index", "Home"),
             _ => RedirectToAction(nameof(AccessDenied))
         };
     }

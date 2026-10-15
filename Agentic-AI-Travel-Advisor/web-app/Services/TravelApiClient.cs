@@ -170,4 +170,19 @@ public class TravelApiClient
 
     public async Task<bool> UpdateMyProfileAsync(UserProfileDto request)
         => Succeeded(await Client.PutAsJsonAsync("/api/users/me/profile", request));
+
+    public async Task<BookingAgentPromptResponse?> ProcessBookingPromptAsync(string prompt)
+        => await ProcessBookingPromptAsync(new BookingAgentPromptRequest { Prompt = prompt });
+
+    public async Task<BookingAgentPromptResponse?> ProcessBookingPromptAsync(BookingAgentPromptRequest request)
+        => await ReadIfSuccessAsync<BookingAgentPromptResponse>(await Client.PostAsJsonAsync("/api/booking-agent/prompt", request));
+
+    public async Task<BookingDto?> ConfirmBookingProposalAsync(ConfirmBookingAgentRequest request)
+        => await ReadIfSuccessAsync<BookingDto>(await Client.PostAsJsonAsync("/api/booking-agent/confirm", request));
+
+    public Task<List<BookingInsightDto>> GetBookingInsightsAsync()
+        => GetListAsync<BookingInsightDto>("/api/booking-agent/insights");
+
+    public Task<BookingAgentPromptResponse?> GetBookingAgentHistoryAsync()
+        => GetAsync<BookingAgentPromptResponse>("/api/booking-agent/history");
 }

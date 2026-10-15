@@ -54,8 +54,11 @@ services:
       ASPNETCORE_URLS: http://+:8080
       ASPNETCORE_ENVIRONMENT: Production
       ApiSettings__BaseUrl: http://api:8080
+    volumes:
+      - webkeys:/var/aspnet/DataProtection-Keys
     depends_on:
       - api
 
 volumes:
   pgdata:
+  webkeys:

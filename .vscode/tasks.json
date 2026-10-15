@@ -1,0 +1,201 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Inspect running registration logs",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"Agentic-AI-Travel-Advisor\\docker-compose.yml",
+				"--project-directory",
+				"Agentic-AI-Travel-Advisor",
+				"logs",
+				"--tail",
+				"120",
+				"api",
+				"web"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Rebuild web with persistent keys",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"Agentic-AI-Travel-Advisor\\docker-compose.yml",
+				"--project-directory",
+				"Agentic-AI-Travel-Advisor",
+				"up",
+				"-d",
+				"--build",
+				"web"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Check persistent key creation",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"Agentic-AI-Travel-Advisor\\docker-compose.yml",
+				"--project-directory",
+				"Agentic-AI-Travel-Advisor",
+				"exec",
+				"-T",
+				"web",
+				"sh",
+				"-c",
+				"ls -la /var/aspnet/DataProtection-Keys"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Verify web container status",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"Agentic-AI-Travel-Advisor\\docker-compose.yml",
+				"--project-directory",
+				"Agentic-AI-Travel-Advisor",
+				"ps"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Verify keys survive web restart",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"Agentic-AI-Travel-Advisor\\docker-compose.yml",
+				"--project-directory",
+				"Agentic-AI-Travel-Advisor",
+				"up",
+				"-d",
+				"--force-recreate",
+				"web"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Check antiforgery errors",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"Agentic-AI-Travel-Advisor\\docker-compose.yml",
+				"--project-directory",
+				"Agentic-AI-Travel-Advisor",
+				"logs",
+				"--tail",
+				"30",
+				"web"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "List persistent web key ring",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"Agentic-AI-Travel-Advisor\\docker-compose.yml",
+				"--project-directory",
+				"Agentic-AI-Travel-Advisor",
+				"exec",
+				"-T",
+				"web",
+				"sh",
+				"-c",
+				"ls -la /var/aspnet/DataProtection-Keys"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Inspect latest registration logs",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"Agentic-AI-Travel-Advisor\\docker-compose.yml",
+				"--project-directory",
+				"Agentic-AI-Travel-Advisor",
+				"logs",
+				"--since",
+				"10m",
+				"--tail",
+				"200",
+				"api",
+				"web"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Rebuild registration error details",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"Agentic-AI-Travel-Advisor\\docker-compose.yml",
+				"--project-directory",
+				"Agentic-AI-Travel-Advisor",
+				"up",
+				"-d",
+				"--build",
+				"web"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Rebuild clearer registration errors",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"Agentic-AI-Travel-Advisor\\docker-compose.yml",
+				"--project-directory",
+				"Agentic-AI-Travel-Advisor",
+				"up",
+				"-d",
+				"--build",
+				"web"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Check current worktree",
+			"type": "shell",
+			"command": "git",
+			"args": [
+				"status",
+				"--short"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}

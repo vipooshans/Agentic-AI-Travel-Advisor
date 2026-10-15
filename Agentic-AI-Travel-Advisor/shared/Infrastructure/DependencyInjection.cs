@@ -70,7 +70,15 @@ public static class DependencyInjection
         AddApplicationServices(services);
         services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 
-        services.Configure<AI.AiOptions>(configuration.GetSection(AI.AiOptions.SectionName));
+        services.Configure<AI.AiOptions>(options =>
+        {
+            configuration.GetSection(AI.AiOptions.SectionName).Bind(options);
+            var gemini = configuration.GetSection("Gemini");
+            if (gemini.Exists() && string.IsNullOrWhiteSpace(options.ApiKey))
+            {
+                gemini.Bind(options);
+            }
+        });
         services.AddSingleton<AI.LlmAvailability>();
         services.AddHttpClient<ILlmClient, AI.OpenAiCompatClient>();
         services.AddScoped<ICatalogTools, AI.CatalogTools>();
@@ -91,6 +99,7 @@ public static class DependencyInjection
         services.AddScoped<AI.Agents.BookingAgent>();
         services.AddScoped<AI.AgentOrchestrator>();
         services.AddScoped<IAgenticAiService, AI.AgenticAiService>();
+        services.AddScoped<IBookingAgentService, AI.BookingAgentService>();
 
         AddJwtAuthentication(services, configuration);
 

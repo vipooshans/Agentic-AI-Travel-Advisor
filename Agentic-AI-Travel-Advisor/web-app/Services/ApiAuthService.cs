@@ -29,8 +29,7 @@ public class ApiAuthService
 
         if (!response.IsSuccessStatusCode)
         {
-            var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
-            return (false, error?.Message ?? "Login failed.", null);
+            return (false, await ReadErrorMessageAsync(response, "Login failed."), null);
         }
 
         var auth = await response.Content.ReadFromJsonAsync<AuthResponse>();
@@ -56,8 +55,7 @@ public class ApiAuthService
 
         if (!response.IsSuccessStatusCode)
         {
-            var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
-            return (false, error?.Message ?? "Registration failed.", null);
+            return (false, await ReadErrorMessageAsync(response, "Registration failed."), null);
         }
 
         var auth = await response.Content.ReadFromJsonAsync<AuthResponse>();
@@ -111,8 +109,23 @@ public class ApiAuthService
         });
     }
 
+    private static async Task<string> ReadErrorMessageAsync(HttpResponseMessage response, string fallback)
+    {
+        var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+        var details = error?.Errors?
+            .SelectMany(entry => entry.Value)
+            .Distinct()
+            .ToArray();
+
+        if (details is { Length: > 0 })
+            return string.Join(" ", details);
+
+        return error?.Message ?? fallback;
+    }
+
     private class ApiErrorResponse
     {
         public string? Message { get; set; }
+        public Dictionary<string, string[]>? Errors { get; set; }
     }
 }

@@ -27,13 +27,13 @@
     <div class="admin-wrapper">
         <aside class="admin-sidebar">
             <div class="sidebar-brand">
-                <div class="brand-lockup">
+                <a asp-controller="Home" asp-action="Index" class="brand-lockup text-decoration-none" title="Back to Travel Advisor Website">
                     <span class="brand-mark" aria-hidden="true">TA</span>
                     <div>
                         <h4>Travel Advisor</h4>
-                        <small>@ViewData["Role"]</small>
+                        <small>@ViewData["Role"] &bull; Back to Home &rarr;</small>
                     </div>
-                </div>
+                </a>
             </div>
             <nav class="sidebar-nav">
                 @if (portal == "Owner")
@@ -155,8 +155,18 @@
                     </div>
                 </div>
                 <div class="header-user">
-                    <span class="avatar" aria-hidden="true">@initial</span>
-                    <span class="user-email">@displayName</span>
+                    @if (portal == "Customer")
+                    {
+                        <a asp-controller="Customer" asp-action="Profile" class="d-flex align-items-center gap-2 text-decoration-none" title="View Profile">
+                            <span class="avatar" aria-hidden="true" style="cursor: pointer; transition: transform 0.15s ease;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">@initial</span>
+                            <span class="user-email text-dark">@displayName</span>
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="avatar" aria-hidden="true">@initial</span>
+                        <span class="user-email">@displayName</span>
+                    }
                     <form asp-controller="Account" asp-action="Logout" method="post">
                         @Html.AntiForgeryToken()
                         <button type="submit" class="btn btn-outline-secondary btn-sm">Sign out</button>

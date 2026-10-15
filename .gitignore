@@ -9,6 +9,7 @@
 .env.*
 !.env.example
 appsettings.*.local.json
+/Agentic-AI-Travel-Advisor/web-api/appsettings.json
 
 # Editor / OS
 .idea/
