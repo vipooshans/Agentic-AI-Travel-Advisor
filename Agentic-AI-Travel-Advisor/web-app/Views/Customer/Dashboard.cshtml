@@ -2,7 +2,7 @@
 @using TravelAdvisor.Core.Enums
 @model List<BookingDto>
 @{
-    Layout = "_AdminLayout";
+    Layout = "_Layout";
     var pendingCount = (int)(ViewBag.PendingBookings ?? 0);
     var confirmedCount = (int)(ViewBag.ConfirmedBookings ?? 0);
     var completedCount = (int)(ViewBag.CompletedBookings ?? 0);
@@ -14,18 +14,19 @@
     var conversationId = (long)(ViewBag.ConversationId ?? 0);
 }
 
-<section class="dashboard-hero">
-    <div>
-        <p class="eyebrow">Traveler overview</p>
-        <h2>Your journey, quietly held</h2>
-        <p>Track your room reservations, tour package requests, and upcoming stays across Sri Lanka.</p>
-    </div>
-    <div class="hero-actions">
-        <span class="hero-chip">@pendingCount pending confirmation</span>
-        <a asp-action="Hotels" class="btn btn-light">Explore stays</a>
-        <a asp-action="Packages" class="btn btn-outline-light">Tour packages</a>
-    </div>
-</section>
+<div class="container py-4">
+    <section class="dashboard-hero">
+        <div>
+            <p class="eyebrow">Traveler overview</p>
+            <h2>Your journey, quietly held</h2>
+            <p>Track your room reservations, tour package requests, and upcoming stays across Sri Lanka.</p>
+        </div>
+        <div class="hero-actions">
+            <span class="hero-chip">@pendingCount pending confirmation</span>
+            <a asp-controller="Home" asp-action="Index" asp-route-tab="hotels" class="btn btn-light">Explore stays</a>
+            <a asp-controller="Home" asp-action="Index" asp-route-tab="packages" class="btn btn-outline-light">Tour packages</a>
+        </div>
+    </section>
 
 <!-- Conversational AI Travel Agent (ChatGPT Style) -->
 <section id="bookingAssistant" class="panel-card mt-4 mb-4" style="border: 1px solid #E2E8F0; background: #FFFFFF; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);">
@@ -316,6 +317,7 @@
         </div>
     }
 </section>
+</div>
 
 <script>
     var currentConversationId = @(conversationId);

@@ -1,0 +1,27 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: web-app/Dockerfile.dev
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+    volumes:
+      - .:/src
+      - webkeys:/var/aspnet/DataProtection-Keys
+      - web-app-bin:/src/web-app/bin
+      - web-app-obj:/src/web-app/obj
+      - core-bin:/src/shared/Core/bin
+      - core-obj:/src/shared/Core/obj
+      - infrastructure-bin:/src/shared/Infrastructure/bin
+      - infrastructure-obj:/src/shared/Infrastructure/obj
+      - nuget-packages:/root/.nuget/packages
+
+volumes:
+  web-app-bin:
+  web-app-obj:
+  core-bin:
+  core-obj:
+  infrastructure-bin:
+  infrastructure-obj:
+  nuget-packages:

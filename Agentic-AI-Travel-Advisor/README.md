@@ -137,6 +137,19 @@ The API container runs in Production and applies migrations on startup. Demo acc
 only seeded when `SEED_DEMO_USERS=true`. `.env.example` sets it to true for demos; set it to false (the Compose
 default) for anything else. Optional: `AI_API_KEY`, `AI_BASE_URL`, `AI_MODEL`.
 
+### Docker hot reload for the MVC portal
+
+For MVC portal development, start Compose with the development override instead:
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build web
+```
+
+This runs `dotnet watch` in the web container and mounts the source tree, so changes to MVC code and Razor
+views are picked up automatically without rebuilding the web image. Keep the command running while developing;
+press `Ctrl+C` to stop it. Use `docker compose up --build` without the override for the regular production-style
+container.
+
 ## Local development
 
 Requirements: .NET 8 SDK, PostgreSQL 16, Node.js 22.12+ (for the React app), Flutter 3 (for the mobile app),

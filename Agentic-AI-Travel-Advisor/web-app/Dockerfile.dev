@@ -1,0 +1,7 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+
+WORKDIR /src
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "watch", "--project", "web-app/TravelAdvisor.Web.csproj", "run", "--no-launch-profile", "--urls", "http://+:8080"]
