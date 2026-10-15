@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -32,7 +31,59 @@ public class BookingAgentService : IBookingAgentService
     private static readonly Regex InsightsRegex = new(@"\b(?:my\s*bookings|my\s*reservations|my\s*trips|insights|upcoming|status)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
     private static readonly Regex GuestsRegex = new(@"\b(\d+)\s*(?:guests?|people|travelers?|pax|persons?)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
     private static readonly Regex DateRangeIso = new(@"(\d{4}-\d{2}-\d{2})\s*(?:to|until|-|through)\s*(\d{4}-\d{2}-\d{2})", RegexOptions.IgnoreCase);
-    private static readonly Regex DateRangeNamed = new(@"\b(?<month>Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+(?<day>\d{1,2})(?:st|nd|rd|th)?(?:,?\s*(?<year>\d{4}))?\s*(?:to|until|-|through)\s*(?:(?<endMonth>Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+)?(?<endDay>\d{1,2})(?:st|nd|rd|th)?(?:,?\s*(?<endYear>\d{4}))?\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
+    private static readonly List<LlmToolDefinition> AgentTools =
+    [
+        new LlmToolDefinition
+        {
+            Name = "search_hotels",
+            Description = "Search for verified hotels in Sri Lanka matching a location, dates, and number of guests.",
+            ParametersSchema = """
+            {
+              "type": "object",
+              "properties": {
+                "location": { "type": "string", "description": "City or destination in Sri Lanka (e.g. Galle, Ella, Kandy, Colombo, Sigiriya, Mirissa, Nuwara Eliya)" },
+                "check_in": { "type": "string", "description": "Check-in date in YYYY-MM-DD format (optional)" },
+                "check_out": { "type": "string", "description": "Check-out date in YYYY-MM-DD format (optional)" },
+                "guests": { "type": "integer", "description": "Number of guests (optional, default 1)" }
+              },
+              "required": ["location"]
+            }
+            """
+        },
+        new LlmToolDefinition
+        {
+            Name = "get_hotel_details",
+            Description = "Retrieve detailed information, room types, pricing, and availability for a specific hotel by ID.",
+            ParametersSchema = """
+            {
+              "type": "object",
+              "properties": {
+                "hotel_id": { "type": "integer", "description": "The unique hotel ID" }
+              },
+              "required": ["hotel_id"]
+            }
+            """
+        },
+        new LlmToolDefinition
+        {
+            Name = "create_booking",
+            Description = "Create a confirmed hotel room reservation for the traveler once they have explicitly confirmed all details (hotel, check-in, check-out, guests). Only call this after the user says yes to a clear confirmation question.",
+            ParametersSchema = """
+            {
+              "type": "object",
+              "properties": {
+                "hotel_id": { "type": "integer", "description": "The unique hotel ID to book" },
+                "room_id": { "type": "integer", "description": "Optional specific room ID within the hotel" },
+                "check_in": { "type": "string", "description": "Check-in date in YYYY-MM-DD format" },
+                "check_out": { "type": "string", "description": "Check-out date in YYYY-MM-DD format" },
+                "guests": { "type": "integer", "description": "Number of guests" }
+              },
+              "required": ["hotel_id", "check_in", "check_out", "guests"]
+            }
+            """
+        }
+    ];
 
     private readonly AppDbContext? _context;
     private readonly IBookingService _bookingService;
@@ -139,63 +190,55 @@ public class BookingAgentService : IBookingAgentService
         };
         history.Add(userMessage);
 
-        // Build conversation transcript context for LLM
-        var conversationContext = string.Join(Environment.NewLine, history
-            .TakeLast(10)
-            .Select(m => $"{m.Role.ToUpperInvariant()}: {m.Content}"));
-
         BookingAgentPromptResponse response;
 
-        // 2. Fast-path: Check for cancellation intent
+        // 2. Cancellation intent check
         var cancelMatch = CancelRegex.Match(currentPrompt);
-        if (cancelMatch.Success && int.TryParse(cancelMatch.Groups[1].Value, out var cancelId))
+        if (cancelMatch.Success && int.TryParse(cancelMatch.Groups[1].Value, out var cancelBookingId))
         {
-            response = await HandleCancellationPreviewAsync(caller, cancelId, cancellationToken);
+            response = await HandleCancellationPreviewAsync(caller, cancelBookingId, cancellationToken);
         }
-        // 3. Fast-path: Check for insights intent
-        else if (InsightsRegex.IsMatch(currentPrompt) && !currentPrompt.Contains("book", StringComparison.OrdinalIgnoreCase))
+        // 3. Insights intent check
+        else if (InsightsRegex.IsMatch(currentPrompt))
         {
             var insights = await GetBookingInsightsAsync(caller, cancellationToken);
             response = new BookingAgentPromptResponse
             {
                 ActionType = "insights",
-                Message = insights.Count > 0
-                    ? $"Found {insights.Count} active reservation insight(s) for your account."
-                    : "You currently have no active or upcoming reservations.",
+                Message = insights.Count == 0
+                    ? "You do not have any active or upcoming reservations right now."
+                    : $"You have {insights.Count} active booking update(s). Check your upcoming deadlines below.",
                 Insights = insights
             };
         }
-        // 4. Try LLM Parsing (Gemini / OpenAI) with conversational flow
-        else if (_llmClient.IsConfigured)
+        else
         {
             try
             {
-                var llmParsed = await ParsePromptWithLlmAsync(conversationContext, cancellationToken);
-                if (llmParsed != null)
+                if (_llmClient.IsConfigured)
                 {
-                    response = await ExecuteParsedIntentAsync(caller, llmParsed, cancellationToken);
+                    response = await ProcessWithLlmAsync(caller, conv, history, cancellationToken);
                 }
                 else
                 {
-                    var fallbackIntent = await FallbackParseIntentAsync(currentPrompt, history, cancellationToken);
-                    response = await ExecuteParsedIntentAsync(caller, fallbackIntent, cancellationToken);
+                    // Fallback when LLM is not configured (e.g. offline unit testing)
+                    var intent = FallbackParseIntent(currentPrompt);
+                    response = await ExecuteFallbackIntentAsync(caller, intent, cancellationToken);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "LLM parsing failed for booking prompt; falling back to deterministic parser.");
-                var fallbackIntent = await FallbackParseIntentAsync(currentPrompt, history, cancellationToken);
-                response = await ExecuteParsedIntentAsync(caller, fallbackIntent, cancellationToken);
+                _logger.LogError(ex, "Failed to communicate with LLM for prompt '{Prompt}'", currentPrompt);
+                response = new BookingAgentPromptResponse
+                {
+                    ConversationId = conv?.Id ?? 0,
+                    ActionType = "chat",
+                    Message = "Sorry, I'm having trouble right now, please try again."
+                };
             }
         }
-        else
-        {
-            // 5. Fallback Parser
-            var fallbackIntent = await FallbackParseIntentAsync(currentPrompt, history, cancellationToken);
-            response = await ExecuteParsedIntentAsync(caller, fallbackIntent, cancellationToken);
-        }
 
-        // Add assistant response to history
+        // Record assistant response in history
         var assistantMessage = new BookingAgentMessageDto
         {
             Role = "assistant",
@@ -224,6 +267,240 @@ public class BookingAgentService : IBookingAgentService
 
         response.History = history;
         return response;
+    }
+
+    private async Task<BookingAgentPromptResponse> ProcessWithLlmAsync(
+        UserContext caller,
+        AIConversation? conv,
+        List<BookingAgentMessageDto> history,
+        CancellationToken cancellationToken)
+    {
+        var systemInstruction = "You are a friendly, natural travel assistant for Travel Advisor, a Sri Lanka hotel and tour booking platform. Chat like a real person. Reply to greetings and small talk naturally and briefly (e.g. 'hi' -> 'Hey! How\\'s it going?'). Always respond to what the user actually said and never ignore it. Your job is to help with hotel stays, tour packages and destinations in Sri Lanka, but don't push it. After a bit of conversation, or when the user mentions travel, gently guide toward where they want to go, their dates and number of guests. Ask for only ONE missing detail at a time. Never repeat the same question if the user said something else. Never invent hotels, prices or availability; only use data returned by the tools. Keep replies short (1-3 sentences). Use plain text, no markdown, no asterisks.";
+
+        var llmMessages = new List<LlmMessage>
+        {
+            new() { Role = LlmRoles.System, Content = systemInstruction }
+        };
+
+        // Send full conversation history (last ~20 messages, excluding transient error notices)
+        var recentHistory = history
+            .Where(m => !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith("Sorry, I'm having trouble right now"))
+            .TakeLast(20)
+            .ToList();
+        foreach (var msg in recentHistory)
+        {
+            llmMessages.Add(new LlmMessage
+            {
+                Role = msg.Role == "user" ? LlmRoles.User : LlmRoles.Assistant,
+                Content = msg.Content
+            });
+        }
+
+        string finalReply = string.Empty;
+        var maxIterations = Math.Max(3, _aiOptions.MaxToolIterations);
+
+        for (var i = 0; i < maxIterations; i++)
+        {
+            var llmResponse = await _llmClient.ChatWithToolsAsync(llmMessages, AgentTools, cancellationToken);
+
+            if (llmResponse.ToolCalls.Count == 0)
+            {
+                finalReply = llmResponse.Content ?? string.Empty;
+                break;
+            }
+
+            // LLM wants to execute tool calls
+            llmMessages.Add(new LlmMessage
+            {
+                Role = LlmRoles.Assistant,
+                Content = llmResponse.Content ?? string.Empty,
+                ToolCalls = llmResponse.ToolCalls
+            });
+
+            foreach (var toolCall in llmResponse.ToolCalls)
+            {
+                _logger.LogInformation("LLM calling tool {ToolName} with arguments: {Args}", toolCall.Name, toolCall.ArgumentsJson);
+                var toolResult = toolCall.Name switch
+                {
+                    "search_hotels" => await ExecuteSearchHotelsAsync(caller, toolCall.ArgumentsJson, cancellationToken),
+                    "get_hotel_details" => await ExecuteGetHotelDetailsAsync(caller, toolCall.ArgumentsJson, cancellationToken),
+                    "create_booking" => await ExecuteCreateBookingAsync(caller, toolCall.ArgumentsJson, cancellationToken),
+                    _ => JsonSerializer.Serialize(new { error = $"Unknown tool '{toolCall.Name}'" })
+                };
+
+                llmMessages.Add(new LlmMessage
+                {
+                    Role = LlmRoles.Tool,
+                    ToolCallId = toolCall.Id,
+                    Content = toolResult
+                });
+            }
+        }
+
+        finalReply = CleanPlainText(finalReply);
+        if (string.IsNullOrWhiteSpace(finalReply))
+        {
+            finalReply = "I am here to help you explore and book stays in Sri Lanka. Where are you planning to visit?";
+        }
+
+        return new BookingAgentPromptResponse
+        {
+            ConversationId = conv?.Id ?? 0,
+            ActionType = "chat",
+            Message = finalReply
+        };
+    }
+
+    private async Task<string> ExecuteSearchHotelsAsync(UserContext caller, string argumentsJson, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(argumentsJson);
+            var root = doc.RootElement;
+            var location = root.TryGetProperty("location", out var loc) ? loc.GetString() : null;
+            var guests = root.TryGetProperty("guests", out var g) && g.TryGetInt32(out var gi) ? gi : 1;
+
+            var results = await _hotelService.SearchAsync(caller, new HotelSearchQuery
+            {
+                City = location,
+                Q = location,
+                Guests = guests > 0 ? guests : 1
+            }, cancellationToken);
+
+            if (results.Count == 0 && !string.IsNullOrWhiteSpace(location))
+            {
+                var all = await _hotelService.SearchAsync(caller, new HotelSearchQuery(), cancellationToken);
+                results = all.Where(h =>
+                    (h.City != null && h.City.Contains(location, StringComparison.OrdinalIgnoreCase)) ||
+                    (h.Name != null && h.Name.Contains(location, StringComparison.OrdinalIgnoreCase)) ||
+                    (h.Address != null && h.Address.Contains(location, StringComparison.OrdinalIgnoreCase))
+                ).ToList();
+            }
+
+            var list = results.Take(5).Select(h => new
+            {
+                hotel_id = h.Id,
+                name = h.Name,
+                city = h.City,
+                address = h.Address,
+                rating = h.AverageRating,
+                min_price_per_night = h.MinPricePerNight,
+                description = h.Description
+            }).ToList();
+
+            return JsonSerializer.Serialize(list, JsonOptions);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Tool search_hotels execution error");
+            return JsonSerializer.Serialize(new { error = ex.Message });
+        }
+    }
+
+    private async Task<string> ExecuteGetHotelDetailsAsync(UserContext caller, string argumentsJson, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(argumentsJson);
+            var root = doc.RootElement;
+            if (!root.TryGetProperty("hotel_id", out var idProp) || !idProp.TryGetInt32(out var hotelId))
+            {
+                return JsonSerializer.Serialize(new { error = "hotel_id is required" });
+            }
+
+            var hotel = await _hotelService.GetAsync(caller, hotelId, cancellationToken);
+            var summary = new
+            {
+                hotel_id = hotel.Id,
+                name = hotel.Name,
+                city = hotel.City,
+                description = hotel.Description,
+                rooms = hotel.Rooms.Select(r => new
+                {
+                    room_id = r.Id,
+                    name = r.Name,
+                    room_type = r.RoomType,
+                    capacity = r.Capacity,
+                    price_per_night = r.PricePerNight,
+                    is_available = r.IsAvailable
+                }).ToList()
+            };
+
+            return JsonSerializer.Serialize(summary, JsonOptions);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Tool get_hotel_details execution error");
+            return JsonSerializer.Serialize(new { error = ex.Message });
+        }
+    }
+
+    private async Task<string> ExecuteCreateBookingAsync(UserContext caller, string argumentsJson, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(argumentsJson);
+            var root = doc.RootElement;
+
+            if (!root.TryGetProperty("hotel_id", out var hidProp) || !hidProp.TryGetInt32(out var hotelId))
+                return JsonSerializer.Serialize(new { success = false, error = "hotel_id is required" });
+
+            if (!root.TryGetProperty("check_in", out var ciProp) || !DateTime.TryParse(ciProp.GetString(), Inv, DateTimeStyles.AssumeUniversal, out var checkIn))
+                return JsonSerializer.Serialize(new { success = false, error = "valid check_in date (YYYY-MM-DD) is required" });
+
+            if (!root.TryGetProperty("check_out", out var coProp) || !DateTime.TryParse(coProp.GetString(), Inv, DateTimeStyles.AssumeUniversal, out var checkOut))
+                return JsonSerializer.Serialize(new { success = false, error = "valid check_out date (YYYY-MM-DD) is required" });
+
+            var guests = root.TryGetProperty("guests", out var gProp) && gProp.TryGetInt32(out var g) ? g : 1;
+
+            int roomId = 0;
+            if (root.TryGetProperty("room_id", out var ridProp) && ridProp.TryGetInt32(out var rid) && rid > 0)
+            {
+                roomId = rid;
+            }
+            else
+            {
+                var hotel = await _hotelService.GetAsync(caller, hotelId, cancellationToken);
+                var room = hotel.Rooms.FirstOrDefault(r => r.IsAvailable && r.Capacity >= guests) ?? hotel.Rooms.FirstOrDefault();
+                if (room == null)
+                    return JsonSerializer.Serialize(new { success = false, error = "No rooms available at this hotel." });
+                roomId = room.Id;
+            }
+
+            var booking = await _bookingService.CreateAsync(caller, new CreateBookingRequest
+            {
+                RoomId = roomId,
+                CheckIn = checkIn,
+                CheckOut = checkOut,
+                Guests = guests
+            }, cancellationToken);
+
+            return JsonSerializer.Serialize(new
+            {
+                success = true,
+                booking_id = booking.Id,
+                hotel_name = booking.HotelName,
+                room_name = booking.RoomName,
+                check_in = booking.CheckIn.ToString("yyyy-MM-dd"),
+                check_out = booking.CheckOut.ToString("yyyy-MM-dd"),
+                guests = booking.Guests,
+                total_price = booking.TotalPrice,
+                status = booking.Status.ToString()
+            }, JsonOptions);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Tool create_booking execution error");
+            return JsonSerializer.Serialize(new { success = false, error = ex.Message });
+        }
+    }
+
+    private static string CleanPlainText(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return string.Empty;
+        var cleaned = text.Replace("**", "").Replace("*", "");
+        cleaned = Regex.Replace(cleaned, @"^#+\s*", "", RegexOptions.Multiline);
+        return cleaned.Trim();
     }
 
     public async Task<BookingDto> ConfirmProposalAsync(UserContext caller, ConfirmBookingAgentRequest request, CancellationToken cancellationToken = default)
@@ -326,13 +603,6 @@ public class BookingAgentService : IBookingAgentService
 
         if (conv == null)
         {
-            conv = await _context.AIConversations
-                .OrderByDescending(c => c.UpdatedAt)
-                .FirstOrDefaultAsync(c => c.UserId == userId && c.Title == "Booking Concierge", cancellationToken);
-        }
-
-        if (conv == null)
-        {
             conv = new AIConversation
             {
                 UserId = userId,
@@ -361,7 +631,7 @@ public class BookingAgentService : IBookingAgentService
             var listingName = booking.RoomName != null ? $"{booking.RoomName} ({booking.HotelName})" : (booking.PackageTitle ?? $"Booking #{booking.Id}");
 
             var message = canCancel
-                ? $"Are you sure you want to cancel your reservation #{booking.Id} for **{listingName}**? Free cancellation deadline is {booking.CheckIn.AddHours(-cutoffHours):MMM dd, yyyy HH:mm} UTC."
+                ? $"Are you sure you want to cancel your reservation #{booking.Id} for {listingName}? Free cancellation deadline is {booking.CheckIn.AddHours(-cutoffHours):MMM dd, yyyy HH:mm} UTC."
                 : $"Booking #{booking.Id} cannot be cancelled online because it is within {cutoffHours} hours of check-in.";
 
             return new BookingAgentPromptResponse
@@ -391,376 +661,111 @@ public class BookingAgentService : IBookingAgentService
         }
     }
 
-    private async Task<ParsedIntent?> ParsePromptWithLlmAsync(string conversationContext, CancellationToken cancellationToken)
+    private static ParsedFallbackIntent FallbackParseIntent(string prompt)
     {
-        var today = _clock.GetUtcNow().UtcDateTime.ToString("yyyy-MM-dd", Inv);
-        var systemPrompt = $$"""
-            You are the professional AI Booking Concierge for Travel Advisor Sri Lanka, interacting with a traveler.
-            Today's date is {{today}}.
-            Your tone is warm, polite, and helpful like ChatGPT.
+        var intent = new ParsedFallbackIntent();
 
-            Analyze the recent conversation and determine the next action:
-            1. If the traveler wants to book a hotel or tour package, but has NOT yet provided all necessary details (destination place, check-in date, check-out date, or number of guests):
-               - Set "intent": "conversation"
-               - Set "reply": Warmly ask the traveler for the missing details naturally (e.g., "I'd love to help you book a stay in Ella! What dates are you thinking of, and how many guests will be staying?").
-            2. If you now have the destination, check-in date, check-out date, and guest count (from the current message or previous messages in the context):
-               - Set "intent": "book_hotel" or "book_package"
-               - Fill "hotelQuery", "roomQuery", "packageQuery", "checkIn" (YYYY-MM-DD), "checkOut" (YYYY-MM-DD), "guests" (number).
-               - Set "reply": A friendly sentence stating that you found a great match and prepared their reservation proposal.
-            3. If the user asks for a cheaper option or to decrease budget:
-               - Set "intent": "book_hotel" (keeping destination and dates)
-               - Set "wantsCheaper": true
-               - Set "reply": "Certainly! Searching for more affordable stays for your dates..."
-            4. If the user asks to upgrade or for luxury:
-               - Set "intent": "book_hotel"
-               - Set "wantsUpgrade": true
-               - Set "reply": "Looking for luxury suites and premium room options..."
-            5. If the user asks to change the place/city:
-               - Set "intent": "book_hotel"
-               - Set "hotelQuery" to the new city, keeping dates and guests.
-               - Set "reply": "Let me check available stays in [city] for your dates..."
-            6. If the user asks to cancel a booking (e.g. "cancel booking 4"):
-               - Set "intent": "cancel_booking"
-               - Set "bookingId": number
-               - Set "reply": "Checking cancellation details for booking #[id]..."
-            7. For general questions, greetings, or help:
-               - Set "intent": "conversation"
-               - Set "reply": Respond politely and naturally like ChatGPT.
-
-            Return ONLY valid JSON matching this schema:
-            {
-              "intent": "conversation" | "book_hotel" | "book_package" | "cancel_booking" | "insights" | "unknown",
-              "bookingId": number or null,
-              "hotelQuery": "hotel or city name" or null,
-              "roomQuery": "room type" or null,
-              "packageQuery": "package title" or null,
-              "checkIn": "YYYY-MM-DD" or null,
-              "checkOut": "YYYY-MM-DD" or null,
-              "guests": number or null,
-              "wantsCheaper": boolean,
-              "wantsUpgrade": boolean,
-              "maxBudget": number or null,
-              "reply": "conversational reply"
-            }
-            """;
-
-        var response = await _llmClient.CompleteAsync(systemPrompt, conversationContext, jsonMode: true, cancellationToken);
-        if (string.IsNullOrWhiteSpace(response)) return null;
-
-        try
+        var dateMatch = DateRangeIso.Match(prompt);
+        if (dateMatch.Success &&
+            DateTime.TryParse(dateMatch.Groups[1].Value, Inv, DateTimeStyles.AssumeUniversal, out var inDt) &&
+            DateTime.TryParse(dateMatch.Groups[2].Value, Inv, DateTimeStyles.AssumeUniversal, out var outDt))
         {
-            using var doc = JsonDocument.Parse(response);
-            var root = doc.RootElement;
-            var intent = root.TryGetProperty("intent", out var iProp) ? iProp.GetString() : "conversation";
-
-            return new ParsedIntent
-            {
-                Intent = intent ?? "conversation",
-                BookingId = root.TryGetProperty("bookingId", out var bProp) && bProp.ValueKind == JsonValueKind.Number ? bProp.GetInt32() : null,
-                HotelQuery = root.TryGetProperty("hotelQuery", out var hProp) ? hProp.GetString() : null,
-                RoomQuery = root.TryGetProperty("roomQuery", out var rProp) ? rProp.GetString() : null,
-                PackageQuery = root.TryGetProperty("packageQuery", out var pProp) ? pProp.GetString() : null,
-                CheckIn = ParseDateOrNull(root.TryGetProperty("checkIn", out var cInProp) ? cInProp.GetString() : null),
-                CheckOut = ParseDateOrNull(root.TryGetProperty("checkOut", out var cOutProp) ? cOutProp.GetString() : null),
-                Guests = root.TryGetProperty("guests", out var gProp) && gProp.ValueKind == JsonValueKind.Number ? Math.Max(1, gProp.GetInt32()) : 2,
-                WantsCheaper = root.TryGetProperty("wantsCheaper", out var wc) && wc.GetBoolean(),
-                WantsUpgrade = root.TryGetProperty("wantsUpgrade", out var wu) && wu.GetBoolean(),
-                MaxBudget = root.TryGetProperty("maxBudget", out var mb) && mb.ValueKind == JsonValueKind.Number ? mb.GetDecimal() : null,
-                Reply = root.TryGetProperty("reply", out var repProp) ? repProp.GetString() : null
-            };
+            intent.CheckIn = inDt;
+            intent.CheckOut = outDt;
         }
-        catch
+
+        var guestsMatch = GuestsRegex.Match(prompt);
+        if (guestsMatch.Success && int.TryParse(guestsMatch.Groups[1].Value, out var g))
         {
-            return null;
+            intent.Guests = g;
         }
-    }
 
-    private async Task<ParsedIntent> FallbackParseIntentAsync(string currentPrompt, List<BookingAgentMessageDto> history, CancellationToken cancellationToken)
-    {
-        var allText = string.Join(" ", history.Select(h => h.Content).Append(currentPrompt));
-        var location = ExtractLocationOrName(allText);
-
-        DateTime? checkIn = null;
-        DateTime? checkOut = null;
-
-        var isoMatch = DateRangeIso.Match(allText);
-        if (isoMatch.Success)
+        var destinations = new[] { "ella", "galle", "kandy", "colombo", "sigiriya", "mirissa", "nuwara eliya", "bentota", "yala" };
+        foreach (var d in destinations)
         {
-            if (DateTime.TryParse(isoMatch.Groups[1].Value, Inv, DateTimeStyles.AssumeUniversal, out var inDt))
-                checkIn = inDt;
-            if (DateTime.TryParse(isoMatch.Groups[2].Value, Inv, DateTimeStyles.AssumeUniversal, out var outDt))
-                checkOut = outDt;
-        }
-        else
-        {
-            var namedMatch = DateRangeNamed.Match(allText);
-            if (namedMatch.Success)
+            if (prompt.Contains(d, StringComparison.OrdinalIgnoreCase))
             {
-                var currentYear = _clock.GetUtcNow().UtcDateTime.Year;
-                var startMonth = namedMatch.Groups["month"].Value;
-                var startDay = int.Parse(namedMatch.Groups["day"].Value, Inv);
-                var startYear = namedMatch.Groups["year"].Success ? int.Parse(namedMatch.Groups["year"].Value, Inv) : currentYear;
-
-                var endMonth = namedMatch.Groups["endMonth"].Success ? namedMatch.Groups["endMonth"].Value : startMonth;
-                var endDay = int.Parse(namedMatch.Groups["endDay"].Value, Inv);
-                var endYear = namedMatch.Groups["endYear"].Success ? int.Parse(namedMatch.Groups["endYear"].Value, Inv) : startYear;
-
-                if (DateTime.TryParse($"{startMonth} {startDay}, {startYear}", Inv, DateTimeStyles.AssumeUniversal, out var inNamed))
-                    checkIn = inNamed;
-                if (DateTime.TryParse($"{endMonth} {endDay}, {endYear}", Inv, DateTimeStyles.AssumeUniversal, out var outNamed))
-                    checkOut = outNamed;
+                intent.Location = d;
+                break;
             }
         }
 
-        var guests = 2;
-        var guestMatch = GuestsRegex.Match(allText);
-        if (guestMatch.Success && int.TryParse(guestMatch.Groups[1].Value, out var g))
-            guests = Math.Clamp(g, 1, 10);
+        intent.HasBookingKeyword = prompt.Contains("book", StringComparison.OrdinalIgnoreCase) ||
+                                  prompt.Contains("hotel", StringComparison.OrdinalIgnoreCase) ||
+                                  prompt.Contains("room", StringComparison.OrdinalIgnoreCase);
 
-        var isPackage = allText.Contains("package", StringComparison.OrdinalIgnoreCase) || allText.Contains("tour", StringComparison.OrdinalIgnoreCase);
-        var wantsCheaper = Regex.IsMatch(currentPrompt, @"\b(cheaper|lower budget|decrease budget|less expensive|economy|save)\b", RegexOptions.IgnoreCase);
-        var wantsUpgrade = Regex.IsMatch(currentPrompt, @"\b(upgrade|higher budget|increase budget|luxury|suite|premium)\b", RegexOptions.IgnoreCase);
-
-        // If dates or destination are missing, ask conversationally like ChatGPT!
-        if (string.IsNullOrWhiteSpace(location))
-        {
-            return new ParsedIntent
-            {
-                Intent = "conversation",
-                Reply = "Hello! I would be delighted to help you plan your journey in Sri Lanka. Where would you like to visit (e.g. Ella, Kandy, Galle, Sigiriya, Mirissa)?"
-            };
-        }
-
-        if (!checkIn.HasValue)
-        {
-            return new ParsedIntent
-            {
-                Intent = "conversation",
-                HotelQuery = location,
-                Reply = $"I would love to help you find a stay in **{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(location)}**! What dates are you planning for your visit, and how many guests will be traveling?"
-            };
-        }
-
-        return new ParsedIntent
-        {
-            Intent = isPackage ? "book_package" : "book_hotel",
-            HotelQuery = location,
-            PackageQuery = location,
-            CheckIn = checkIn,
-            CheckOut = checkOut ?? checkIn.Value.AddDays(2),
-            Guests = guests,
-            WantsCheaper = wantsCheaper,
-            WantsUpgrade = wantsUpgrade
-        };
+        return intent;
     }
 
-    private async Task<BookingAgentPromptResponse> ExecuteParsedIntentAsync(UserContext caller, ParsedIntent intent, CancellationToken cancellationToken)
+    private async Task<BookingAgentPromptResponse> ExecuteFallbackIntentAsync(UserContext caller, ParsedFallbackIntent intent, CancellationToken cancellationToken)
     {
-        if (intent.Intent == "conversation")
+        if (intent.HasBookingKeyword && string.IsNullOrWhiteSpace(intent.Location) && !intent.CheckIn.HasValue)
         {
             return new BookingAgentPromptResponse
             {
-                ActionType = "chat",
-                Message = intent.Reply ?? "How can I help you plan your trip?"
+                ActionType = "info",
+                Message = "Could you please specify your preferred hotel or destination, check-in date, check-out date, and the number of guests?"
             };
         }
 
-        if (intent.Intent == "cancel_booking" && intent.BookingId.HasValue)
+        if (intent.Location != null && intent.CheckIn.HasValue && intent.CheckOut.HasValue)
         {
-            return await HandleCancellationPreviewAsync(caller, intent.BookingId.Value, cancellationToken);
-        }
-
-        if (intent.Intent == "insights")
-        {
-            var insights = await GetBookingInsightsAsync(caller, cancellationToken);
-            return new BookingAgentPromptResponse
+            var hotels = await _hotelService.SearchAsync(caller, new HotelSearchQuery
             {
-                ActionType = "insights",
-                Message = $"Found {insights.Count} active reservation insight(s).",
-                Insights = insights
-            };
-        }
+                City = intent.Location,
+                Q = intent.Location,
+                Guests = intent.Guests
+            }, cancellationToken);
 
-        if (intent.Intent == "book_package")
-        {
-            return await ProposePackageBookingAsync(caller, intent, cancellationToken);
-        }
-
-        return await ProposeHotelBookingAsync(caller, intent, cancellationToken);
-    }
-
-    private async Task<BookingAgentPromptResponse> ProposeHotelBookingAsync(UserContext caller, ParsedIntent intent, CancellationToken cancellationToken)
-    {
-        var hotels = await _hotelService.SearchAsync(caller, new HotelSearchQuery
-        {
-            Q = intent.HotelQuery,
-            Guests = intent.Guests
-        }, cancellationToken);
-
-        if (hotels.Count == 0)
-        {
-            hotels = await _hotelService.SearchAsync(caller, new HotelSearchQuery(), cancellationToken);
-        }
-
-        if (hotels.Count == 0)
-        {
-            return new BookingAgentPromptResponse
+            var hotel = hotels.FirstOrDefault();
+            if (hotel != null)
             {
-                ActionType = "chat",
-                Message = "No approved hotels are currently available in the catalog matching that destination."
-            };
+                var detail = await _hotelService.GetAsync(caller, hotel.Id, cancellationToken);
+                var room = detail.Rooms.FirstOrDefault(r => r.IsAvailable && r.Capacity >= intent.Guests) ?? detail.Rooms.FirstOrDefault();
+
+                if (room != null)
+                {
+                    var quote = await _bookingService.CheckAvailabilityAsync(caller, new AvailabilityQuery
+                    {
+                        RoomId = room.Id,
+                        CheckIn = intent.CheckIn.Value,
+                        CheckOut = intent.CheckOut.Value,
+                        Guests = intent.Guests
+                    }, cancellationToken);
+
+                    if (quote.Available)
+                    {
+                        var expiresAt = _clock.GetUtcNow().UtcDateTime.AddMinutes(Math.Max(5, _aiOptions.BookingProposalMinutes));
+                        var token = GenerateProposalToken(room.Id, null, quote.CheckIn, quote.CheckOut, quote.Guests, quote.TotalPrice, expiresAt);
+
+                        return new BookingAgentPromptResponse
+                        {
+                            ActionType = "proposal",
+                            Message = $"I found a stay at {hotel.Name} ({room.Name}) from {quote.CheckIn:MMM dd, yyyy} to {quote.CheckOut:MMM dd, yyyy} for LKR {quote.TotalPrice:N0}.",
+                            Proposal = new BookingProposalDto
+                            {
+                                Kind = "hotel",
+                                RoomId = room.Id,
+                                HotelName = hotel.Name,
+                                RoomName = room.Name,
+                                CheckIn = quote.CheckIn,
+                                CheckOut = quote.CheckOut,
+                                Nights = quote.Nights,
+                                Guests = quote.Guests,
+                                TotalPrice = quote.TotalPrice,
+                                ProposalToken = token,
+                                ExpiresAt = expiresAt
+                            }
+                        };
+                    }
+                }
+            }
         }
-
-        if (intent.WantsCheaper || intent.MaxBudget.HasValue)
-            hotels = hotels.OrderBy(h => h.MinPricePerNight ?? decimal.MaxValue).ToList();
-        else if (intent.WantsUpgrade)
-            hotels = hotels.OrderByDescending(h => h.MinPricePerNight ?? 0).ToList();
-
-        var selectedHotel = hotels.FirstOrDefault();
-        var hotelDetail = await _hotelService.GetAsync(null, selectedHotel!.Id, cancellationToken);
-
-        if (hotelDetail.Rooms.Count == 0)
-        {
-            return new BookingAgentPromptResponse
-            {
-                ActionType = "chat",
-                Message = $"We found **{hotelDetail.Name}**, but there are no rooms listed for booking right now."
-            };
-        }
-
-        var candidateRooms = hotelDetail.Rooms.Where(r => r.IsAvailable && r.Capacity >= intent.Guests).ToList();
-        if (candidateRooms.Count == 0) candidateRooms = hotelDetail.Rooms.Where(r => r.IsAvailable).ToList();
-        if (candidateRooms.Count == 0) candidateRooms = hotelDetail.Rooms;
-
-        RoomDto room;
-        if (intent.WantsCheaper)
-            room = candidateRooms.OrderBy(r => r.PricePerNight).First();
-        else if (intent.WantsUpgrade)
-            room = candidateRooms.OrderByDescending(r => r.PricePerNight).First();
-        else
-            room = candidateRooms.FirstOrDefault(r => r.Capacity >= intent.Guests) ?? candidateRooms.First();
-
-        var checkIn = intent.CheckIn ?? _clock.GetUtcNow().UtcDateTime.Date.AddDays(7);
-        var checkOut = intent.CheckOut ?? checkIn.AddDays(2);
-
-        var quote = await _bookingService.CheckAvailabilityAsync(caller, new AvailabilityQuery
-        {
-            RoomId = room.Id,
-            CheckIn = checkIn,
-            CheckOut = checkOut,
-            Guests = intent.Guests
-        }, cancellationToken);
-
-        if (!quote.Available)
-        {
-            return new BookingAgentPromptResponse
-            {
-                ActionType = "chat",
-                Message = $"**{hotelDetail.Name} - {room.Name}** is not available for those dates: {quote.Reason}. Would you like to check different dates?"
-            };
-        }
-
-        var expiresAt = _clock.GetUtcNow().UtcDateTime.AddMinutes(Math.Max(5, _aiOptions.BookingProposalMinutes));
-        var token = GenerateProposalToken(room.Id, null, quote.CheckIn, quote.CheckOut, quote.Guests, quote.TotalPrice, expiresAt);
-
-        var proposal = new BookingProposalDto
-        {
-            Kind = "hotel",
-            HotelId = hotelDetail.Id,
-            HotelName = hotelDetail.Name,
-            RoomId = room.Id,
-            RoomName = room.Name,
-            CheckIn = quote.CheckIn,
-            CheckOut = quote.CheckOut,
-            Nights = quote.Nights,
-            Guests = quote.Guests,
-            TotalPrice = quote.TotalPrice,
-            ProposalToken = token,
-            ExpiresAt = expiresAt
-        };
-
-        var replyMessage = intent.Reply ?? $"I have prepared a reservation proposal for **{room.Name}** at **{hotelDetail.Name}** from **{quote.CheckIn:MMM dd, yyyy}** to **{quote.CheckOut:MMM dd, yyyy}** ({quote.Nights} nights, {quote.Guests} guest(s)) for **LKR {quote.TotalPrice:N0}**.";
 
         return new BookingAgentPromptResponse
         {
-            ActionType = "proposal",
-            Message = replyMessage,
-            Proposal = proposal
-        };
-    }
-
-    private async Task<BookingAgentPromptResponse> ProposePackageBookingAsync(UserContext caller, ParsedIntent intent, CancellationToken cancellationToken)
-    {
-        var packages = await _packageService.SearchAsync(caller, new PackageSearchQuery
-        {
-            Q = intent.PackageQuery
-        }, cancellationToken);
-
-        if (intent.WantsCheaper || intent.MaxBudget.HasValue)
-            packages = packages.OrderBy(p => p.Price).ToList();
-        else if (intent.WantsUpgrade)
-            packages = packages.OrderByDescending(p => p.Price).ToList();
-
-        var pkg = packages.FirstOrDefault(p => p.MaxTravelers >= intent.Guests);
-        if (pkg is null)
-        {
-            packages = await _packageService.SearchAsync(caller, new PackageSearchQuery(), cancellationToken);
-            pkg = packages.FirstOrDefault(p => p.MaxTravelers >= intent.Guests);
-        }
-
-        if (pkg is null)
-        {
-            return new BookingAgentPromptResponse
-            {
-                ActionType = "chat",
-                Message = packages.Count == 0
-                    ? "No approved tour packages were found matching your criteria."
-                    : $"No approved tour package can accommodate {intent.Guests} traveler(s)."
-            };
-        }
-
-        var checkIn = intent.CheckIn ?? _clock.GetUtcNow().UtcDateTime.Date.AddDays(7);
-
-        var quote = await _bookingService.CheckAvailabilityAsync(caller, new AvailabilityQuery
-        {
-            TravelPackageId = pkg.Id,
-            CheckIn = checkIn,
-            Guests = intent.Guests
-        }, cancellationToken);
-
-        if (!quote.Available)
-        {
-            return new BookingAgentPromptResponse
-            {
-                ActionType = "chat",
-                Message = $"Tour package **{pkg.Title}** is not available on {checkIn:MMM dd, yyyy}: {quote.Reason}."
-            };
-        }
-
-        var expiresAt = _clock.GetUtcNow().UtcDateTime.AddMinutes(Math.Max(5, _aiOptions.BookingProposalMinutes));
-        var token = GenerateProposalToken(null, pkg.Id, quote.CheckIn, quote.CheckOut, quote.Guests, quote.TotalPrice, expiresAt);
-
-        var proposal = new BookingProposalDto
-        {
-            Kind = "package",
-            TravelPackageId = pkg.Id,
-            PackageTitle = pkg.Title,
-            CheckIn = quote.CheckIn,
-            CheckOut = quote.CheckOut,
-            Nights = quote.Nights,
-            Guests = quote.Guests,
-            TotalPrice = quote.TotalPrice,
-            ProposalToken = token,
-            ExpiresAt = expiresAt
-        };
-
-        var replyMessage = intent.Reply ?? $"I have prepared a reservation proposal for **{pkg.Title}** starting **{quote.CheckIn:MMM dd, yyyy}** ({pkg.DurationDays} days, {quote.Guests} traveler(s)) for **LKR {quote.TotalPrice:N0}**.";
-
-        return new BookingAgentPromptResponse
-        {
-            ActionType = "proposal",
-            Message = replyMessage,
-            Proposal = proposal
+            ActionType = "chat",
+            Message = "How can I assist you with your travels in Sri Lanka today?"
         };
     }
 
@@ -809,23 +814,6 @@ public class BookingAgentService : IBookingAgentService
         }
     }
 
-    private static DateTime? ParseDateOrNull(string? raw)
-    {
-        if (string.IsNullOrWhiteSpace(raw)) return null;
-        return DateTime.TryParse(raw, Inv, DateTimeStyles.AssumeUniversal, out var dt) ? dt : null;
-    }
-
-    private static string? ExtractLocationOrName(string prompt)
-    {
-        var words = new[] { "ella", "galle", "kandy", "colombo", "sigiriya", "mirissa", "nuwara eliya", "bentota", "yala" };
-        foreach (var w in words)
-        {
-            if (prompt.Contains(w, StringComparison.OrdinalIgnoreCase))
-                return w;
-        }
-        return null;
-    }
-
     private sealed class TokenData
     {
         public int? RoomId { get; set; }
@@ -837,19 +825,12 @@ public class BookingAgentService : IBookingAgentService
         public DateTime ExpiresAt { get; set; }
     }
 
-    private sealed class ParsedIntent
+    private sealed class ParsedFallbackIntent
     {
-        public string Intent { get; set; } = "conversation";
-        public int? BookingId { get; set; }
-        public string? HotelQuery { get; set; }
-        public string? RoomQuery { get; set; }
-        public string? PackageQuery { get; set; }
+        public string? Location { get; set; }
         public DateTime? CheckIn { get; set; }
         public DateTime? CheckOut { get; set; }
         public int Guests { get; set; } = 2;
-        public decimal? MaxBudget { get; set; }
-        public bool WantsCheaper { get; set; }
-        public bool WantsUpgrade { get; set; }
-        public string? Reply { get; set; }
+        public bool HasBookingKeyword { get; set; }
     }
 }

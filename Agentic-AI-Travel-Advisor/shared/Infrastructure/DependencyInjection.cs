@@ -74,10 +74,29 @@ public static class DependencyInjection
         {
             configuration.GetSection(AI.AiOptions.SectionName).Bind(options);
             var gemini = configuration.GetSection("Gemini");
-            if (gemini.Exists() && string.IsNullOrWhiteSpace(options.ApiKey))
+            if (gemini.Exists())
             {
-                gemini.Bind(options);
+                if (string.IsNullOrWhiteSpace(options.ApiKey))
+                    options.ApiKey = gemini["ApiKey"] ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(options.BaseUrl) || options.BaseUrl.Contains("api.openai.com"))
+                    options.BaseUrl = gemini["BaseUrl"] ?? options.BaseUrl;
+                if (string.IsNullOrWhiteSpace(options.Model) || options.Model.Contains("gpt") || options.Model == "gemini-2.5-flash")
+                    options.Model = gemini["Model"] ?? "gemini-3.8-flash";
             }
+
+            if (string.IsNullOrWhiteSpace(options.ApiKey))
+            {
+                options.ApiKey = Environment.GetEnvironmentVariable("AI_API_KEY")
+                              ?? Environment.GetEnvironmentVariable("GEMINI_API_KEY")
+                              ?? string.Empty;
+            }
+
+            if (options.Model == "gemini-2.5-flash")
+            {
+                options.Model = "gemini-3.8-flash";
+            }
+
+            options.Temperature = 0.8;
         });
         services.AddSingleton<AI.LlmAvailability>();
         services.AddHttpClient<ILlmClient, AI.OpenAiCompatClient>();

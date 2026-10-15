@@ -36,6 +36,7 @@ public interface IUserService
 public interface IHotelService
 {
     Task<List<HotelDto>> SearchAsync(UserContext? caller, HotelSearchQuery query, CancellationToken cancellationToken = default);
+    Task<List<HotelDto>> SearchAsync(HotelSearchQuery query, CancellationToken cancellationToken = default);
     Task<List<HotelDto>> ListMineAsync(UserContext caller, CancellationToken cancellationToken = default);
     Task<HotelDetailDto> GetAsync(UserContext? caller, int id, CancellationToken cancellationToken = default);
     Task<HotelDto> CreateAsync(UserContext caller, CreateHotelRequest request, CancellationToken cancellationToken = default);

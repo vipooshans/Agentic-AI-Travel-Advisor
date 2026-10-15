@@ -26,8 +26,8 @@ public class OpenAiCompatClient : ILlmClient
         _http.Timeout = TimeSpan.FromSeconds(Math.Clamp(_options.TimeoutSeconds, 5, 300));
     }
 
-    /// <summary>False without a key, and for a while after the provider rejects the key.</summary>
-    public bool IsConfigured => !string.IsNullOrWhiteSpace(_options.ApiKey) && !_availability.IsSuspended;
+    /// <summary>True when an API key is present in configuration or environment.</summary>
+    public bool IsConfigured => !string.IsNullOrWhiteSpace(_options.ApiKey);
 
     public async Task<string> CompleteAsync(
         string systemPrompt,
@@ -113,7 +113,13 @@ public class OpenAiCompatClient : ILlmClient
         }
 
         using var doc = await SendAsync(payload, cancellationToken);
-        var message0 = doc.RootElement.GetProperty("choices")[0].GetProperty("message");
+        if (!doc.RootElement.TryGetProperty("choices", out var choices) || choices.GetArrayLength() == 0)
+        {
+            _logger.LogError("LLM returned unexpected payload without choices: {Json}", doc.RootElement.GetRawText());
+            throw new InvalidOperationException($"LLM returned unexpected payload: {doc.RootElement.GetRawText()}");
+        }
+
+        var message0 = choices[0].GetProperty("message");
         var content = message0.TryGetProperty("content", out var c) && c.ValueKind == JsonValueKind.String ? c.GetString() : null;
 
         var toolCalls = new List<LlmToolCall>();
@@ -122,11 +128,17 @@ public class OpenAiCompatClient : ILlmClient
             foreach (var call in tc.EnumerateArray())
             {
                 var function = call.GetProperty("function");
+                string argsString = "{}";
+                if (function.TryGetProperty("arguments", out var args))
+                {
+                    argsString = args.ValueKind == JsonValueKind.String ? args.GetString() ?? "{}" : args.GetRawText();
+                }
+
                 toolCalls.Add(new LlmToolCall
                 {
                     Id = call.TryGetProperty("id", out var id) ? id.GetString() ?? Guid.NewGuid().ToString("N") : Guid.NewGuid().ToString("N"),
                     Name = function.GetProperty("name").GetString() ?? string.Empty,
-                    ArgumentsJson = function.TryGetProperty("arguments", out var args) ? args.GetString() ?? "{}" : "{}"
+                    ArgumentsJson = argsString
                 });
             }
         }
@@ -139,26 +151,23 @@ public class OpenAiCompatClient : ILlmClient
         if (!IsConfigured)
             throw new InvalidOperationException("AI API key is not configured.");
 
+        var key = _options.ApiKey.Trim();
         var url = $"{_options.BaseUrl.TrimEnd('/')}/chat/completions";
         using var request = new HttpRequestMessage(HttpMethod.Post, url);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiKey);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
+        request.Headers.TryAddWithoutValidation("x-goog-api-key", key);
         request.Content = new StringContent(payload.ToJsonString(), Encoding.UTF8, "application/json");
+
+        _logger.LogInformation("Sending LLM request to {Url} with model {Model}", url, _options.Model);
 
         using var response = await _http.SendAsync(request, cancellationToken);
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
-            // A rejected key will not start working on the next request; timeouts and 5xx might, so only these suspend.
-            if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
-            {
-                _availability.Suspend();
-                _logger.LogError(
-                    "The AI provider rejected the API key ({Status}). Using the deterministic planner until {Until:u}; check Ai:ApiKey.",
-                    (int)response.StatusCode, _availability.SuspendedUntil);
-            }
-
-            var snippet = body.Length > 300 ? body[..300] + "..." : body;
-            throw new HttpRequestException($"LLM request failed ({(int)response.StatusCode}): {snippet}", null, response.StatusCode);
+            _logger.LogError(
+                "Gemini/LLM request to {Url} failed with status {StatusCode}: {ErrorBody}",
+                url, (int)response.StatusCode, body);
+            throw new HttpRequestException($"LLM request failed ({(int)response.StatusCode}): {body}", null, response.StatusCode);
         }
 
         return JsonDocument.Parse(body);

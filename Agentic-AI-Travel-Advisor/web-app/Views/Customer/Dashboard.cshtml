@@ -334,14 +334,19 @@
         var input = document.getElementById('chatInputText');
         var text = (input ? input.value : '').trim();
         if (text) {
-            sendPrompt(text);
             input.value = '';
+            sendPrompt(text);
         }
     }
 
     function sendPrompt(text) {
         var stream = document.getElementById('bookingChatStream');
         if (!stream) return;
+
+        var input = document.getElementById('chatInputText');
+        var submitBtn = document.getElementById('chatSubmitBtn');
+        if (input) input.disabled = true;
+        if (submitBtn) submitBtn.disabled = true;
 
         // Append user bubble
         var userHtml = `
@@ -365,6 +370,14 @@
         stream.insertAdjacentHTML('beforeend', loadingHtml);
         stream.scrollTop = stream.scrollHeight;
 
+        function enableControls() {
+            if (input) {
+                input.disabled = false;
+                input.focus();
+            }
+            if (submitBtn) submitBtn.disabled = false;
+        }
+
         // Send JSON request with DB conversation ID
         fetch('/Customer/QuickPromptJson', {
             method: 'POST',
@@ -378,6 +391,7 @@
             return res.json();
         })
         .then(function(data) {
+            enableControls();
             var el = document.getElementById(loadingId);
             if (el) el.remove();
             if (data && data.conversationId) {
@@ -386,6 +400,7 @@
             renderAiResponse(data);
         })
         .catch(function(err) {
+            enableControls();
             var el = document.getElementById(loadingId);
             if (el) el.remove();
             var errHtml = `
@@ -404,7 +419,7 @@
         var stream = document.getElementById('bookingChatStream');
         if (!stream || !data) return;
 
-        var formattedText = escapeHtml(data.message || '').replace(/\n/g, '<br/>');
+        var formattedText = formatMarkdown(data.message || '');
         var innerContent = `<div style="line-height: 1.55;">${formattedText}</div>`;
 
         // Proposal Card
@@ -524,5 +539,13 @@
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    function formatMarkdown(text) {
+        if (!text) return '';
+        var escaped = escapeHtml(text);
+        escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        escaped = escaped.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        return escaped.replace(/\n/g, '<br/>');
     }
 </script>

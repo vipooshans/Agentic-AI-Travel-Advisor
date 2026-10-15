@@ -55,6 +55,9 @@ public sealed class HotelService(IHotelRepository hotels, IUnitOfWork unitOfWork
         return results.Select(h => h.ToDto()).ToList();
     }
 
+    public Task<List<HotelDto>> SearchAsync(HotelSearchQuery query, CancellationToken cancellationToken = default) =>
+        SearchAsync(null, query, cancellationToken);
+
     public async Task<List<HotelDto>> ListMineAsync(UserContext caller, CancellationToken cancellationToken = default) =>
         (await hotels.ListByOwnerAsync(caller.UserId, cancellationToken)).Select(h => h.ToDto()).ToList();
 
