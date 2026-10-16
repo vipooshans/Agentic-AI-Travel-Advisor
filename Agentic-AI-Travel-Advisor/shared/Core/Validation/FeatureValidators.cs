@@ -117,7 +117,14 @@ public sealed partial class UserProfileDtoValidator : AbstractValidator<UserProf
     {
         RuleFor(x => x.PhoneNumber)
             .Must(p => string.IsNullOrWhiteSpace(p) || Phone().IsMatch(p.Trim()))
-            .WithMessage("Phone number may contain digits, spaces, (), - and a leading +, 6-32 characters.");
+            .WithMessage("Phone number must use international format with a country code and digits only.");
+        RuleFor(x => x)
+            .Must(profile => string.IsNullOrWhiteSpace(profile.PhoneNumber)
+                || !(string.Equals(profile.Nationality?.Trim(), "Sri Lanka", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(profile.Nationality?.Trim(), "Sri Lankan", StringComparison.OrdinalIgnoreCase))
+                || (profile.PhoneNumber.StartsWith("+94", StringComparison.Ordinal)
+                    && profile.PhoneNumber.Length == 12))
+            .WithMessage("A Sri Lankan phone number must use country code +94 and contain 10 local digits.");
         RuleFor(x => x.Nationality).MaximumLength(64);
         RuleFor(x => x.DateOfBirth)
             .Must(d => d is null || (d.Value.Year >= 1900 && d.Value < DateOnly.FromDateTime(DateTime.UtcNow)))
@@ -129,7 +136,7 @@ public sealed partial class UserProfileDtoValidator : AbstractValidator<UserProf
             .WithMessage("Preferred currency must be a 3-letter code.");
     }
 
-    [GeneratedRegex(@"^\+?[0-9 ()\-]{6,32}$")]
+    [GeneratedRegex(@"^\+[1-9]\d{6,14}$")]
     private static partial Regex Phone();
 
     [GeneratedRegex("^[A-Z]{3}$")]
