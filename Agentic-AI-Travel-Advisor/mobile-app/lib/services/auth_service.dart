@@ -33,9 +33,6 @@ class AuthService {
     final auth = AuthResponse.fromJson(
       jsonDecode(response.body) as Map<String, dynamic>,
     );
-    if (auth.user.role != travelerRole) {
-      throw const ApiException(travelersOnlyMessage, statusCode: 403);
-    }
     await _persistSession(auth);
     return auth;
   }
@@ -87,7 +84,7 @@ class AuthService {
 
     _api.setToken(token);
     final me = await getMe();
-    if (me == null || me.role != travelerRole) {
+    if (me == null) {
       await logout();
       return null;
     }

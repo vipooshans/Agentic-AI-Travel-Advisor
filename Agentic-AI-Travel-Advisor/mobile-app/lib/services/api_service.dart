@@ -53,7 +53,9 @@ class ApiService {
 
   /// Builds a URL for [path], dropping null or blank query values.
   Uri uri(String path, [Map<String, Object?>? query]) {
-    final base = Uri.parse('${_baseUrl ?? ApiConfig.baseUrl}$path');
+    final rawBase = (_baseUrl ?? ApiConfig.baseUrl).replaceAll(RegExp(r'/+$'), '');
+    final normalizedPath = path.startsWith('/') ? path : '/$path';
+    final base = Uri.parse('$rawBase$normalizedPath');
     final params = <String, String>{
       ...base.queryParameters,
       if (query != null)

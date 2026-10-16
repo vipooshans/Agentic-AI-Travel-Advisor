@@ -35,6 +35,9 @@ public sealed class LlmMessage
 
     /// <summary>Set on assistant messages that requested tool calls.</summary>
     public IReadOnlyList<LlmToolCall>? ToolCalls { get; init; }
+
+    /// <summary>Optional provider-specific message metadata (e.g. Gemini thought signatures).</summary>
+    public string? ExtraContentJson { get; init; }
 }
 
 public sealed class LlmToolCall
@@ -42,6 +45,7 @@ public sealed class LlmToolCall
     public string Id { get; init; } = string.Empty;
     public string Name { get; init; } = string.Empty;
     public string ArgumentsJson { get; init; } = "{}";
+    public string? ExtraContentJson { get; init; }
 }
 
 public sealed class LlmToolDefinition
@@ -57,4 +61,5 @@ public sealed class LlmToolResponse
 {
     public string? Content { get; init; }
     public IReadOnlyList<LlmToolCall> ToolCalls { get; init; } = [];
+    public string? ExtraContentJson { get; init; }
 }

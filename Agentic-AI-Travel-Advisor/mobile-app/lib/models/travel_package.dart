@@ -11,6 +11,7 @@ class TravelPackage {
   final String destinationCountry;
   final String? imageUrl;
   final int activityCount;
+  final int approvalStatus;
 
   /// Package price plus included activity prices, per person.
   final double? totalPrice;
@@ -30,6 +31,7 @@ class TravelPackage {
     required this.destinationCountry,
     this.imageUrl,
     required this.activityCount,
+    this.approvalStatus = 1,
     this.totalPrice,
     this.maxTravelers,
     this.averageRating,
@@ -39,7 +41,31 @@ class TravelPackage {
 
   double get pricePerPerson => totalPrice ?? price;
 
+  String get approvalStatusLabel {
+    switch (approvalStatus) {
+      case 0:
+        return 'Pending';
+      case 1:
+        return 'Approved';
+      case 2:
+        return 'Rejected';
+      default:
+        return 'Pending';
+    }
+  }
+
   factory TravelPackage.fromJson(Map<String, dynamic> json) {
+    int parseStatus(dynamic val) {
+      if (val is num) return val.toInt();
+      if (val is String) {
+        final s = val.toLowerCase();
+        if (s == 'approved') return 1;
+        if (s == 'rejected') return 2;
+        return 0;
+      }
+      return 1;
+    }
+
     return TravelPackage(
       id: (json['id'] as num).toInt(),
       title: json['title'] as String,
@@ -51,6 +77,7 @@ class TravelPackage {
       destinationCountry: json['destinationCountry'] as String? ?? '',
       imageUrl: json['imageUrl'] as String?,
       activityCount: (json['activityCount'] as num?)?.toInt() ?? 0,
+      approvalStatus: parseStatus(json['approvalStatus']),
       totalPrice: (json['totalPrice'] as num?)?.toDouble(),
       maxTravelers: (json['maxTravelers'] as num?)?.toInt(),
       averageRating: (json['averageRating'] as num?)?.toDouble(),

@@ -9,6 +9,7 @@ class Hotel {
   final String? description;
   final String? imageUrl;
   final int roomCount;
+  final int approvalStatus;
   final double? minPricePerNight;
   final double? averageRating;
   final int reviewCount;
@@ -23,13 +24,38 @@ class Hotel {
     this.description,
     this.imageUrl,
     required this.roomCount,
+    this.approvalStatus = 1,
     this.minPricePerNight,
     this.averageRating,
     this.reviewCount = 0,
     this.rooms,
   });
 
+  String get approvalStatusLabel {
+    switch (approvalStatus) {
+      case 0:
+        return 'Pending';
+      case 1:
+        return 'Approved';
+      case 2:
+        return 'Rejected';
+      default:
+        return 'Pending';
+    }
+  }
+
   factory Hotel.fromJson(Map<String, dynamic> json) {
+    int parseStatus(dynamic val) {
+      if (val is num) return val.toInt();
+      if (val is String) {
+        final s = val.toLowerCase();
+        if (s == 'approved') return 1;
+        if (s == 'rejected') return 2;
+        return 0;
+      }
+      return 1;
+    }
+
     return Hotel(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
@@ -39,6 +65,7 @@ class Hotel {
       description: json['description'] as String?,
       imageUrl: json['imageUrl'] as String?,
       roomCount: (json['roomCount'] as num?)?.toInt() ?? 0,
+      approvalStatus: parseStatus(json['approvalStatus']),
       minPricePerNight: (json['minPricePerNight'] as num?)?.toDouble(),
       averageRating: (json['averageRating'] as num?)?.toDouble(),
       reviewCount: (json['reviewCount'] as num?)?.toInt() ?? 0,

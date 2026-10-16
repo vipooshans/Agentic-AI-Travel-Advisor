@@ -314,7 +314,8 @@ public class BookingAgentService : IBookingAgentService
             {
                 Role = LlmRoles.Assistant,
                 Content = llmResponse.Content ?? string.Empty,
-                ToolCalls = llmResponse.ToolCalls
+                ToolCalls = llmResponse.ToolCalls,
+                ExtraContentJson = llmResponse.ExtraContentJson
             });
 
             foreach (var toolCall in llmResponse.ToolCalls)

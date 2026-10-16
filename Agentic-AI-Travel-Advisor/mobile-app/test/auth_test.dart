@@ -28,21 +28,19 @@ void main() {
     });
 
     for (final role in ['HOTEL_OWNER', 'TRAVEL_AGENT', 'ADMIN']) {
-      test('$role is refused and nothing is stored', () async {
+      test('$role is allowed to sign in and session is stored', () async {
         final api = fakeApi((_) async => jsonResponse(authJson(role: role)));
         final service = AuthService(api: api, storage: storage);
 
-        await expectLater(
-          service.login('staff@traveladvisor.com', 'Owner@123'),
-          throwsA(isA<ApiException>().having((e) => e.message, 'message', AuthService.travelersOnlyMessage)),
-        );
-        expect(api.hasToken, isFalse);
-        expect(await storage.read(key: 'access_token'), isNull);
-        expect(await storage.read(key: 'user_data'), isNull);
+        final auth = await service.login('staff@traveladvisor.com', 'Owner@123');
+        expect(auth.user.role, role);
+        expect(api.hasToken, isTrue);
+        expect(await storage.read(key: 'access_token'), isNotNull);
+        expect(await storage.read(key: 'user_data'), isNotNull);
       });
     }
 
-    test('a stored staff session is discarded on restore', () async {
+    test('a stored staff session is restored properly', () async {
       FlutterSecureStorage.setMockInitialValues({
         'access_token': 'old-token',
         'user_data': jsonEncode(userJson(role: 'TRAVEL_AGENT')),
@@ -51,9 +49,9 @@ void main() {
 
       final user = await AuthService(api: api, storage: storage).restoreSession();
 
-      expect(user, isNull);
-      expect(api.hasToken, isFalse);
-      expect(await storage.read(key: 'access_token'), isNull);
+      expect(user?.role, 'TRAVEL_AGENT');
+      expect(user?.isTravelAgent, isTrue);
+      expect(api.hasToken, isTrue);
     });
 
     test('a valid traveler session is restored', () async {
@@ -90,15 +88,15 @@ void main() {
   });
 
   group('AuthProvider session expiry', () {
-    test('staff sign-in leaves the provider signed out with the travelers-only message', () async {
+    test('staff sign-in succeeds and authenticates staff provider', () async {
       final api = fakeApi((_) async => jsonResponse(authJson(role: 'ADMIN')));
       final provider = AuthProvider(AuthService(api: api, storage: storage));
 
       final ok = await provider.login('admin@traveladvisor.com', 'Admin@123');
 
-      expect(ok, isFalse);
-      expect(provider.isAuthenticated, isFalse);
-      expect(provider.error, AuthService.travelersOnlyMessage);
+      expect(ok, isTrue);
+      expect(provider.isAuthenticated, isTrue);
+      expect(provider.user?.isAdmin, isTrue);
     });
 
     test('a 401 after sign-in signs the user out, clears storage and explains why', () async {
