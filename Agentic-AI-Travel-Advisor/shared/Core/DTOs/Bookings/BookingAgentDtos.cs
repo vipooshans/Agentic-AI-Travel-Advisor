@@ -63,16 +63,18 @@ public class BookingAgentMessageDto
     public string Content { get; set; } = string.Empty;
     public BookingProposalDto? Proposal { get; set; }
     public CancellationPreviewDto? Cancellation { get; set; }
+    public BookingDto? Booking { get; set; }
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 }
 
 public class BookingAgentPromptResponse
 {
     public int ConversationId { get; set; }
-    public string ActionType { get; set; } = "info"; // "chat", "proposal", "cancellation", "insights", "info", "error"
+    public string ActionType { get; set; } = "info"; // "chat", "proposal", "cancellation", "insights", "info", "booking_confirmed", "error"
     public string Message { get; set; } = string.Empty;
     public BookingProposalDto? Proposal { get; set; }
     public CancellationPreviewDto? Cancellation { get; set; }
+    public BookingDto? Booking { get; set; }
     public List<BookingInsightDto>? Insights { get; set; }
     public List<BookingSuggestionDto> Suggestions { get; set; } = [];
     public List<BookingAgentMessageDto> History { get; set; } = [];
