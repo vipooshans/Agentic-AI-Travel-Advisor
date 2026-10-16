@@ -27,8 +27,7 @@ public class BookingAgentService : IBookingAgentService
         PropertyNameCaseInsensitive = true
     };
 
-    private static readonly Regex CancelRegex = new(@"\b(?:cancel|drop|terminate)\b.*?(?:booking|reservation|trip)?\s*#?\s*(\d+)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-    private static readonly Regex InsightsRegex = new(@"\b(?:my\s*bookings|my\s*reservations|my\s*trips|insights|upcoming|status)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+    private static readonly Regex CancelRegex = new(@"^\s*(?:cancel|drop|terminate)\b.*?(?:booking|reservation|trip)?\s*#?\s*(\d+)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
     private static readonly Regex GuestsRegex = new(@"\b(\d+)\s*(?:guests?|people|travelers?|pax|persons?)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
     private static readonly Regex DateRangeIso = new(@"(\d{4}-\d{2}-\d{2})\s*(?:to|until|-|through)\s*(\d{4}-\d{2}-\d{2})", RegexOptions.IgnoreCase);
 
@@ -37,12 +36,12 @@ public class BookingAgentService : IBookingAgentService
         new LlmToolDefinition
         {
             Name = "search_hotels",
-            Description = "Search for verified hotels in Sri Lanka matching a location, dates, and number of guests.",
+            Description = "Search for verified hotels in Sri Lanka matching a location, city, dates, or guests.",
             ParametersSchema = """
             {
               "type": "object",
               "properties": {
-                "location": { "type": "string", "description": "City or destination in Sri Lanka (e.g. Galle, Ella, Kandy, Colombo, Sigiriya, Mirissa, Nuwara Eliya)" },
+                "location": { "type": "string", "description": "City or destination in Sri Lanka (e.g. Galle, Ella, Kandy, Colombo, Sigiriya, Mirissa, Nuwara Eliya, Bentota, Yala)" },
                 "check_in": { "type": "string", "description": "Check-in date in YYYY-MM-DD format (optional)" },
                 "check_out": { "type": "string", "description": "Check-out date in YYYY-MM-DD format (optional)" },
                 "guests": { "type": "integer", "description": "Number of guests (optional, default 1)" }
@@ -54,7 +53,7 @@ public class BookingAgentService : IBookingAgentService
         new LlmToolDefinition
         {
             Name = "get_hotel_details",
-            Description = "Retrieve detailed information, room types, pricing, and availability for a specific hotel by ID.",
+            Description = "Retrieve detailed information, rooms, pricing, and availability for a specific hotel by ID.",
             ParametersSchema = """
             {
               "type": "object",
@@ -67,19 +66,65 @@ public class BookingAgentService : IBookingAgentService
         },
         new LlmToolDefinition
         {
-            Name = "create_booking",
-            Description = "Create a confirmed hotel room reservation for the traveler once they have explicitly confirmed all details (hotel, check-in, check-out, guests). Only call this after the user says yes to a clear confirmation question.",
+            Name = "search_packages",
+            Description = "Search for tour packages, itineraries, and experiences in Sri Lanka.",
             ParametersSchema = """
             {
               "type": "object",
               "properties": {
-                "hotel_id": { "type": "integer", "description": "The unique hotel ID to book" },
+                "query": { "type": "string", "description": "Theme, activity or keyword (e.g. cultural, safari, hill country, beach, train)" },
+                "location": { "type": "string", "description": "Destination or city in Sri Lanka (optional)" }
+              }
+            }
+            """
+        },
+        new LlmToolDefinition
+        {
+            Name = "get_my_bookings",
+            Description = "Retrieve the traveler's active and upcoming hotel and tour package reservations.",
+            ParametersSchema = """
+            {
+              "type": "object",
+              "properties": {}
+            }
+            """
+        },
+        new LlmToolDefinition
+        {
+            Name = "create_booking",
+            Description = "Directly create and confirm a reservation for a hotel stay or tour package in Sri Lanka.",
+            ParametersSchema = """
+            {
+              "type": "object",
+              "properties": {
+                "hotel_id": { "type": "integer", "description": "The hotel ID (required for hotel stays)" },
                 "room_id": { "type": "integer", "description": "Optional specific room ID within the hotel" },
+                "package_id": { "type": "integer", "description": "The tour package ID (required for tour packages)" },
+                "check_in": { "type": "string", "description": "Check-in date in YYYY-MM-DD format" },
+                "check_out": { "type": "string", "description": "Check-out date in YYYY-MM-DD format (optional for tour packages)" },
+                "guests": { "type": "integer", "description": "Number of guests" },
+                "notes": { "type": "string", "description": "Optional traveler notes or special requests" }
+              },
+              "required": ["check_in", "guests"]
+            }
+            """
+        },
+        new LlmToolDefinition
+        {
+            Name = "create_proposal",
+            Description = "Generate an interactive price quote and proposal card with a 'Review & Reserve' button for the traveler.",
+            ParametersSchema = """
+            {
+              "type": "object",
+              "properties": {
+                "hotel_id": { "type": "integer", "description": "The hotel ID (for hotel stays)" },
+                "room_id": { "type": "integer", "description": "Optional room ID" },
+                "package_id": { "type": "integer", "description": "The tour package ID (for tour packages)" },
                 "check_in": { "type": "string", "description": "Check-in date in YYYY-MM-DD format" },
                 "check_out": { "type": "string", "description": "Check-out date in YYYY-MM-DD format" },
                 "guests": { "type": "integer", "description": "Number of guests" }
               },
-              "required": ["hotel_id", "check_in", "check_out", "guests"]
+              "required": ["check_in", "guests"]
             }
             """
         }
@@ -192,24 +237,11 @@ public class BookingAgentService : IBookingAgentService
 
         BookingAgentPromptResponse response;
 
-        // 2. Cancellation intent check
+        // 2. Cancellation intent check for explicit commands (e.g. "cancel booking #12" or "cancel #12")
         var cancelMatch = CancelRegex.Match(currentPrompt);
         if (cancelMatch.Success && int.TryParse(cancelMatch.Groups[1].Value, out var cancelBookingId))
         {
             response = await HandleCancellationPreviewAsync(caller, cancelBookingId, cancellationToken);
-        }
-        // 3. Insights intent check
-        else if (InsightsRegex.IsMatch(currentPrompt))
-        {
-            var insights = await GetBookingInsightsAsync(caller, cancellationToken);
-            response = new BookingAgentPromptResponse
-            {
-                ActionType = "insights",
-                Message = insights.Count == 0
-                    ? "You do not have any active or upcoming reservations right now."
-                    : $"You have {insights.Count} active booking update(s). Check your upcoming deadlines below.",
-                Insights = insights
-            };
         }
         else
         {
@@ -248,6 +280,7 @@ public class BookingAgentService : IBookingAgentService
             Content = response.Message,
             Proposal = response.Proposal,
             Cancellation = response.Cancellation,
+            Booking = response.Booking,
             Timestamp = _clock.GetUtcNow().UtcDateTime
         };
         history.Add(assistantMessage);
