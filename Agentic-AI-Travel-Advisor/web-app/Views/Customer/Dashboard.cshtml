@@ -321,6 +321,7 @@
 
 <script>
     var currentConversationId = @(conversationId);
+    var lastUserPrompt = '';
 
     window.addEventListener('DOMContentLoaded', function() {
         var stream = document.getElementById('bookingChatStream');
@@ -328,6 +329,12 @@
             stream.scrollTop = stream.scrollHeight;
         }
     });
+
+    function retryLastPrompt() {
+        if (lastUserPrompt) {
+            sendPrompt(lastUserPrompt);
+        }
+    }
 
     function handleChatSubmit(e) {
         e.preventDefault();
@@ -343,6 +350,7 @@
         var stream = document.getElementById('bookingChatStream');
         if (!stream) return;
 
+        lastUserPrompt = text;
         var input = document.getElementById('chatInputText');
         var submitBtn = document.getElementById('chatSubmitBtn');
         if (input) input.disabled = true;
@@ -407,7 +415,12 @@
                 <div class="chat-message ai-message d-flex gap-2.5">
                     <div class="chat-avatar rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 text-white" style="width: 32px; height: 32px; font-size: 0.75rem; font-weight: 700; background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);">!</div>
                     <div class="chat-bubble p-3 rounded-4 bg-white text-danger shadow-sm border" style="max-width: 85%; font-size: 0.9rem; border-bottom-left-radius: 4px !important;">
-                        Sorry, I encountered an issue processing that request. Please try again.
+                        <div>Sorry, I encountered an issue processing that request. Please try again in a moment.</div>
+                        <div class="mt-2 pt-2 border-top">
+                            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1" onclick="retryLastPrompt()">
+                                ↻ Retry
+                            </button>
+                        </div>
                     </div>
                 </div>`;
             stream.insertAdjacentHTML('beforeend', errHtml);
@@ -421,6 +434,19 @@
 
         var formattedText = formatMarkdown(data.message || '');
         var innerContent = `<div style="line-height: 1.55;">${formattedText}</div>`;
+
+        var isBusyOrError = data.message && (
+            data.message.indexOf('assistant is busy right now') !== -1 ||
+            data.message.indexOf('trouble right now') !== -1
+        );
+        if (isBusyOrError) {
+            innerContent += `
+                <div class="mt-2 pt-2 border-top">
+                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1" onclick="retryLastPrompt()">
+                        ↻ Retry
+                    </button>
+                </div>`;
+        }
 
         // Proposal Card
         if (data.actionType === 'proposal' && data.proposal) {
