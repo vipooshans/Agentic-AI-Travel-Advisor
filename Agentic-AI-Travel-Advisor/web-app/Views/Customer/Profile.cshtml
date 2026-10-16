@@ -27,15 +27,34 @@
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label asp-for="PhoneNumber" class="form-label small fw-semibold">Phone Number</label>
-                        <input asp-for="PhoneNumber" class="form-control" placeholder="+94 77 123 4567" />
+                        <div class="input-group">
+                            <span class="input-group-text" id="phoneDialCode">+</span>
+                            <input id="phoneNationalNumber"
+                                   class="form-control"
+                                   type="text"
+                                   inputmode="numeric"
+                                   autocomplete="tel-national"
+                                   pattern="[0-9]*"
+                                   maxlength="15"
+                                   placeholder="Select your country first"
+                                   aria-describedby="phoneHelp phoneError" />
+                        </div>
+                        <input asp-for="PhoneNumber" type="hidden" />
+                        <div id="phoneHelp" class="form-text">Choose your country to add its calling code. Use digits only.</div>
                         <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                     </div>
                     <div class="col-md-6">
                         <label asp-for="Nationality" class="form-label small fw-semibold">Nationality</label>
-                        <input asp-for="Nationality" class="form-control" placeholder="e.g. Sri Lankan, British, etc." />
+                        <select asp-for="Nationality"
+                                class="form-select"
+                                id="nationalitySelect"
+                                data-current-nationality="@Model.Nationality">
+                            <option value="">Select your country</option>
+                        </select>
                         <span asp-validation-for="Nationality" class="text-danger small"></span>
                     </div>
                 </div>
+                <div id="phoneError" class="text-danger small mb-3" role="alert"></div>
 
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
@@ -67,3 +86,7 @@
     </div>
 </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/profile-phone.js" asp-append-version="true"></script>
+}
