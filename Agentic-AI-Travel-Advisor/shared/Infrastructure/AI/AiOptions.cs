@@ -4,10 +4,11 @@ public class AiOptions
 {
     public const string SectionName = "Ai";
 
+    public string Provider { get; set; } = "OpenAI"; // "OpenAI" | "Gemini" | "Claude"
     public string ApiKey { get; set; } = string.Empty;
-    public string BaseUrl { get; set; } = "https://generativelanguage.googleapis.com/v1beta/openai/";
-    public string Model { get; set; } = "gemini-3.8-flash";
-    public int TimeoutSeconds { get; set; } = 60;
+    public string BaseUrl { get; set; } = string.Empty;
+    public string Model { get; set; } = string.Empty;
+    public int TimeoutSeconds { get; set; } = 30;
     public double Temperature { get; set; } = 0.8;
 
     /// <summary>Upper bound on LLM ↔ tool round trips per chat turn.</summary>
