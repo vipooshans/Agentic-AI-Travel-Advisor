@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../providers/auth_provider.dart';
+import '../screens/admin/admin_dashboard_screen.dart';
+import '../screens/agent/package_dashboard_screen.dart';
 import '../screens/booking_list_screen.dart';
 import '../screens/chat_screen.dart';
 import '../screens/create_booking_screen.dart';
@@ -12,6 +14,7 @@ import '../screens/hotel_detail_screen.dart';
 import '../screens/itinerary_detail_screen.dart';
 import '../screens/itinerary_list_screen.dart';
 import '../screens/login_screen.dart';
+import '../screens/owner/hotel_dashboard_screen.dart';
 import '../screens/package_detail_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/conversation_list_screen.dart';
@@ -64,6 +67,9 @@ GoRouter createAppRouter(AuthProvider authProvider) {
       GoRoute(path: '/profile/edit', builder: (_, __) => const EditProfileScreen()),
       GoRoute(path: '/preferences', builder: (_, __) => const PreferencesScreen()),
       GoRoute(path: '/conversations', builder: (_, __) => const ConversationListScreen()),
+      GoRoute(path: '/admin', builder: (_, __) => const AdminDashboardScreen()),
+      GoRoute(path: '/packages-dashboard', builder: (_, __) => const PackageDashboardScreen()),
+      GoRoute(path: '/hotels-dashboard', builder: (_, __) => const HotelDashboardScreen()),
       GoRoute(
         path: '/destinations/:id',
         builder: (_, state) => DestinationDetailScreen(id: int.parse(state.pathParameters['id']!)),

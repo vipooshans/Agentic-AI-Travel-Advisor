@@ -3,7 +3,7 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using TravelAdvisor.Core.DTOs.AI;
 using TravelAdvisor.Core.Enums;
-using TravelAdvisor.Infrastructure.AI.Planning;
+using TravelAdvisor.Infrastructure.AI.Planning; 
 using TravelAdvisor.Infrastructure.AI.Schema;
 using TravelAdvisor.Infrastructure.AI.Tools;
 

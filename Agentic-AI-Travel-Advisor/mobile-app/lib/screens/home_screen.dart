@@ -29,6 +29,34 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text('Where would you like to go?', style: TextStyle(color: Colors.grey.shade600)),
             const SizedBox(height: 16),
+            if (auth.user?.isStaff == true) ...[
+              Card(
+                color: Colors.indigo.shade50,
+                child: ListTile(
+                  leading: const Icon(Icons.dashboard_customize, color: Colors.indigo),
+                  title: Text(
+                    auth.user?.isAdmin == true
+                        ? 'Admin & Staff Portals'
+                        : auth.user?.isHotelOwner == true
+                            ? 'Hotel Owner Portal'
+                            : 'Travel Agent Portal',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: const Text('Access your management dashboards'),
+                  trailing: const Icon(Icons.arrow_forward),
+                  onTap: () {
+                    if (auth.user?.isAdmin == true) {
+                      context.push('/admin');
+                    } else if (auth.user?.isHotelOwner == true) {
+                      context.push('/hotels-dashboard');
+                    } else {
+                      context.push('/packages-dashboard');
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
             Card(
               child: ListTile(
                 leading: const Icon(Icons.smart_toy, color: Colors.blue),

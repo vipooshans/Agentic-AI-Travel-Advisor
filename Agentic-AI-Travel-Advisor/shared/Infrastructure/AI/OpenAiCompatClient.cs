@@ -71,15 +71,29 @@ public class OpenAiCompatClient : ILlmClient
                 var calls = new JsonArray();
                 foreach (var call in message.ToolCalls)
                 {
-                    calls.Add(new JsonObject
+                    var callNode = new JsonObject
                     {
                         ["id"] = call.Id,
                         ["type"] = "function",
                         ["function"] = new JsonObject { ["name"] = call.Name, ["arguments"] = call.ArgumentsJson }
-                    });
+                    };
+                    if (!string.IsNullOrWhiteSpace(call.ExtraContentJson))
+                    {
+                        try { callNode["extra_content"] = JsonNode.Parse(call.ExtraContentJson); } catch { }
+                    }
+                    calls.Add(callNode);
                 }
 
                 node["tool_calls"] = calls;
+                if (string.IsNullOrEmpty(message.Content))
+                {
+                    node["content"] = null;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(message.ExtraContentJson))
+            {
+                try { node["extra_content"] = JsonNode.Parse(message.ExtraContentJson); } catch { }
             }
 
             messageArray.Add(node);
@@ -134,16 +148,20 @@ public class OpenAiCompatClient : ILlmClient
                     argsString = args.ValueKind == JsonValueKind.String ? args.GetString() ?? "{}" : args.GetRawText();
                 }
 
+                string? toolExtra = call.TryGetProperty("extra_content", out var tec) ? tec.GetRawText() : null;
+
                 toolCalls.Add(new LlmToolCall
                 {
                     Id = call.TryGetProperty("id", out var id) ? id.GetString() ?? Guid.NewGuid().ToString("N") : Guid.NewGuid().ToString("N"),
                     Name = function.GetProperty("name").GetString() ?? string.Empty,
-                    ArgumentsJson = argsString
+                    ArgumentsJson = argsString,
+                    ExtraContentJson = toolExtra
                 });
             }
         }
 
-        return new LlmToolResponse { Content = content, ToolCalls = toolCalls };
+        string? extraContent = message0.TryGetProperty("extra_content", out var ec) ? ec.GetRawText() : null;
+        return new LlmToolResponse { Content = content, ToolCalls = toolCalls, ExtraContentJson = extraContent };
     }
 
     private async Task<JsonDocument> SendAsync(JsonObject payload, CancellationToken cancellationToken)
@@ -152,24 +170,48 @@ public class OpenAiCompatClient : ILlmClient
             throw new InvalidOperationException("AI API key is not configured.");
 
         var key = _options.ApiKey.Trim();
-        var url = $"{_options.BaseUrl.TrimEnd('/')}/chat/completions";
-        using var request = new HttpRequestMessage(HttpMethod.Post, url);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
-        request.Headers.TryAddWithoutValidation("x-goog-api-key", key);
-        request.Content = new StringContent(payload.ToJsonString(), Encoding.UTF8, "application/json");
-
-        _logger.LogInformation("Sending LLM request to {Url} with model {Model}", url, _options.Model);
-
-        using var response = await _http.SendAsync(request, cancellationToken);
-        var body = await response.Content.ReadAsStringAsync(cancellationToken);
-        if (!response.IsSuccessStatusCode)
+        var baseUrl = _options.BaseUrl.Trim().TrimEnd('/');
+        if (baseUrl.Contains("generativelanguage.googleapis.com", StringComparison.OrdinalIgnoreCase)
+            && !baseUrl.EndsWith("/openai", StringComparison.OrdinalIgnoreCase))
         {
+            baseUrl += "/openai";
+        }
+        var url = $"{baseUrl}/chat/completions";
+
+        const int maxAttempts = 3;
+        for (var attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Post, url);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
+            request.Headers.TryAddWithoutValidation("x-goog-api-key", key);
+            request.Content = new StringContent(payload.ToJsonString(), Encoding.UTF8, "application/json");
+
+            _logger.LogInformation("Sending LLM request (attempt {Attempt}/{Max}) to {Url} with model {Model}", attempt, maxAttempts, url, _options.Model);
+
+            using var response = await _http.SendAsync(request, cancellationToken);
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return JsonDocument.Parse(body);
+            }
+
+            var statusCode = (int)response.StatusCode;
+            var isTransient = statusCode is 503 or 429 or 502 or 504;
+
+            if (isTransient && attempt < maxAttempts)
+            {
+                _logger.LogWarning("Gemini request returned {StatusCode}. Retrying in {Delay}ms...", statusCode, attempt * 1200);
+                await Task.Delay(attempt * 1200, cancellationToken);
+                continue;
+            }
+
             _logger.LogError(
                 "Gemini/LLM request to {Url} failed with status {StatusCode}: {ErrorBody}",
-                url, (int)response.StatusCode, body);
-            throw new HttpRequestException($"LLM request failed ({(int)response.StatusCode}): {body}", null, response.StatusCode);
+                url, statusCode, body);
+            throw new HttpRequestException($"LLM request failed ({statusCode}): {body}", null, response.StatusCode);
         }
 
-        return JsonDocument.Parse(body);
+        throw new InvalidOperationException("Unreachable code in SendAsync");
     }
 }

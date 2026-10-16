@@ -26,11 +26,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 
-var apiBaseUrl = builder.Configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5000";
 builder.Services.AddTransient<JwtCookieHandler>();
-builder.Services.AddHttpClient("TravelAdvisorApi", client =>
+builder.Services.AddHttpClient("TravelAdvisorApi", (sp, client) =>
 {
-    client.BaseAddress = new Uri(apiBaseUrl);
+    var config = sp.GetRequiredService<IConfiguration>();
+    var baseUrl = config["ApiSettings:BaseUrl"] ?? "http://localhost:5080";
+    client.BaseAddress = new Uri(baseUrl);
 }).AddHttpMessageHandler<JwtCookieHandler>();
 
 var app = builder.Build();

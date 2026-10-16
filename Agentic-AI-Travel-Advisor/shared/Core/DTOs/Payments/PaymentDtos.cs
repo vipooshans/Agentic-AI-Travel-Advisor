@@ -7,7 +7,7 @@ public class PaymentDto
     public int Id { get; set; }
     public int BookingId { get; set; }
     public decimal Amount { get; set; }
-    public string Currency { get; set; } = "LKR";
+    public string Currency { get; set; } = "LKR";  
     public PaymentMethod Method { get; set; }
     public PaymentStatus Status { get; set; }
     public string TransactionReference { get; set; } = string.Empty;

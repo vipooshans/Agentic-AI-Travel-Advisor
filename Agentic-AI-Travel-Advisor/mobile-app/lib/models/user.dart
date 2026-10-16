@@ -24,6 +24,11 @@ class User {
   }
 
   String get fullName => '$firstName $lastName';
+
+  bool get isAdmin => role.toUpperCase() == 'ADMIN';
+  bool get isHotelOwner => role.toUpperCase() == 'HOTEL_OWNER';
+  bool get isTravelAgent => role.toUpperCase() == 'TRAVEL_AGENT';
+  bool get isStaff => isAdmin || isHotelOwner || isTravelAgent;
 }
 
 class AuthResponse {

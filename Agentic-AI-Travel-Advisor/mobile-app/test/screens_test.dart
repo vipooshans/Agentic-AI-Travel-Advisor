@@ -134,17 +134,29 @@ void main() {
       expect(requests, 0);
     });
 
-    testWidgets('a staff account sees the travelers-only message', (tester) async {
+    testWidgets('a staff account signs in successfully', (tester) async {
       final auth = AuthProvider(AuthService(api: fakeApi((_) async => jsonResponse(authJson(role: 'HOTEL_OWNER')))));
-      await tester.pumpWidget(ChangeNotifierProvider.value(value: auth, child: const MaterialApp(home: LoginScreen())));
+      final router = GoRouter(
+        initialLocation: '/login',
+        routes: [
+          GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+          GoRoute(path: '/home', builder: (_, __) => const Scaffold(body: Text('Home'))),
+        ],
+      );
+      await tester.pumpWidget(
+        ChangeNotifierProvider.value(
+          value: auth,
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
 
       await tester.enterText(find.widgetWithText(TextFormField, 'Email'), 'owner@traveladvisor.com');
       await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'Owner@123');
       await tester.tap(find.text('Sign In'));
       await tester.pumpAndSettle();
 
-      expect(find.text(AuthService.travelersOnlyMessage), findsOneWidget);
-      expect(auth.isAuthenticated, isFalse);
+      expect(auth.isAuthenticated, isTrue);
+      expect(auth.user?.isHotelOwner, isTrue);
     });
 
     testWidgets('after a session expires the sign-in screen says why', (tester) async {
