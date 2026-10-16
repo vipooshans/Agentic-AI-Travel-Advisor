@@ -78,6 +78,52 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  void _startNewChat() {
+    final chat = context.read<ChatProvider>();
+    if (chat.messages.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Already in a fresh conversation'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Start New Chat?'),
+        content: const Text(
+          'Your previous conversation is saved in your chat history. '
+          'Starting a new chat will clear this view for a fresh trip plan.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton.icon(
+            icon: const Icon(Icons.add, size: 18),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            label: const Text('New Chat'),
+          ),
+        ],
+      ),
+    ).then((confirmed) {
+      if (confirmed == true && mounted) {
+        context.read<ChatProvider>().reset();
+        _controller.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Started a new conversation'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final chat = context.watch<ChatProvider>();
@@ -87,6 +133,16 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: const Text('AI Travel Assistant'),
         actions: [
+          IconButton(
+            tooltip: 'New chat',
+            onPressed: _startNewChat,
+            icon: const Icon(Icons.add_comment_outlined),
+          ),
+          IconButton(
+            tooltip: 'Chat history',
+            onPressed: () => context.push('/conversations'),
+            icon: const Icon(Icons.history_rounded),
+          ),
           IconButton(
             tooltip: 'Saved itineraries',
             onPressed: () => context.push('/itineraries'),
@@ -105,7 +161,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           Expanded(
             child: chat.messages.isEmpty
-                ? _EmptyState(onStarter: () => _send(_starter))
+                ? _EmptyState(onStarter: _send)
                 : ListView.builder(
                     controller: _scroll,
                     padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
@@ -171,13 +227,13 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class _EmptyState extends StatelessWidget {
-  final VoidCallback onStarter;
+  final ValueChanged<String> onStarter;
   const _EmptyState({required this.onStarter});
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -192,10 +248,27 @@ class _EmptyState extends StatelessWidget {
               style: TextStyle(color: Colors.grey.shade600),
             ),
             const SizedBox(height: 24),
-            ActionChip(
-              avatar: const Icon(Icons.auto_awesome, size: 18),
-              label: const Text('Plan a 3-day trip to Ella under Rs. 50,000.'),
-              onPressed: onStarter,
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
+              children: [
+                ActionChip(
+                  avatar: const Icon(Icons.auto_awesome, size: 18),
+                  label: const Text('Plan a 3-day trip to Ella under Rs. 50,000.'),
+                  onPressed: () => onStarter('Plan a 3-day trip to Ella under Rs. 50,000.'),
+                ),
+                ActionChip(
+                  avatar: const Icon(Icons.hotel_outlined, size: 18),
+                  label: const Text('Recommend hotels in Kandy'),
+                  onPressed: () => onStarter('Recommend hotels in Kandy'),
+                ),
+                ActionChip(
+                  avatar: const Icon(Icons.tour_outlined, size: 18),
+                  label: const Text('Find travel packages in Galle'),
+                  onPressed: () => onStarter('Find travel packages in Galle'),
+                ),
+              ],
             ),
           ],
         ),
