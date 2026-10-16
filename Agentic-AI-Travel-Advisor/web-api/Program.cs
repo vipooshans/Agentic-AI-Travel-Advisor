@@ -54,6 +54,11 @@ AddRateLimiting(builder.Services, builder.Configuration);
 
 var app = builder.Build();
 
+var aiOptions = app.Services.GetRequiredService<Microsoft.Extensions.Options.IOptions<TravelAdvisor.Infrastructure.AI.AiOptions>>().Value;
+var startupLogger = app.Services.GetRequiredService<ILogger<Program>>();
+startupLogger.LogInformation("AI Subsystem initialized: Provider={Provider}, Model={Model}, BaseUrl={BaseUrl}, Configured={Configured}",
+    aiOptions.Provider, aiOptions.Model, aiOptions.BaseUrl, !string.IsNullOrWhiteSpace(aiOptions.ApiKey));
+
 // Registered via OnStarting so the headers survive the exception handler clearing the response.
 app.Use(async (context, next) =>
 {
