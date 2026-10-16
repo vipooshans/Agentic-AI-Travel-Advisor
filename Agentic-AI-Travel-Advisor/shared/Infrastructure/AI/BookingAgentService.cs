@@ -362,12 +362,40 @@ public class BookingAgentService : IBookingAgentService
         List<BookingAgentMessageDto> history,
         CancellationToken cancellationToken)
     {
-        var systemInstruction = "You are a friendly, natural travel assistant for Travel Advisor, a Sri Lanka hotel and tour booking platform. Chat like a real person. Reply to greetings and small talk naturally and briefly (e.g. 'hi' -> 'Hey! How\\'s it going?'). Always respond to what the user actually said and never ignore it. Your job is to help with hotel stays, tour packages and destinations in Sri Lanka, but don't push it. After a bit of conversation, or when the user mentions travel, gently guide toward where they want to go, their dates and number of guests. Ask for only ONE missing detail at a time. Never repeat the same question if the user said something else. Never invent hotels, prices or availability; only use data returned by the tools. Keep replies short (1-3 sentences). Use plain text, no markdown, no asterisks.";
+        var systemInstruction = """
+You are a friendly, natural, and helpful AI Travel Assistant for Travel Advisor, a premier hotel and tour booking platform in Sri Lanka.
+Talk just like ChatGPT: casual, warm, engaging, and conversational.
+
+Conversation Style:
+1. Talk naturally like a real person:
+   - Always respond directly to what the user actually said.
+   - For greetings ("hi", "hello"), casual check-ins ("how are you", "did you eat"), jokes, food questions, or general chat, reply warmly and naturally (e.g. "I'm doing great, thank you! How are you doing today?").
+   - You can chat freely about Sri Lanka: cities (Galle, Kandy, Colombo, Ella, Sigiriya, Mirissa, Nuwara Eliya), attractions, train rides, beaches, wildlife safaris, and famous food (kottu, egg hoppers, Ceylon tea).
+   - Do NOT push hotel bookings aggressively on casual small talk or greetings. Talk like a friendly human first.
+
+2. Hotel & tour recommendations:
+   - When the user asks about hotels, destinations, or trips, give genuine, helpful recommendations.
+   - When they want to plan or book a stay, guide them smoothly: find out where they want to go, check-in and check-out dates, and number of guests.
+   - Always call your tools (search_hotels, get_hotel_details, search_packages, get_my_bookings) to look up real, verified listings. Never invent fake hotels or prices.
+
+3. Booking execution:
+   - When the user confirms they want to book a hotel or tour package, use your create_booking tool to make the reservation.
+   - If the traveler prefers a price quote with a confirmation button to review first, use create_proposal.
+   - Once booked, share their confirmed booking ID, dates, and total price in LKR.
+
+4. Existing bookings:
+   - If the user asks about their reservations, active trips, or booking status, use get_my_bookings.
+
+5. Tone & Formatting:
+   - Friendly, polite, and helpful. Use readable markdown with bold text (**Hotel Name**, dates, and prices).
+""";
 
         var llmMessages = BuildAlternatingMessages(systemInstruction, history);
 
         string finalReply = string.Empty;
         var maxIterations = Math.Max(3, _aiOptions.MaxToolIterations);
+        BookingDto? lastCreatedBooking = null;
+        BookingProposalDto? lastCreatedProposal = null;
 
         for (var i = 0; i < maxIterations; i++)
         {
@@ -390,13 +418,37 @@ public class BookingAgentService : IBookingAgentService
             foreach (var toolCall in llmResponse.ToolCalls)
             {
                 _logger.LogInformation("LLM calling tool {ToolName} with arguments: {Args}", toolCall.Name, toolCall.ArgumentsJson);
-                var toolResult = toolCall.Name switch
+                string toolResult;
+                switch (toolCall.Name)
                 {
-                    "search_hotels" => await ExecuteSearchHotelsAsync(caller, toolCall.ArgumentsJson, cancellationToken),
-                    "get_hotel_details" => await ExecuteGetHotelDetailsAsync(caller, toolCall.ArgumentsJson, cancellationToken),
-                    "create_booking" => await ExecuteCreateBookingAsync(caller, toolCall.ArgumentsJson, cancellationToken),
-                    _ => JsonSerializer.Serialize(new { error = $"Unknown tool '{toolCall.Name}'" })
-                };
+                    case "search_hotels":
+                        toolResult = await ExecuteSearchHotelsAsync(caller, toolCall.ArgumentsJson, cancellationToken);
+                        break;
+                    case "get_hotel_details":
+                        toolResult = await ExecuteGetHotelDetailsAsync(caller, toolCall.ArgumentsJson, cancellationToken);
+                        break;
+                    case "search_packages":
+                        toolResult = await ExecuteSearchPackagesAsync(toolCall.ArgumentsJson, cancellationToken);
+                        break;
+                    case "get_my_bookings":
+                        toolResult = await ExecuteGetMyBookingsAsync(caller, cancellationToken);
+                        break;
+                    case "create_booking":
+                        var bookingOutcome = await ExecuteCreateBookingAsync(caller, toolCall.ArgumentsJson, cancellationToken);
+                        toolResult = bookingOutcome.Json;
+                        if (bookingOutcome.Booking != null)
+                            lastCreatedBooking = bookingOutcome.Booking;
+                        break;
+                    case "create_proposal":
+                        var proposalOutcome = await ExecuteCreateProposalAsync(caller, toolCall.ArgumentsJson, cancellationToken);
+                        toolResult = proposalOutcome.Json;
+                        if (proposalOutcome.Proposal != null)
+                            lastCreatedProposal = proposalOutcome.Proposal;
+                        break;
+                    default:
+                        toolResult = JsonSerializer.Serialize(new { error = $"Unknown tool '{toolCall.Name}'" });
+                        break;
+                }
 
                 llmMessages.Add(new LlmMessage
                 {
@@ -413,11 +465,19 @@ public class BookingAgentService : IBookingAgentService
             finalReply = "I am here to help you explore and book stays in Sri Lanka. Where are you planning to visit?";
         }
 
+        var actionType = "chat";
+        if (lastCreatedBooking != null)
+            actionType = "booking_confirmed";
+        else if (lastCreatedProposal != null)
+            actionType = "proposal";
+
         return new BookingAgentPromptResponse
         {
             ConversationId = conv?.Id ?? 0,
-            ActionType = "chat",
-            Message = finalReply
+            ActionType = actionType,
+            Message = finalReply,
+            Booking = lastCreatedBooking,
+            Proposal = lastCreatedProposal
         };
     }
 
@@ -467,6 +527,87 @@ public class BookingAgentService : IBookingAgentService
         }
     }
 
+    private async Task<string> ExecuteSearchPackagesAsync(string argumentsJson, CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (_context == null)
+                return JsonSerializer.Serialize(new { error = "Database context not available" });
+
+            string? query = null;
+            string? location = null;
+            if (!string.IsNullOrWhiteSpace(argumentsJson))
+            {
+                using var doc = JsonDocument.Parse(argumentsJson);
+                var root = doc.RootElement;
+                if (root.TryGetProperty("query", out var q)) query = q.GetString();
+                if (root.TryGetProperty("location", out var loc)) location = loc.GetString();
+            }
+
+            var queryable = _context.TravelPackages
+                .AsNoTracking()
+                .Include(p => p.Destination)
+                .Where(p => p.ApprovalStatus == ApprovalStatus.Approved);
+
+            if (!string.IsNullOrWhiteSpace(location))
+            {
+                var term = location.Trim();
+                queryable = queryable.Where(p => EF.Functions.ILike(p.Destination.Name, $"%{term}%") || EF.Functions.ILike(p.Destination.City, $"%{term}%"));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                var term = query.Trim();
+                queryable = queryable.Where(p =>
+                    EF.Functions.ILike(p.Title, $"%{term}%") ||
+                    (p.Description != null && EF.Functions.ILike(p.Description, $"%{term}%")));
+            }
+
+            var packages = await queryable.OrderBy(p => p.Price).Take(5).Select(p => new
+            {
+                package_id = p.Id,
+                title = p.Title,
+                destination = p.Destination.Name,
+                price = p.Price,
+                duration_days = p.DurationDays,
+                max_travelers = p.MaxTravelers,
+                description = p.Description
+            }).ToListAsync(cancellationToken);
+
+            return JsonSerializer.Serialize(packages, JsonOptions);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Tool search_packages execution error");
+            return JsonSerializer.Serialize(new { error = ex.Message });
+        }
+    }
+
+    private async Task<string> ExecuteGetMyBookingsAsync(UserContext caller, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var bookings = await _bookingService.ListAsync(caller, cancellationToken);
+            var list = bookings.OrderByDescending(b => b.CreatedAt).Take(5).Select(b => new
+            {
+                booking_id = b.Id,
+                listing_name = b.RoomName != null ? $"{b.HotelName} ({b.RoomName})" : (b.PackageTitle ?? $"Booking #{b.Id}"),
+                check_in = b.CheckIn.ToString("yyyy-MM-dd"),
+                check_out = b.CheckOut.ToString("yyyy-MM-dd"),
+                guests = b.Guests,
+                total_price = b.TotalPrice,
+                status = b.Status.ToString()
+            }).ToList();
+
+            return JsonSerializer.Serialize(list, JsonOptions);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Tool get_my_bookings execution error");
+            return JsonSerializer.Serialize(new { error = ex.Message });
+        }
+    }
+
     private async Task<string> ExecuteGetHotelDetailsAsync(UserContext caller, string argumentsJson, CancellationToken cancellationToken)
     {
         try
@@ -505,47 +646,80 @@ public class BookingAgentService : IBookingAgentService
         }
     }
 
-    private async Task<string> ExecuteCreateBookingAsync(UserContext caller, string argumentsJson, CancellationToken cancellationToken)
+    private async Task<(string Json, BookingDto? Booking)> ExecuteCreateBookingAsync(UserContext caller, string argumentsJson, CancellationToken cancellationToken)
     {
         try
         {
             using var doc = JsonDocument.Parse(argumentsJson);
             var root = doc.RootElement;
 
-            if (!root.TryGetProperty("hotel_id", out var hidProp) || !hidProp.TryGetInt32(out var hotelId))
-                return JsonSerializer.Serialize(new { success = false, error = "hotel_id is required" });
+            int hotelId = root.TryGetProperty("hotel_id", out var hidProp) && hidProp.TryGetInt32(out var hid) ? hid : 0;
+            int roomId = root.TryGetProperty("room_id", out var ridProp) && ridProp.TryGetInt32(out var rid) ? rid : 0;
+            int packageId = root.TryGetProperty("package_id", out var pidProp) && pidProp.TryGetInt32(out var pid) ? pid : 0;
 
             if (!root.TryGetProperty("check_in", out var ciProp) || !DateTime.TryParse(ciProp.GetString(), Inv, DateTimeStyles.AssumeUniversal, out var checkIn))
-                return JsonSerializer.Serialize(new { success = false, error = "valid check_in date (YYYY-MM-DD) is required" });
+                return (JsonSerializer.Serialize(new { success = false, error = "Valid check_in date (YYYY-MM-DD) is required" }), null);
 
-            if (!root.TryGetProperty("check_out", out var coProp) || !DateTime.TryParse(coProp.GetString(), Inv, DateTimeStyles.AssumeUniversal, out var checkOut))
-                return JsonSerializer.Serialize(new { success = false, error = "valid check_out date (YYYY-MM-DD) is required" });
+            DateTime? checkOut = null;
+            if (root.TryGetProperty("check_out", out var coProp) && DateTime.TryParse(coProp.GetString(), Inv, DateTimeStyles.AssumeUniversal, out var co))
+            {
+                checkOut = co;
+            }
 
             var guests = root.TryGetProperty("guests", out var gProp) && gProp.TryGetInt32(out var g) ? g : 1;
+            string? notes = root.TryGetProperty("notes", out var nProp) ? nProp.GetString() : null;
 
-            int roomId = 0;
-            if (root.TryGetProperty("room_id", out var ridProp) && ridProp.TryGetInt32(out var rid) && rid > 0)
+            if (packageId > 0)
             {
-                roomId = rid;
+                var packageBooking = await _bookingService.CreateAsync(caller, new CreateBookingRequest
+                {
+                    TravelPackageId = packageId,
+                    CheckIn = checkIn,
+                    CheckOut = checkOut ?? checkIn.AddDays(3),
+                    Guests = guests,
+                    Notes = notes
+                }, cancellationToken);
+
+                return (JsonSerializer.Serialize(new
+                {
+                    success = true,
+                    booking_id = packageBooking.Id,
+                    package_title = packageBooking.PackageTitle,
+                    check_in = packageBooking.CheckIn.ToString("yyyy-MM-dd"),
+                    check_out = packageBooking.CheckOut.ToString("yyyy-MM-dd"),
+                    guests = packageBooking.Guests,
+                    total_price = packageBooking.TotalPrice,
+                    status = packageBooking.Status.ToString()
+                }, JsonOptions), packageBooking);
             }
-            else
+
+            if (hotelId <= 0 && roomId <= 0)
+            {
+                return (JsonSerializer.Serialize(new { success = false, error = "hotel_id or room_id is required" }), null);
+            }
+
+            if (roomId <= 0 && hotelId > 0)
             {
                 var hotel = await _hotelService.GetAsync(caller, hotelId, cancellationToken);
                 var room = hotel.Rooms.FirstOrDefault(r => r.IsAvailable && r.Capacity >= guests) ?? hotel.Rooms.FirstOrDefault();
                 if (room == null)
-                    return JsonSerializer.Serialize(new { success = false, error = "No rooms available at this hotel." });
+                    return (JsonSerializer.Serialize(new { success = false, error = "No rooms available at this hotel." }), null);
                 roomId = room.Id;
             }
+
+            if (!checkOut.HasValue)
+                checkOut = checkIn.AddDays(1);
 
             var booking = await _bookingService.CreateAsync(caller, new CreateBookingRequest
             {
                 RoomId = roomId,
                 CheckIn = checkIn,
-                CheckOut = checkOut,
-                Guests = guests
+                CheckOut = checkOut.Value,
+                Guests = guests,
+                Notes = notes
             }, cancellationToken);
 
-            return JsonSerializer.Serialize(new
+            return (JsonSerializer.Serialize(new
             {
                 success = true,
                 booking_id = booking.Id,
@@ -556,21 +730,99 @@ public class BookingAgentService : IBookingAgentService
                 guests = booking.Guests,
                 total_price = booking.TotalPrice,
                 status = booking.Status.ToString()
-            }, JsonOptions);
+            }, JsonOptions), booking);
         }
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Tool create_booking execution error");
-            return JsonSerializer.Serialize(new { success = false, error = ex.Message });
+            return (JsonSerializer.Serialize(new { success = false, error = ex.Message }), null);
+        }
+    }
+
+    private async Task<(string Json, BookingProposalDto? Proposal)> ExecuteCreateProposalAsync(UserContext caller, string argumentsJson, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(argumentsJson);
+            var root = doc.RootElement;
+
+            int hotelId = root.TryGetProperty("hotel_id", out var hidProp) && hidProp.TryGetInt32(out var hid) ? hid : 0;
+            int roomId = root.TryGetProperty("room_id", out var ridProp) && ridProp.TryGetInt32(out var rid) ? rid : 0;
+            int packageId = root.TryGetProperty("package_id", out var pidProp) && pidProp.TryGetInt32(out var pid) ? pid : 0;
+
+            if (!root.TryGetProperty("check_in", out var ciProp) || !DateTime.TryParse(ciProp.GetString(), Inv, DateTimeStyles.AssumeUniversal, out var checkIn))
+                return (JsonSerializer.Serialize(new { error = "Valid check_in date is required" }), null);
+
+            DateTime? checkOut = null;
+            if (root.TryGetProperty("check_out", out var coProp) && DateTime.TryParse(coProp.GetString(), Inv, DateTimeStyles.AssumeUniversal, out var co))
+                checkOut = co;
+
+            var guests = root.TryGetProperty("guests", out var gProp) && gProp.TryGetInt32(out var g) ? g : 1;
+
+            if (hotelId > 0 || roomId > 0)
+            {
+                if (roomId <= 0 && hotelId > 0)
+                {
+                    var hotel = await _hotelService.GetAsync(caller, hotelId, cancellationToken);
+                    var room = hotel.Rooms.FirstOrDefault(r => r.IsAvailable && r.Capacity >= guests) ?? hotel.Rooms.FirstOrDefault();
+                    if (room == null)
+                        return (JsonSerializer.Serialize(new { error = "No rooms available at this property." }), null);
+                    roomId = room.Id;
+                }
+
+                if (!checkOut.HasValue) checkOut = checkIn.AddDays(1);
+
+                var quote = await _bookingService.CheckAvailabilityAsync(caller, new AvailabilityQuery
+                {
+                    RoomId = roomId,
+                    CheckIn = checkIn,
+                    CheckOut = checkOut.Value,
+                    Guests = guests
+                }, cancellationToken);
+
+                var expiresAt = _clock.GetUtcNow().UtcDateTime.AddMinutes(Math.Max(5, _aiOptions.BookingProposalMinutes));
+                var token = GenerateProposalToken(roomId, null, quote.CheckIn, quote.CheckOut, quote.Guests, quote.TotalPrice, expiresAt);
+
+                var proposal = new BookingProposalDto
+                {
+                    Kind = "hotel",
+                    RoomId = roomId,
+                    HotelName = quote.HotelName,
+                    RoomName = quote.RoomName,
+                    CheckIn = quote.CheckIn,
+                    CheckOut = quote.CheckOut,
+                    Nights = quote.Nights,
+                    Guests = quote.Guests,
+                    TotalPrice = quote.TotalPrice,
+                    ProposalToken = token,
+                    ExpiresAt = expiresAt
+                };
+
+                return (JsonSerializer.Serialize(new
+                {
+                    success = true,
+                    hotel_name = quote.HotelName,
+                    room_name = quote.RoomName,
+                    total_price = quote.TotalPrice,
+                    nights = quote.Nights,
+                    check_in = quote.CheckIn.ToString("yyyy-MM-dd"),
+                    check_out = quote.CheckOut.ToString("yyyy-MM-dd")
+                }, JsonOptions), proposal);
+            }
+
+            return (JsonSerializer.Serialize(new { error = "hotel_id or room_id is required" }), null);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Tool create_proposal execution error");
+            return (JsonSerializer.Serialize(new { error = ex.Message }), null);
         }
     }
 
     private static string CleanPlainText(string text)
     {
         if (string.IsNullOrWhiteSpace(text)) return string.Empty;
-        var cleaned = text.Replace("**", "").Replace("*", "");
-        cleaned = Regex.Replace(cleaned, @"^#+\s*", "", RegexOptions.Multiline);
-        return cleaned.Trim();
+        return text.Trim();
     }
 
     public async Task<BookingDto> ConfirmProposalAsync(UserContext caller, ConfirmBookingAgentRequest request, CancellationToken cancellationToken = default)
