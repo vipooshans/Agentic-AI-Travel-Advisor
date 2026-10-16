@@ -986,6 +986,14 @@ Conversation Style:
     private static ParsedFallbackIntent FallbackParseIntent(string prompt)
     {
         var intent = new ParsedFallbackIntent();
+        var lower = prompt.Trim().ToLowerInvariant();
+
+        var greetings = new[] { "hi", "hello", "hey", "how are you", "how you doing", "did you eat", "good morning", "good evening", "good afternoon", "sup", "what's up", "whats up" };
+        if (greetings.Any(g => lower == g || lower.StartsWith(g + " ") || lower.StartsWith(g + "?") || lower.StartsWith(g + "!") || lower.EndsWith(" " + g)))
+        {
+            intent.IsGreeting = true;
+            return intent;
+        }
 
         var dateMatch = DateRangeIso.Match(prompt);
         if (dateMatch.Success &&
@@ -1021,6 +1029,21 @@ Conversation Style:
 
     private async Task<BookingAgentPromptResponse> ExecuteFallbackIntentAsync(UserContext caller, ParsedFallbackIntent intent, CancellationToken cancellationToken)
     {
+        if (intent.IsGreeting)
+        {
+            var greetings = new[]
+            {
+                "Hello! I'm doing great, thank you! How are you doing today? Let me know if you need any recommendations for hotels, tour packages, or places to visit in Sri Lanka.",
+                "Hey! How's it going? I'm doing well. Are you planning a trip or just stopping by to chat?",
+                "Hi there! I'm wonderful, thanks for asking! How can I assist you with your travels today?"
+            };
+            return new BookingAgentPromptResponse
+            {
+                ActionType = "chat",
+                Message = greetings[Random.Shared.Next(greetings.Length)]
+            };
+        }
+
         if (intent.HasBookingKeyword && string.IsNullOrWhiteSpace(intent.Location) && !intent.CheckIn.HasValue)
         {
             return new BookingAgentPromptResponse
@@ -1149,6 +1172,7 @@ Conversation Style:
 
     private sealed class ParsedFallbackIntent
     {
+        public bool IsGreeting { get; set; }
         public string? Location { get; set; }
         public DateTime? CheckIn { get; set; }
         public DateTime? CheckOut { get; set; }
