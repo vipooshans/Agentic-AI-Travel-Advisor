@@ -80,6 +80,15 @@ public class CustomerController : Controller
             .TakeLast(10)
             .ToList();
         var response = await _api.ProcessBookingPromptAsync(request);
+        if (response == null)
+        {
+            return Json(new BookingAgentPromptResponse
+            {
+                ConversationId = request.ConversationId ?? 0,
+                ActionType = "chat",
+                Message = "The AI service is temporarily unavailable. Please try again in a few moments."
+            });
+        }
         return Json(response);
     }
 
