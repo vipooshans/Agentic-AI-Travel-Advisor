@@ -229,11 +229,13 @@ public class BookingAgentService : IBookingAgentService
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to communicate with LLM for prompt '{Prompt}'", currentPrompt);
+                var errDetail = ex.Message;
+                if (errDetail.Length > 200) errDetail = errDetail[..200] + "...";
                 response = new BookingAgentPromptResponse
                 {
                     ConversationId = conv?.Id ?? 0,
                     ActionType = "chat",
-                    Message = "Sorry, I'm having trouble right now, please try again."
+                    Message = $"Sorry, I'm having trouble right now ({errDetail}). Please try again."
                 };
             }
         }
@@ -269,6 +271,55 @@ public class BookingAgentService : IBookingAgentService
         return response;
     }
 
+    private static List<LlmMessage> BuildAlternatingMessages(string systemInstruction, List<BookingAgentMessageDto> history)
+    {
+        var result = new List<LlmMessage>
+        {
+            new() { Role = LlmRoles.System, Content = systemInstruction }
+        };
+
+        // Filter out empty messages and error notices
+        var valid = history
+            .Where(m => !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith("Sorry, I'm having trouble right now"))
+            .TakeLast(20)
+            .ToList();
+
+        var turns = new List<LlmMessage>();
+        foreach (var msg in valid)
+        {
+            var role = msg.Role == "user" ? LlmRoles.User : LlmRoles.Assistant;
+            var content = msg.Content.Trim();
+
+            if (turns.Count == 0)
+            {
+                // First turn after system MUST be user
+                if (role == LlmRoles.User)
+                {
+                    turns.Add(new LlmMessage { Role = role, Content = content });
+                }
+                continue;
+            }
+
+            var lastTurn = turns[^1];
+            if (lastTurn.Role == role)
+            {
+                // Merge consecutive turns with the same role to strictly guarantee alternation for Gemini
+                turns[^1] = new LlmMessage
+                {
+                    Role = role,
+                    Content = $"{lastTurn.Content}\n{content}"
+                };
+            }
+            else
+            {
+                turns.Add(new LlmMessage { Role = role, Content = content });
+            }
+        }
+
+        result.AddRange(turns);
+        return result;
+    }
+
     private async Task<BookingAgentPromptResponse> ProcessWithLlmAsync(
         UserContext caller,
         AIConversation? conv,
@@ -277,24 +328,7 @@ public class BookingAgentService : IBookingAgentService
     {
         var systemInstruction = "You are a friendly, natural travel assistant for Travel Advisor, a Sri Lanka hotel and tour booking platform. Chat like a real person. Reply to greetings and small talk naturally and briefly (e.g. 'hi' -> 'Hey! How\\'s it going?'). Always respond to what the user actually said and never ignore it. Your job is to help with hotel stays, tour packages and destinations in Sri Lanka, but don't push it. After a bit of conversation, or when the user mentions travel, gently guide toward where they want to go, their dates and number of guests. Ask for only ONE missing detail at a time. Never repeat the same question if the user said something else. Never invent hotels, prices or availability; only use data returned by the tools. Keep replies short (1-3 sentences). Use plain text, no markdown, no asterisks.";
 
-        var llmMessages = new List<LlmMessage>
-        {
-            new() { Role = LlmRoles.System, Content = systemInstruction }
-        };
-
-        // Send full conversation history (last ~20 messages, excluding transient error notices)
-        var recentHistory = history
-            .Where(m => !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith("Sorry, I'm having trouble right now"))
-            .TakeLast(20)
-            .ToList();
-        foreach (var msg in recentHistory)
-        {
-            llmMessages.Add(new LlmMessage
-            {
-                Role = msg.Role == "user" ? LlmRoles.User : LlmRoles.Assistant,
-                Content = msg.Content
-            });
-        }
+        var llmMessages = BuildAlternatingMessages(systemInstruction, history);
 
         string finalReply = string.Empty;
         var maxIterations = Math.Max(3, _aiOptions.MaxToolIterations);
