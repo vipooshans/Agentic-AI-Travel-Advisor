@@ -182,6 +182,28 @@ public class BookingAgentServiceTests
     }
 
     [Fact]
+    public async Task Llm_failure_falls_back_to_booking_assistance()
+    {
+        _llmClientMock.Setup(l => l.IsConfigured).Returns(true);
+        _llmClientMock
+            .Setup(l => l.ChatWithToolsAsync(
+                It.IsAny<IReadOnlyList<LlmMessage>>(),
+                It.IsAny<IReadOnlyList<LlmToolDefinition>>(),
+                It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new HttpRequestException("Provider unavailable"));
+
+        var service = CreateService();
+        var response = await service.ProcessPromptAsync(_caller, new BookingAgentPromptRequest
+        {
+            Prompt = "I want to book a hotel"
+        });
+
+        Assert.Equal("info", response.ActionType);
+        Assert.Contains("can't reach the AI model", response.Message);
+        Assert.Contains("hotel or destination", response.Message);
+    }
+
+    [Fact]
     public async Task Confirming_valid_proposal_delegates_to_booking_service()
     {
         var created = new BookingDto

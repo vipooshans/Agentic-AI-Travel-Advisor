@@ -5,9 +5,13 @@ using TravelAdvisor.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDataProtection()
-    .SetApplicationName("TravelAdvisor.Web")
-    .PersistKeysToFileSystem(new DirectoryInfo("/var/aspnet/DataProtection-Keys"));
+var dataProtection = builder.Services.AddDataProtection()
+    .SetApplicationName("TravelAdvisor.Web");
+
+if (!OperatingSystem.IsWindows() && Directory.Exists("/var/aspnet"))
+{
+    dataProtection.PersistKeysToFileSystem(new DirectoryInfo("/var/aspnet/DataProtection-Keys"));
+}
 
 builder.Services.AddControllersWithViews(options => options.Filters.Add<ApiAuthExceptionFilter>());
 builder.Services.AddAntiforgery(options => options.HeaderName = "RequestVerificationToken");
@@ -44,6 +48,10 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     if (!httpOnly)
         app.UseHsts();
+}
+else
+{
+    app.UseDeveloperExceptionPage();
 }
 
 if (!httpOnly)

@@ -36,17 +36,16 @@ public class BookingAgentService : IBookingAgentService
         new LlmToolDefinition
         {
             Name = "search_hotels",
-            Description = "Search for verified hotels in Sri Lanka matching a location, city, dates, or guests.",
+            Description = "Search for verified hotels in Sri Lanka matching a location, city, dates, or guests. If location is omitted, returns top hotels across Sri Lanka.",
             ParametersSchema = """
             {
               "type": "object",
               "properties": {
-                "location": { "type": "string", "description": "City or destination in Sri Lanka (e.g. Galle, Ella, Kandy, Colombo, Sigiriya, Mirissa, Nuwara Eliya, Bentota, Yala)" },
+                "location": { "type": "string", "description": "City or destination in Sri Lanka (e.g. Galle, Ella, Kandy, Colombo, Sigiriya, Mirissa, Nuwara Eliya, Bentota, Yala) (optional)" },
                 "check_in": { "type": "string", "description": "Check-in date in YYYY-MM-DD format (optional)" },
                 "check_out": { "type": "string", "description": "Check-out date in YYYY-MM-DD format (optional)" },
                 "guests": { "type": "integer", "description": "Number of guests (optional, default 1)" }
-              },
-              "required": ["location"]
+              }
             }
             """
         },
@@ -245,31 +244,32 @@ public class BookingAgentService : IBookingAgentService
         }
         else
         {
-            try
+            if (_llmClient.IsConfigured)
             {
-                if (_llmClient.IsConfigured)
+                try
                 {
                     _logger.LogInformation("Processing booking prompt with AI Provider: {Provider}, Model: {Model}, BaseUrl: {BaseUrl}",
                         _aiOptions.Provider, _aiOptions.Model, _aiOptions.BaseUrl);
                     response = await ProcessWithLlmAsync(caller, conv, history, cancellationToken);
                 }
-                else
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
                 {
-                    // Fallback when LLM is not configured (e.g. offline unit testing)
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to communicate with LLM for prompt '{Prompt}' (Provider: {Provider}, Model: {Model}); using booking fallback",
+                        currentPrompt, _aiOptions.Provider, _aiOptions.Model);
                     var intent = FallbackParseIntent(currentPrompt);
                     response = await ExecuteFallbackIntentAsync(caller, intent, cancellationToken);
+                    response.Message = $"I can't reach the AI model right now, so I'm using basic booking assistance. {response.Message}";
                 }
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError(ex, "Failed to communicate with LLM for prompt '{Prompt}' (Provider: {Provider}, Model: {Model})",
-                    currentPrompt, _aiOptions.Provider, _aiOptions.Model);
-                response = new BookingAgentPromptResponse
-                {
-                    ConversationId = conv?.Id ?? 0,
-                    ActionType = "chat",
-                    Message = "The assistant is busy right now, please try again in a moment."
-                };
+                // Fallback when LLM is not configured (e.g. offline unit testing)
+                var intent = FallbackParseIntent(currentPrompt);
+                response = await ExecuteFallbackIntentAsync(caller, intent, cancellationToken);
             }
         }
 
@@ -362,32 +362,37 @@ public class BookingAgentService : IBookingAgentService
         List<BookingAgentMessageDto> history,
         CancellationToken cancellationToken)
     {
-        var systemInstruction = """
-You are a friendly, natural, and helpful AI Travel Assistant for Travel Advisor, a premier hotel and tour booking platform in Sri Lanka.
-Talk just like ChatGPT: casual, warm, engaging, and conversational.
+        var today = _clock.GetUtcNow().ToString("yyyy-MM-dd");
+        var systemInstruction = $"""
+You are an intelligent, proactive, and friendly AI Travel Concierge for Travel Advisor, a premier hotel and tour booking platform in Sri Lanka.
+Talk naturally, warmly, and engagingly just like ChatGPT, but act as an autonomous travel expert who thinks on their own.
+Today's date is {today}.
 
-Conversation Style:
-1. Talk naturally like a real person:
-   - Always respond directly to what the user actually said.
-   - For greetings ("hi", "hello"), casual check-ins ("how are you", "did you eat"), jokes, food questions, or general chat, reply warmly and naturally (e.g. "I'm doing great, thank you! How are you doing today?").
-   - You can chat freely about Sri Lanka: cities (Galle, Kandy, Colombo, Ella, Sigiriya, Mirissa, Nuwara Eliya), attractions, train rides, beaches, wildlife safaris, and famous food (kottu, egg hoppers, Ceylon tea).
-   - Do NOT push hotel bookings aggressively on casual small talk or greetings. Talk like a friendly human first.
+CORE AGENTIC BEHAVIOR:
+1. Talk Naturally & Think On Your Own:
+   - Always reply naturally and directly to what the user said (e.g. for greetings, check-ins like "how are you" or "did you eat", respond warmly and casually).
+   - If the user asks for suggestions, recommendations, or seems in the mood to travel:
+     * DO NOT just ask a list of questions back. Autonomously think: what is the best stay or tour in Sri Lanka for them?
+     * Immediately call search_hotels or search_packages using your tools to discover real, verified options from the catalog!
+     * Proactively recommend 1 to 3 specific hotels with bold names (**Hotel Name**), city, room types, highlights (e.g., beachfront, mountain view, infinity pool, luxury spa), and price per night in LKR.
 
-2. Hotel & tour recommendations:
-   - When the user asks about hotels, destinations, or trips, give genuine, helpful recommendations.
-   - When they want to plan or book a stay, guide them smoothly: find out where they want to go, check-in and check-out dates, and number of guests.
-   - Always call your tools (search_hotels, get_hotel_details, search_packages, get_my_bookings) to look up real, verified listings. Never invent fake hotels or prices.
+2. Proactively Suggest Reservations:
+   - Don't just list hotels passively—proactively propose a reservation for the traveler!
+   - Suggest realistic upcoming dates (e.g., this weekend or starting next week for 2 nights) and ask:
+     "I can reserve a room for you at **[Hotel Name]** from [Check-in] to [Check-out] for 2 guests. Would you like me to book it for you right now, or generate a reservation quote card?"
+   - When the user says "yes", "book it", "please reserve it", or agrees to your suggestion:
+     * Immediately call create_booking (or create_proposal if they prefer to review first)!
+     * Celebrate the confirmation with their Booking ID, room details, and dates.
 
-3. Booking execution:
-   - When the user confirms they want to book a hotel or tour package, use your create_booking tool to make the reservation.
-   - If the traveler prefers a price quote with a confirmation button to review first, use create_proposal.
-   - Once booked, share their confirmed booking ID, dates, and total price in LKR.
+3. Live Verified Data:
+   - Never invent hotels or prices; only use data returned by search_hotels, get_hotel_details, or search_packages.
+   - If a search for a specific location returns few or no results, automatically search all of Sri Lanka to recommend the best alternatives.
 
-4. Existing bookings:
-   - If the user asks about their reservations, active trips, or booking status, use get_my_bookings.
+4. Existing Trips:
+   - If the user asks about their reservations or trips, call get_my_bookings.
 
-5. Tone & Formatting:
-   - Friendly, polite, and helpful. Use readable markdown with bold text (**Hotel Name**, dates, and prices).
+5. Tone & Style:
+   - Warm, enthusiastic, articulate, and conversational. Use readable markdown bolding for property names, dates, and prices.
 """;
 
         var llmMessages = BuildAlternatingMessages(systemInstruction, history);
@@ -485,26 +490,43 @@ Conversation Style:
     {
         try
         {
-            using var doc = JsonDocument.Parse(argumentsJson);
-            var root = doc.RootElement;
-            var location = root.TryGetProperty("location", out var loc) ? loc.GetString() : null;
-            var guests = root.TryGetProperty("guests", out var g) && g.TryGetInt32(out var gi) ? gi : 1;
-
-            var results = await _hotelService.SearchAsync(caller, new HotelSearchQuery
+            string? location = null;
+            int guests = 1;
+            if (!string.IsNullOrWhiteSpace(argumentsJson))
             {
-                City = location,
-                Q = location,
-                Guests = guests > 0 ? guests : 1
-            }, cancellationToken);
+                using var doc = JsonDocument.Parse(argumentsJson);
+                var root = doc.RootElement;
+                if (root.TryGetProperty("location", out var loc)) location = loc.GetString();
+                if (root.TryGetProperty("guests", out var g) && g.TryGetInt32(out var gi)) guests = gi > 0 ? gi : 1;
+            }
 
-            if (results.Count == 0 && !string.IsNullOrWhiteSpace(location))
+            List<HotelDto> results;
+            if (string.IsNullOrWhiteSpace(location))
             {
-                var all = await _hotelService.SearchAsync(caller, new HotelSearchQuery(), cancellationToken);
-                results = all.Where(h =>
-                    (h.City != null && h.City.Contains(location, StringComparison.OrdinalIgnoreCase)) ||
-                    (h.Name != null && h.Name.Contains(location, StringComparison.OrdinalIgnoreCase)) ||
-                    (h.Address != null && h.Address.Contains(location, StringComparison.OrdinalIgnoreCase))
-                ).ToList();
+                results = await _hotelService.SearchAsync(caller, new HotelSearchQuery { Guests = guests }, cancellationToken);
+            }
+            else
+            {
+                results = await _hotelService.SearchAsync(caller, new HotelSearchQuery
+                {
+                    City = location,
+                    Q = location,
+                    Guests = guests
+                }, cancellationToken);
+
+                if (results.Count == 0)
+                {
+                    var all = await _hotelService.SearchAsync(caller, new HotelSearchQuery(), cancellationToken);
+                    results = all.Where(h =>
+                        (h.City != null && h.City.Contains(location, StringComparison.OrdinalIgnoreCase)) ||
+                        (h.Name != null && h.Name.Contains(location, StringComparison.OrdinalIgnoreCase)) ||
+                        (h.Address != null && h.Address.Contains(location, StringComparison.OrdinalIgnoreCase))
+                    ).ToList();
+                    if (results.Count == 0)
+                    {
+                        results = all;
+                    }
+                }
             }
 
             var list = results.Take(5).Select(h => new
@@ -552,7 +574,7 @@ Conversation Style:
             if (!string.IsNullOrWhiteSpace(location))
             {
                 var term = location.Trim();
-                queryable = queryable.Where(p => EF.Functions.ILike(p.Destination.Name, $"%{term}%") || EF.Functions.ILike(p.Destination.City, $"%{term}%"));
+                queryable = queryable.Where(p => EF.Functions.ILike(p.Destination.Name, $"%{term}%") || EF.Functions.ILike(p.Destination.Country, $"%{term}%"));
             }
 
             if (!string.IsNullOrWhiteSpace(query))
@@ -783,12 +805,24 @@ Conversation Style:
                 var expiresAt = _clock.GetUtcNow().UtcDateTime.AddMinutes(Math.Max(5, _aiOptions.BookingProposalMinutes));
                 var token = GenerateProposalToken(roomId, null, quote.CheckIn, quote.CheckOut, quote.Guests, quote.TotalPrice, expiresAt);
 
+                string hotelName = "Hotel Accommodation";
+                string roomName = "Selected Room";
+                if (_context != null)
+                {
+                    var roomEntity = await _context.Rooms.Include(r => r.Hotel).FirstOrDefaultAsync(r => r.Id == roomId, cancellationToken);
+                    if (roomEntity != null)
+                    {
+                        hotelName = roomEntity.Hotel?.Name ?? hotelName;
+                        roomName = roomEntity.Name;
+                    }
+                }
+
                 var proposal = new BookingProposalDto
                 {
                     Kind = "hotel",
                     RoomId = roomId,
-                    HotelName = quote.HotelName,
-                    RoomName = quote.RoomName,
+                    HotelName = hotelName,
+                    RoomName = roomName,
                     CheckIn = quote.CheckIn,
                     CheckOut = quote.CheckOut,
                     Nights = quote.Nights,
@@ -801,8 +835,8 @@ Conversation Style:
                 return (JsonSerializer.Serialize(new
                 {
                     success = true,
-                    hotel_name = quote.HotelName,
-                    room_name = quote.RoomName,
+                    hotel_name = hotelName,
+                    room_name = roomName,
                     total_price = quote.TotalPrice,
                     nights = quote.Nights,
                     check_in = quote.CheckIn.ToString("yyyy-MM-dd"),

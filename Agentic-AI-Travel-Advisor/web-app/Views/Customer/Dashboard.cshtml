@@ -130,7 +130,7 @@
                                             <div>
                                                 <h5 class="fw-bold text-dark mb-1" style="font-size: 1.05rem;">@title</h5>
                                                 <p class="text-muted small mb-0">
-                                                    @b.CheckIn.ToString("MMM dd, yyyy") @(b.CheckOut.HasValue ? $"→ {b.CheckOut.Value:MMM dd, yyyy}" : "") &bull; @b.Guests guest(s)
+                                                    @b.CheckIn.ToString("MMM dd, yyyy") &rarr; @b.CheckOut.ToString("MMM dd, yyyy") &bull; @b.Guests guest(s)
                                                 </p>
                                             </div>
                                             <div class="text-end">
