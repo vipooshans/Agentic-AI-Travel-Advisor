@@ -18,7 +18,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final _controller = TextEditingController();
   final _scroll = ScrollController();
 
-  static const _starter = 'Plan a 3-day trip to Ella under Rs. 50,000.';
+  static const starter = 'Plan a 3-day trip to Ella under Rs. 50,000.';
 
   @override
   void dispose() {
@@ -255,8 +255,8 @@ class _EmptyState extends StatelessWidget {
               children: [
                 ActionChip(
                   avatar: const Icon(Icons.auto_awesome, size: 18),
-                  label: const Text('Plan a 3-day trip to Ella under Rs. 50,000.'),
-                  onPressed: () => onStarter('Plan a 3-day trip to Ella under Rs. 50,000.'),
+                  label: const Text(_ChatScreenState.starter),
+                  onPressed: () => onStarter(_ChatScreenState.starter),
                 ),
                 ActionChip(
                   avatar: const Icon(Icons.hotel_outlined, size: 18),
