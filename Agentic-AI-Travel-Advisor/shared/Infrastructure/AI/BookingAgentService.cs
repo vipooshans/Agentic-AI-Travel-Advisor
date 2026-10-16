@@ -217,6 +217,8 @@ public class BookingAgentService : IBookingAgentService
             {
                 if (_llmClient.IsConfigured)
                 {
+                    _logger.LogInformation("Processing booking prompt with AI Provider: {Provider}, Model: {Model}, BaseUrl: {BaseUrl}",
+                        _aiOptions.Provider, _aiOptions.Model, _aiOptions.BaseUrl);
                     response = await ProcessWithLlmAsync(caller, conv, history, cancellationToken);
                 }
                 else
@@ -228,14 +230,13 @@ public class BookingAgentService : IBookingAgentService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to communicate with LLM for prompt '{Prompt}'", currentPrompt);
-                var errDetail = ex.Message;
-                if (errDetail.Length > 200) errDetail = errDetail[..200] + "...";
+                _logger.LogError(ex, "Failed to communicate with LLM for prompt '{Prompt}' (Provider: {Provider}, Model: {Model})",
+                    currentPrompt, _aiOptions.Provider, _aiOptions.Model);
                 response = new BookingAgentPromptResponse
                 {
                     ConversationId = conv?.Id ?? 0,
                     ActionType = "chat",
-                    Message = $"Sorry, I'm having trouble right now ({errDetail}). Please try again."
+                    Message = "The assistant is busy right now, please try again in a moment."
                 };
             }
         }
@@ -280,7 +281,9 @@ public class BookingAgentService : IBookingAgentService
 
         // Filter out empty messages and error notices
         var valid = history
-            .Where(m => !string.IsNullOrWhiteSpace(m.Content) && !m.Content.StartsWith("Sorry, I'm having trouble right now"))
+            .Where(m => !string.IsNullOrWhiteSpace(m.Content)
+                     && !m.Content.StartsWith("The assistant is busy right now", StringComparison.OrdinalIgnoreCase)
+                     && !m.Content.StartsWith("Sorry,", StringComparison.OrdinalIgnoreCase))
             .TakeLast(20)
             .ToList();
 
