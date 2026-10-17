@@ -196,6 +196,79 @@
 			],
 			"isBackground": false,
 			"problemMatcher": []
+		},
+		{
+			"label": "Temporary TravelAdvisor solution build",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"Agentic-AI-Travel-Advisor\\TravelAdvisor.slnx"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Temporary API and web forced rebuild",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"compose",
+				"-f",
+				"Agentic-AI-Travel-Advisor\\docker-compose.yml",
+				"--project-directory",
+				"Agentic-AI-Travel-Advisor",
+				"up",
+				"-d",
+				"--build",
+				"--force-recreate",
+				"api",
+				"web"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Temporary run AI unit tests in SDK container",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"run",
+				"--rm",
+				"-v",
+				"E:\\Ajay\\project\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor:/src",
+				"-w",
+				"/src",
+				"mcr.microsoft.com/dotnet/sdk:8.0",
+				"dotnet",
+				"test",
+				"tests/TravelAdvisor.UnitTests/TravelAdvisor.UnitTests.csproj",
+				"--filter",
+				"FullyQualifiedName~TravelAdvisor.UnitTests.AI"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Temporary rerun AI unit tests in SDK container",
+			"type": "shell",
+			"command": "docker",
+			"args": [
+				"run",
+				"--rm",
+				"-v",
+				"E:\\Ajay\\project\\Agentic-AI-Travel-Advisor\\Agentic-AI-Travel-Advisor:/src",
+				"-w",
+				"/src",
+				"mcr.microsoft.com/dotnet/sdk:8.0",
+				"dotnet",
+				"test",
+				"tests/TravelAdvisor.UnitTests/TravelAdvisor.UnitTests.csproj",
+				"--filter",
+				"FullyQualifiedName~TravelAdvisor.UnitTests.AI"
+			],
+			"isBackground": false,
+			"problemMatcher": []
 		}
 	]
 }

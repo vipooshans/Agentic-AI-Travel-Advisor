@@ -166,6 +166,18 @@
                                     }
                                 </div>
                             }
+
+                            @if (msg.Suggestions.Count > 0)
+                            {
+                                <div class="d-flex flex-wrap gap-2 mt-3">
+                                    @foreach (var suggestion in msg.Suggestions)
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill py-1 px-3" data-chat-prompt="@suggestion.Prompt">
+                                            @suggestion.Label
+                                        </button>
+                                    }
+                                </div>
+                            }
                         </div>
                     </div>
                 }
@@ -359,6 +371,10 @@
         var stream = document.getElementById('bookingChatStream');
         if (stream) {
             stream.scrollTop = stream.scrollHeight;
+            stream.addEventListener('click', function(e) {
+                var button = e.target.closest('[data-chat-prompt]');
+                if (button) sendPrompt(button.getAttribute('data-chat-prompt'));
+            });
         }
     });
 
@@ -597,7 +613,7 @@
                                (s.type === 'budget_up' ? 'btn-outline-warning text-dark' :
                                (s.type === 'place_change' ? 'btn-outline-info text-dark' : 'btn-outline-secondary'));
                 innerContent += `
-                    <button type="button" class="btn btn-sm ${btnClass} rounded-pill py-1 px-3" style="font-size: 0.8rem;" onclick="sendPrompt('${escapeHtml(s.prompt)}')">
+                    <button type="button" class="btn btn-sm ${btnClass} rounded-pill py-1 px-3" style="font-size: 0.8rem;" data-chat-prompt="${escapeHtml(s.prompt)}">
                         ${escapeHtml(s.label)}
                     </button>`;
             });

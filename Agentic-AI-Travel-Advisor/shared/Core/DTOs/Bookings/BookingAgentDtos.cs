@@ -64,6 +64,7 @@ public class BookingAgentMessageDto
     public BookingProposalDto? Proposal { get; set; }
     public CancellationPreviewDto? Cancellation { get; set; }
     public BookingDto? Booking { get; set; }
+    public List<BookingSuggestionDto> Suggestions { get; set; } = [];
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 }
 

@@ -70,75 +70,20 @@ public static class DependencyInjection
         AddApplicationServices(services);
         services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 
-        services.Configure<AI.AiOptions>(options =>
-        {
-            configuration.GetSection(AI.AiOptions.SectionName).Bind(options);
-
-            // Normalize provider (defaults to "OpenAI")
-            var provider = string.IsNullOrWhiteSpace(options.Provider) ? "OpenAI" : options.Provider.Trim();
-            options.Provider = provider;
-
-            // Resolve API key from config, then generic AI_API_KEY, then provider-specific env vars
-            if (string.IsNullOrWhiteSpace(options.ApiKey))
-            {
-                options.ApiKey = Environment.GetEnvironmentVariable("AI_API_KEY") ?? string.Empty;
-            }
-
-            if (string.IsNullOrWhiteSpace(options.ApiKey))
-            {
-                if (string.Equals(provider, "OpenAI", StringComparison.OrdinalIgnoreCase))
-                    options.ApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY") ?? string.Empty;
-                else if (string.Equals(provider, "Gemini", StringComparison.OrdinalIgnoreCase))
-                    options.ApiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY") ?? string.Empty;
-                else if (string.Equals(provider, "Claude", StringComparison.OrdinalIgnoreCase))
-                    options.ApiKey = Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY") ?? string.Empty;
-            }
-
-            // Provider-specific default BaseUrl and Model (only applied if not explicitly configured)
-            if (string.Equals(provider, "OpenAI", StringComparison.OrdinalIgnoreCase))
-            {
-                if (string.IsNullOrWhiteSpace(options.BaseUrl))
-                    options.BaseUrl = "https://api.openai.com/v1";
-                if (string.IsNullOrWhiteSpace(options.Model))
-                    options.Model = "gpt-4o-mini";
-            }
-            else if (string.Equals(provider, "Gemini", StringComparison.OrdinalIgnoreCase))
-            {
-                if (string.IsNullOrWhiteSpace(options.BaseUrl))
-                    options.BaseUrl = "https://generativelanguage.googleapis.com/v1beta/openai/";
-                if (string.IsNullOrWhiteSpace(options.Model))
-                    options.Model = "gemini-2.5-flash"; // Stable production model
-            }
-            else if (string.Equals(provider, "Claude", StringComparison.OrdinalIgnoreCase))
-            {
-                if (string.IsNullOrWhiteSpace(options.BaseUrl))
-                    options.BaseUrl = "https://api.anthropic.com/v1/messages";
-                if (string.IsNullOrWhiteSpace(options.Model))
-                    options.Model = "claude-3-5-haiku-20241022";
-            }
-
-            options.TimeoutSeconds = Math.Clamp(options.TimeoutSeconds > 0 ? options.TimeoutSeconds : 30, 5, 300);
-            options.Temperature = 0.8;
-        });
+        services.Configure<AI.AiOptions>(configuration.GetSection(AI.AiOptions.SectionName));
 
         services.AddSingleton<AI.LlmAvailability>();
 
-        // Register distinct provider clients
-        services.AddHttpClient<AI.OpenAiLlmClient>();
-        services.AddHttpClient<AI.GeminiLlmClient>();
-        services.AddHttpClient<AI.ClaudeLlmClient>();
         services.AddHttpClient<AI.OpenAiCompatClient>();
+        services.AddHttpClient<AI.ClaudeLlmClient>();
 
-        // Resolve ILlmClient dynamically based on Ai:Provider setting
         services.AddTransient<ILlmClient>(sp =>
         {
             var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<AI.AiOptions>>().Value;
             var provider = options.Provider?.Trim();
-            if (string.Equals(provider, "Gemini", StringComparison.OrdinalIgnoreCase))
-                return sp.GetRequiredService<AI.GeminiLlmClient>();
             if (string.Equals(provider, "Claude", StringComparison.OrdinalIgnoreCase))
                 return sp.GetRequiredService<AI.ClaudeLlmClient>();
-            return sp.GetRequiredService<AI.OpenAiLlmClient>();
+            return sp.GetRequiredService<AI.OpenAiCompatClient>();
         });
         services.AddScoped<ICatalogTools, AI.CatalogTools>();
         services.AddSingleton<AI.Safety.OutputSanitizer>();

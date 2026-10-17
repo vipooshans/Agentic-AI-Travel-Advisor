@@ -27,15 +27,11 @@ public class OpenAiCompatClient : ILlmClient
     }
 
     /// <summary>True when an API key is present in configuration or environment.</summary>
-    public bool IsConfigured => !string.IsNullOrWhiteSpace(_options.ApiKey);
+    public bool IsConfigured => !string.IsNullOrWhiteSpace(_options.ApiKey) && !_availability.IsSuspended;
 
     private bool IsAnthropic =>
         (!string.IsNullOrWhiteSpace(_options.ApiKey) && _options.ApiKey.Trim().StartsWith("sk-ant-", StringComparison.OrdinalIgnoreCase))
         || (!string.IsNullOrWhiteSpace(_options.BaseUrl) && _options.BaseUrl.Contains("anthropic.com", StringComparison.OrdinalIgnoreCase));
-
-    private bool IsOpenAi =>
-        (!string.IsNullOrWhiteSpace(_options.ApiKey) && (_options.ApiKey.Trim().StartsWith("sk-proj-", StringComparison.OrdinalIgnoreCase) || (_options.ApiKey.Trim().StartsWith("sk-", StringComparison.OrdinalIgnoreCase) && !_options.ApiKey.Trim().StartsWith("sk-ant-", StringComparison.OrdinalIgnoreCase))))
-        || (!string.IsNullOrWhiteSpace(_options.BaseUrl) && _options.BaseUrl.Contains("api.openai.com", StringComparison.OrdinalIgnoreCase));
 
     public async Task<string> CompleteAsync(
         string systemPrompt,
@@ -178,75 +174,71 @@ public class OpenAiCompatClient : ILlmClient
             throw new InvalidOperationException("AI API key is not configured.");
 
         var key = _options.ApiKey.Trim();
-        var url = $"{_options.BaseUrl.TrimEnd('/')}/chat/completions";
-
-        var modelsToTry = new List<string>();
-        if (!string.IsNullOrWhiteSpace(_options.Model))
-        {
-            modelsToTry.Add(_options.Model.Trim());
-        }
-
-        if (IsOpenAi)
-        {
-            modelsToTry.Add("gpt-4o-mini");
-            modelsToTry.Add("gpt-4o");
-            modelsToTry.Add("gpt-3.5-turbo");
-        }
-        else
-        {
-            modelsToTry.Add("gemini-3.5-flash");
-            modelsToTry.Add("gemini-3.5-flash-lite");
-            modelsToTry.Add("gemini-3.7-flash");
-        }
-
-        modelsToTry = modelsToTry.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-
-        string lastErrorBody = string.Empty;
+        var baseUrl = string.IsNullOrWhiteSpace(_options.BaseUrl)
+            ? "https://api.openai.com/v1"
+            : _options.BaseUrl.TrimEnd('/');
+        var url = SafeLogUrl($"{baseUrl}/chat/completions");
+        var logUrl = url;
+        var modelName = string.IsNullOrWhiteSpace(_options.Model) ? "gpt-4o-mini" : _options.Model.Trim();
+        payload["model"] = modelName;
+        var retryDelays = new[] { 1000, 2000, 4000 };
         HttpStatusCode lastStatusCode = HttpStatusCode.InternalServerError;
 
-        foreach (var modelName in modelsToTry)
+        for (var attempt = 1; attempt <= retryDelays.Length + 1; attempt++)
         {
-            for (var attempt = 1; attempt <= 3; attempt++)
+            using var request = new HttpRequestMessage(HttpMethod.Post, url);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
+            if (url.Contains("generativelanguage.googleapis.com", StringComparison.OrdinalIgnoreCase))
             {
-                payload["model"] = modelName;
-                using var request = new HttpRequestMessage(HttpMethod.Post, url);
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
-                if (!IsOpenAi)
-                {
-                    request.Headers.TryAddWithoutValidation("x-goog-api-key", key);
-                }
-                request.Content = new StringContent(payload.ToJsonString(), Encoding.UTF8, "application/json");
-
-                _logger.LogInformation("Sending LLM request to {Url} with model {Model} (attempt {Attempt})", url, modelName, attempt);
-
-                using var response = await _http.SendAsync(request, cancellationToken);
-                var body = await response.Content.ReadAsStringAsync(cancellationToken);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return JsonDocument.Parse(body);
-                }
-
-                lastStatusCode = response.StatusCode;
-                lastErrorBody = body;
-
-                _logger.LogWarning("LLM request for model {Model} returned {Status}: {Body}",
-                    modelName, (int)response.StatusCode, body.Length > 200 ? body[..200] : body);
-
-                if (response.StatusCode == HttpStatusCode.ServiceUnavailable || (int)response.StatusCode == 429)
-                {
-                    await Task.Delay(1000 * attempt, cancellationToken);
-                    continue;
-                }
-
-                break;
+                request.Headers.TryAddWithoutValidation("x-goog-api-key", key);
             }
+            request.Content = new StringContent(payload.ToJsonString(), Encoding.UTF8, "application/json");
+
+            _logger.LogInformation("Sending LLM request to {ProviderUrl} with model {Model} (attempt {Attempt})",
+                logUrl, modelName, attempt);
+
+            using var response = await _http.SendAsync(request, cancellationToken);
+            if (response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync(cancellationToken);
+                return JsonDocument.Parse(body);
+            }
+
+            lastStatusCode = response.StatusCode;
+            _logger.LogWarning("LLM request to {ProviderUrl} for model {Model} returned status code {StatusCode}",
+                logUrl, modelName, (int)lastStatusCode);
+
+            if (lastStatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
+                _availability.Suspend();
+
+            var retryable = lastStatusCode is HttpStatusCode.TooManyRequests
+                or HttpStatusCode.BadGateway
+                or HttpStatusCode.ServiceUnavailable
+                or HttpStatusCode.GatewayTimeout;
+            if (!retryable || attempt > retryDelays.Length)
+                break;
+
+            await Task.Delay(retryDelays[attempt - 1], cancellationToken);
         }
 
-        _logger.LogError("All LLM model attempts failed. Last status: {Status}, body: {Body}",
-            (int)lastStatusCode, lastErrorBody);
+        _logger.LogError("LLM request to {ProviderUrl} for model {Model} failed with status code {StatusCode}",
+            logUrl, modelName, (int)lastStatusCode);
+        throw new HttpRequestException($"LLM request failed with status code {(int)lastStatusCode}.", null, lastStatusCode);
+    }
 
-        throw new HttpRequestException($"LLM request failed ({(int)lastStatusCode}): {lastErrorBody}", null, lastStatusCode);
+    private static string SafeLogUrl(string url)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            return url;
+
+        var safeUri = new UriBuilder(uri)
+        {
+            Query = string.Empty,
+            Fragment = string.Empty,
+            UserName = string.Empty,
+            Password = string.Empty
+        };
+        return safeUri.Uri.AbsoluteUri;
     }
 
     private async Task<LlmToolResponse> ChatWithToolsAnthropicAsync(

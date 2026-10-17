@@ -6,6 +6,7 @@ using TravelAdvisor.Core.Common;
 using TravelAdvisor.Core.DTOs.Bookings;
 using TravelAdvisor.Core.DTOs.Hotels;
 using TravelAdvisor.Core.DTOs.Packages;
+using TravelAdvisor.Core.DTOs.Settings;
 using TravelAdvisor.Core.Enums;
 using TravelAdvisor.Core.Interfaces;
 using TravelAdvisor.Core.Interfaces.Services;
@@ -23,10 +24,13 @@ public class BookingAgentServiceTests
     private readonly Mock<ILlmClient> _llmClientMock = new();
     private readonly TimeProvider _clock = TimeProvider.System;
     private readonly IOptions<AiOptions> _options = Options.Create(new AiOptions { BookingProposalMinutes = 15 });
-    private readonly UserContext _caller = new("traveler-1", "traveler@test.com", "Traveler", RoleNames.User);
+    private readonly UserContext _caller = new("traveler-1", RoleNames.User);
 
     private BookingAgentService CreateService()
     {
+        _settingsMock.Setup(settings => settings.GetPublicAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PublicSettingsDto { GuestCancellationCutoffHours = 48 });
+
         return new BookingAgentService(
             null,
             _bookingMock.Object,
@@ -56,9 +60,6 @@ public class BookingAgentServiceTests
 
         _bookingMock.Setup(b => b.GetAsync(It.IsAny<UserContext>(), 15, It.IsAny<CancellationToken>()))
             .ReturnsAsync(booking);
-        _settingsMock.Setup(s => s.GetIntAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(48);
-
         var service = CreateService();
         var response = await service.ProcessPromptAsync(_caller, new BookingAgentPromptRequest
         {
@@ -92,9 +93,6 @@ public class BookingAgentServiceTests
 
         _bookingMock.Setup(b => b.ListAsync(It.IsAny<UserContext>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(bookings);
-        _settingsMock.Setup(s => s.GetIntAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(48);
-
         var service = CreateService();
         var response = await service.ProcessPromptAsync(_caller, new BookingAgentPromptRequest
         {
@@ -139,9 +137,9 @@ public class BookingAgentServiceTests
             TotalPrice = 100000m
         };
 
-        _hotelMock.Setup(h => h.SearchAsync(It.IsAny<HotelSearchQuery>(), It.IsAny<CancellationToken>()))
+        _hotelMock.Setup(h => h.SearchAsync(It.IsAny<UserContext>(), It.IsAny<HotelSearchQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(hotels);
-        _hotelMock.Setup(h => h.GetAsync(null, 1, It.IsAny<CancellationToken>()))
+        _hotelMock.Setup(h => h.GetAsync(It.IsAny<UserContext>(), 1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(hotelDetail);
         _bookingMock.Setup(b => b.CheckAvailabilityAsync(It.IsAny<UserContext>(), It.IsAny<AvailabilityQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(quote);
@@ -160,6 +158,8 @@ public class BookingAgentServiceTests
         Assert.Equal(10, response.Proposal.RoomId);
         Assert.Equal(100000m, response.Proposal.TotalPrice);
         Assert.False(string.IsNullOrWhiteSpace(response.Proposal.ProposalToken));
+        Assert.Equal(1, response.Proposal.HotelId);
+        _bookingMock.Verify(b => b.CreateAsync(It.IsAny<UserContext>(), It.IsAny<CreateBookingRequest>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -173,11 +173,10 @@ public class BookingAgentServiceTests
             Prompt = "I want to book a hotel"
         });
 
-        Assert.Equal("info", response.ActionType);
-        Assert.Contains("hotel or destination", response.Message);
-        Assert.Contains("check-in date", response.Message);
-        Assert.Contains("check-out date", response.Message);
-        Assert.Contains("number of guests", response.Message);
+        Assert.Equal("chat", response.ActionType);
+        Assert.Contains("Where in Sri Lanka", response.Message);
+        Assert.DoesNotContain("check-out", response.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("guests", response.Message, StringComparison.OrdinalIgnoreCase);
         _hotelMock.Verify(h => h.SearchAsync(It.IsAny<UserContext>(), It.IsAny<HotelSearchQuery>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -199,8 +198,8 @@ public class BookingAgentServiceTests
         });
 
         Assert.Equal("info", response.ActionType);
-        Assert.Contains("can't reach the AI model", response.Message);
-        Assert.Contains("hotel or destination", response.Message);
+        Assert.Contains("Where in Sri Lanka", response.Message);
+        Assert.DoesNotContain("basic booking assistance", response.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

@@ -188,6 +188,9 @@ and truncated before it is passed to the model, so a listing cannot smuggle inst
 - `LlmAvailability`: when the provider rejects the key with 401 or 403, LLM calls are suspended for 10 minutes so
   every chat turn does not wait for a doomed request (DEF-026).
 - Admins can switch the assistant off with the `Ai.AssistantEnabled` setting; chat then returns 503.
+- The traveler dashboard's booking concierge uses a separate conversational slot-filling fallback when
+  no model key is configured or a model call fails. It preserves recent conversation context and only
+  returns availability-checked proposals; reservation creation remains behind the explicit confirm endpoint.
 
 ## Clients
 

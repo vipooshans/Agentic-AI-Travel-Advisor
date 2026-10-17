@@ -39,7 +39,6 @@ public class OpenAiCompatClientTests
 
     [Theory]
     [InlineData(HttpStatusCode.InternalServerError)]
-    [InlineData(HttpStatusCode.TooManyRequests)]
     [InlineData(HttpStatusCode.BadRequest)]
     public async Task Transient_or_request_errors_do_not_suspend(HttpStatusCode failure)
     {
@@ -51,6 +50,34 @@ public class OpenAiCompatClientTests
         Assert.True(llm.IsConfigured);
         await Assert.ThrowsAsync<HttpRequestException>(() => llm.CompleteAsync("system", "user"));
         Assert.Equal(2, handler.Calls);
+    }
+
+    [Theory]
+    [InlineData(HttpStatusCode.TooManyRequests)]
+    [InlineData(HttpStatusCode.BadGateway)]
+    [InlineData(HttpStatusCode.ServiceUnavailable)]
+    [InlineData(HttpStatusCode.GatewayTimeout)]
+    public async Task Retries_transient_provider_statuses(HttpStatusCode failure)
+    {
+        var handler = new StubHandler(failure) { SucceedAfterCall = 2 };
+        var llm = Client(handler, new LlmAvailability(new ManualClock()));
+
+        Assert.Equal("ok", await llm.CompleteAsync("system", "user"));
+
+        Assert.Equal(2, handler.Calls);
+    }
+
+    [Fact]
+    public async Task Retries_at_most_four_times_and_does_not_expose_provider_error_body()
+    {
+        var handler = new StubHandler(HttpStatusCode.ServiceUnavailable);
+        var llm = Client(handler, new LlmAvailability(new ManualClock()));
+
+        var error = await Assert.ThrowsAsync<HttpRequestException>(() => llm.CompleteAsync("system", "user"));
+
+        Assert.Equal(4, handler.Calls);
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, error.StatusCode);
+        Assert.DoesNotContain("rejected", error.Message);
     }
 
     [Fact]
@@ -77,6 +104,25 @@ public class OpenAiCompatClientTests
         Assert.False(llm.IsConfigured);
     }
 
+    [Fact]
+    public async Task Google_api_key_header_is_only_added_for_google_provider_urls()
+    {
+        var googleHandler = new StubHandler(HttpStatusCode.OK);
+        var googleClient = new OpenAiCompatClient(
+            new HttpClient(googleHandler),
+            Options.Create(new AiOptions { ApiKey = "test-key", BaseUrl = "https://generativelanguage.googleapis.com/v1beta/openai" }),
+            new LlmAvailability(new ManualClock()),
+            NullLogger<OpenAiCompatClient>.Instance);
+        await googleClient.CompleteAsync("system", "user");
+
+        var regularHandler = new StubHandler(HttpStatusCode.OK);
+        var regularClient = Client(regularHandler, new LlmAvailability(new ManualClock()));
+        await regularClient.CompleteAsync("system", "user");
+
+        Assert.True(googleHandler.SawGoogleApiKeyHeader);
+        Assert.False(regularHandler.SawGoogleApiKeyHeader);
+    }
+
     private static OpenAiCompatClient Client(StubHandler handler, LlmAvailability availability) =>
         new(new HttpClient(handler), Options.Create(new AiOptions { ApiKey = "test-key", BaseUrl = "https://llm.test/v1" }),
             availability, NullLogger<OpenAiCompatClient>.Instance);
@@ -85,12 +131,16 @@ public class OpenAiCompatClientTests
     {
         public HttpStatusCode Status { get; set; } = status;
         public int Calls { get; private set; }
+        public int SucceedAfterCall { get; set; } = int.MaxValue;
+        public bool SawGoogleApiKeyHeader { get; private set; }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             Calls++;
-            var body = Status == HttpStatusCode.OK ? Completion : """{"error":{"message":"rejected"}}""";
-            return Task.FromResult(new HttpResponseMessage(Status) { Content = new StringContent(body) });
+            SawGoogleApiKeyHeader |= request.Headers.Contains("x-goog-api-key");
+            var responseStatus = Calls >= SucceedAfterCall ? HttpStatusCode.OK : Status;
+            var body = responseStatus == HttpStatusCode.OK ? Completion : """{"error":{"message":"rejected"}}""";
+            return Task.FromResult(new HttpResponseMessage(responseStatus) { Content = new StringContent(body) });
         }
     }
 

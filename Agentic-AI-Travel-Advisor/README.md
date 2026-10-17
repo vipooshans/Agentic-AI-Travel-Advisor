@@ -99,6 +99,11 @@ If the LLM provider fails, times out, rate limits, or if `Ai:ApiKey` is not conf
 - Uses regex and intent recognition to handle common commands (e.g., `"my bookings"`, `"show reservations"`, `"cancel booking 14"`, `"book hotel [id]"`).
 - Directly queries backend services without hallucinating or failing ungracefully.
 
+The traveler dashboard booking concierge (`POST /api/booking-agent/prompt`) uses a separate
+conversational fallback. It remembers recent destination, dates, and guest-count answers, asks for
+one missing detail at a time, and produces an availability-checked proposal. A booking is submitted
+only when the traveler reviews and submits that proposal.
+
 ### Configuration
 | Key / Environment Variable | Default | Purpose |
 |---|---|---|
