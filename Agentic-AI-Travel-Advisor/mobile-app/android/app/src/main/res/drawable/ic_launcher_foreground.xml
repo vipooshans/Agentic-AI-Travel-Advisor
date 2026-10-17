@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="1.25"
+        android:scaleY="1.25"
+        android:pivotX="54"
+        android:pivotY="54">
+        <!-- Globe Circle -->
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#38BDF8"
+            android:strokeWidth="2.5"
+            android:pathData="M54,34 A20,20 0 1,0 54,74 A20,20 0 1,0 54,34 Z" />
+        <!-- Globe Equator / Lat lines -->
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#38BDF8"
+            android:strokeWidth="1.8"
+            android:pathData="M34,54 L74,54" />
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#38BDF8"
+            android:strokeWidth="1.8"
+            android:pathData="M37,44 C42,48 66,48 71,44" />
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#38BDF8"
+            android:strokeWidth="1.8"
+            android:pathData="M37,64 C42,60 66,60 71,64" />
+        <!-- Globe Meridian -->
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#38BDF8"
+            android:strokeWidth="1.8"
+            android:pathData="M54,34 C44,40 44,68 54,74 C64,68 64,40 54,34 Z" />
+        <!-- Airplane -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M66,38 L63,44 L57,42 L59,47 L53,49 L49,46 L47,48 L50,52 L45,55 L42,54 L41,56 L44,58 L45,61 L47,60 L46,57 L51,54 L55,57 L57,55 L54,51 L59,47 L65,49 L68,46 L70,36 Z" />
+        <!-- Travel Pin / Star accent -->
+        <path
+            android:fillColor="#FBBF24"
+            android:pathData="M68,36 M67,33 L68.5,35.5 L71,36 L69,38 L69.5,40.5 L67,39 L64.5,40.5 L65,38 L63,36 L65.5,35.5 Z" />
+    </group>
+</vector>
